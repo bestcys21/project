@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// 개발 환경: 기업 프록시/인트라넷 SSL 인증서 우회
-if (process.env.NODE_ENV !== "production") {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-}
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+// 랭킹은 1시간 캐시 (Yahoo Finance 호출 최소화)
+export const revalidate = 3600;
 
 function getClient() {
   const YahooFinance = require("yahoo-finance2").default;
