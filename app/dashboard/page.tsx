@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getHoldings, addHolding, removeHolding } from "@/lib/storage";
+import { getHoldings, addHolding, removeHolding, getGoal, saveGoal } from "@/lib/storage";
 import { calcStackedMonthly, holdingsToDividendEvents } from "@/lib/calculator";
 import { Holding, Market, DividendEvent } from "@/lib/types";
 import DividendChart, { STOCK_COLORS } from "@/components/DividendChart";
@@ -10,18 +10,31 @@ import { SummaryCardSkeleton, ChartSkeleton, HoldingRowSkeleton } from "@/compon
 
 const TAX_RATE: Record<Market, number> = { KR: 0.154, US: 0.15 };
 
+type ApiEntry = {
+  dps: number;
+  dividendYield?: number | null;
+  exDate?: string | null;
+  paymentDate?: string | null;
+};
+
 export default function DashboardPage() {
-  const [holdings,   setHoldings]   = useState<Holding[]>([]);
-  const [apiData,    setApiData]    = useState<Record<string, { dps: number; exDate?: string | null; paymentDate?: string | null }>>({});
-  const [initLoading, setInitLoading] = useState(true);   // 첫 로드
-  const [apiLoading,  setApiLoading]  = useState(false);  // API 갱신
+  const [holdings,    setHoldings]    = useState<Holding[]>([]);
+  const [apiData,     setApiData]     = useState<Record<string, ApiEntry>>({});
+  const [initLoading, setInitLoading] = useState(true);
+  const [apiLoading,  setApiLoading]  = useState(false);
   const [form, setForm]     = useState({ ticker: "", name: "", market: "KR" as Market, quantity: "", purchaseDate: "" });
   const [formError, setFormError] = useState("");
   const [showForm,  setShowForm]  = useState(false);
 
+  // 목표 배당금
+  const [goalAmount,   setGoalAmount]   = useState<number | null>(null);
+  const [goalInput,    setGoalInput]    = useState("");
+  const [editingGoal,  setEditingGoal]  = useState(false);
+
   useEffect(() => {
     const h = getHoldings();
     setHoldings(h);
+    setGoalAmount(getGoal());
     if (h.length > 0) {
       fetchApiData(h).finally(() => setInitLoading(false));
     } else {
@@ -31,7 +44,7 @@ export default function DashboardPage() {
 
   async function fetchApiData(h: Holding[]) {
     setApiLoading(true);
-    const results: Record<string, { dps: number }> = {};
+    const results: Record<string, ApiEntry> = {};
     await Promise.allSettled(
       h.map(async (holding) => {
         const ticker = holding.market === "KR"
@@ -41,9 +54,14 @@ export default function DashboardPage() {
           const res  = await fetch(`/api/dividend?ticker=${encodeURIComponent(ticker)}`);
           const data = await res.json();
           if (!data.error && data.dps != null) {
-            results[holding.ticker] = { dps: data.dps };
+            results[holding.ticker] = {
+              dps:           data.dps,
+              dividendYield: data.dividendYield ?? null,
+              exDate:        data.exDate ?? null,
+              paymentDate:   data.paymentDate ?? null,
+            };
           }
-        } catch { /* 개별 종목 실패는 무시 */ }
+        } catch { /* 개별 종목 실패 무시 */ }
       })
     );
     setApiData(results);
@@ -79,12 +97,28 @@ export default function DashboardPage() {
     else setApiData({});
   }
 
+  function handleGoalSave() {
+    const v = parseFloat(goalInput.replace(/,/g, ""));
+    if (!isNaN(v) && v > 0) {
+      setGoalAmount(v);
+      saveGoal(v);
+    }
+    setEditingGoal(false);
+    setGoalInput("");
+  }
+
   const events = holdingsToDividendEvents(holdings, apiData);
   const { stackedData, tickers } = calcStackedMonthly(holdings, apiData);
-  const annualNet = stackedData.reduce((s, m) => s + m.total, 0);
-  const bestMonth = stackedData.reduce((a, b) => a.total > b.total ? a : b, stackedData[0] ?? { month: "-", total: 0 });
-  const nextEvent = getNextEvent(events);
-  const dday      = nextEvent ? getDday(nextEvent.paymentDate) : null;
+  const annualNet  = stackedData.reduce((s, m) => s + m.total, 0);
+  const bestMonth  = stackedData.reduce((a, b) => a.total > b.total ? a : b, stackedData[0] ?? { month: "-", total: 0 });
+  const nextEvent  = getNextEvent(events);
+  const dday       = nextEvent ? getDday(nextEvent.paymentDate) : null;
+
+  // 포트폴리오 평균 수익률 (배당금 가중 평균)
+  const avgYield = calcAvgYield(holdings, apiData, events);
+
+  // 목표 달성률
+  const goalProgress = goalAmount && goalAmount > 0 ? Math.min((annualNet / goalAmount) * 100, 100) : null;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-5">
@@ -100,14 +134,93 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <SummaryCard label="보유 종목"     value={`${holdings.length}개`} />
-          <SummaryCard label="연간 세후 배당" value={`${Math.round(annualNet).toLocaleString("ko-KR")}원`} highlight />
-          <SummaryCard label="최대 배당월"   value={bestMonth.total > 0 ? bestMonth.month : "-"} />
+          <SummaryCard label="보유 종목"       value={`${holdings.length}개`} />
+          <SummaryCard label="연간 세후 배당"  value={`${Math.round(annualNet).toLocaleString("ko-KR")}원`} highlight />
+          <SummaryCard label="평균 배당수익률" value={avgYield != null ? `${(avgYield * 100).toFixed(2)}%` : "-"} />
           <SummaryCard
             label="다음 배당 D-day"
             value={dday !== null ? (dday === 0 ? "오늘! 🎉" : `D-${dday}`) : "-"}
             highlight={dday !== null && dday <= 7}
           />
+        </div>
+      )}
+
+      {/* 연간 목표 배당금 게이지 */}
+      {!initLoading && (
+        <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[14px] font-bold text-toss-text">연간 목표 배당금</p>
+            <button
+              onClick={() => { setEditingGoal((v) => !v); setGoalInput(goalAmount ? Math.round(goalAmount).toString() : ""); }}
+              className="text-[12px] font-semibold text-toss-blue bg-blue-50 px-3 py-1.5 rounded-xl hover:bg-blue-100 transition-colors"
+            >
+              {goalAmount ? "수정" : "목표 설정"}
+            </button>
+          </div>
+
+          {editingGoal && (
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <input
+                  type="number"
+                  placeholder="연간 목표 금액 (원)"
+                  value={goalInput}
+                  onChange={(e) => setGoalInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleGoalSave()}
+                  className="toss-input pr-6 text-[13px]"
+                />
+                <span className="absolute inset-y-0 right-3 flex items-center text-[13px] text-toss-sub pointer-events-none">원</span>
+              </div>
+              <button onClick={handleGoalSave}
+                className="px-4 py-2 bg-toss-blue text-white font-bold text-[13px] rounded-xl hover:bg-toss-blueDark transition-colors">
+                저장
+              </button>
+            </div>
+          )}
+
+          {goalAmount ? (
+            <div className="space-y-2">
+              <div className="flex justify-between text-[13px]">
+                <span className="text-toss-label font-medium">
+                  달성: <span className="text-toss-blue font-bold">{Math.round(annualNet).toLocaleString("ko-KR")}원</span>
+                </span>
+                <span className="text-toss-sub">
+                  목표: {Math.round(goalAmount).toLocaleString("ko-KR")}원
+                </span>
+              </div>
+              <div className="h-3 bg-toss-bg rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${goalProgress ?? 0}%`,
+                    background: (goalProgress ?? 0) >= 100
+                      ? "#22c55e"
+                      : (goalProgress ?? 0) >= 60
+                        ? "#3182F6"
+                        : "#f59e0b",
+                  }}
+                />
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-[12px] text-toss-sub">
+                  {(goalProgress ?? 0) >= 100
+                    ? "🎉 목표 달성!"
+                    : `남은 금액: ${Math.round(Math.max(goalAmount - annualNet, 0)).toLocaleString("ko-KR")}원`}
+                </span>
+                <span className={`text-[14px] font-extrabold ${
+                  (goalProgress ?? 0) >= 100 ? "text-green-500" :
+                  (goalProgress ?? 0) >= 60  ? "text-toss-blue" : "text-amber-500"
+                }`}>
+                  {(goalProgress ?? 0).toFixed(1)}%
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-4 space-y-1">
+              <p className="text-3xl">🎯</p>
+              <p className="text-[13px] text-toss-sub">연간 목표 배당금을 설정하면 달성률을 확인할 수 있어요.</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -198,9 +311,10 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-1">
               {events.map((e, i) => {
-                const color    = STOCK_COLORS[i % STOCK_COLORS.length];
-                const isLive   = !!apiData[e.ticker];
-                const ddayVal  = getDday(e.paymentDate);
+                const color       = STOCK_COLORS[i % STOCK_COLORS.length];
+                const isLive      = !!apiData[e.ticker];
+                const ddayVal     = getDday(e.paymentDate);
+                const yieldRate   = apiData[e.ticker]?.dividendYield ?? null;
                 return (
                   <div key={e.holdingId} className="flex items-center justify-between py-3 border-b border-toss-border last:border-0">
                     <div className="flex items-center gap-3">
@@ -213,14 +327,23 @@ export default function DashboardPage() {
                           <p className="text-[14px] font-bold text-toss-text">{e.name}</p>
                           {isLive && <span className="text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full">실시간</span>}
                         </div>
-                        <p className="text-[12px] text-toss-sub">
-                          {e.quantity.toLocaleString()}주 · {e.market}
-                          {ddayVal >= 0 && ddayVal <= 30 && (
-                            <span className="ml-1.5 text-toss-blue font-semibold">
-                              · D-{ddayVal}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-[12px] text-toss-sub">
+                            {e.quantity.toLocaleString()}주 · {e.market}
+                            {ddayVal >= 0 && ddayVal <= 30 && (
+                              <span className="ml-1.5 text-toss-blue font-semibold">· D-{ddayVal}</span>
+                            )}
+                          </p>
+                          {yieldRate != null && (
+                            <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full ${
+                              yieldRate >= 0.07 ? "bg-red-50 text-red-500" :
+                              yieldRate >= 0.04 ? "bg-blue-50 text-toss-blue" :
+                              "bg-toss-bg text-toss-label"
+                            }`}>
+                              {(yieldRate * 100).toFixed(2)}%
                             </span>
                           )}
-                        </p>
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -249,6 +372,21 @@ export default function DashboardPage() {
 }
 
 /* ── helpers ── */
+function calcAvgYield(
+  holdings: Holding[],
+  apiData: Record<string, ApiEntry>,
+  events: DividendEvent[]
+): number | null {
+  const withYield = events.filter((e) => apiData[e.ticker]?.dividendYield != null);
+  if (withYield.length === 0) return null;
+  const totalNet = withYield.reduce((s, e) => s + e.netAmount, 0);
+  if (totalNet === 0) return null;
+  const weighted = withYield.reduce((s, e) => {
+    return s + (apiData[e.ticker]!.dividendYield! * e.netAmount);
+  }, 0);
+  return weighted / totalNet;
+}
+
 function getNextEvent(events: DividendEvent[]): DividendEvent | null {
   const today = new Date();
   return events

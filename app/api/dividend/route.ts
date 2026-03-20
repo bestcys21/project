@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// 개발 환경: 기업 프록시/인트라넷 SSL 인증서 우회
+if (process.env.NODE_ENV !== "production") {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
+
 // 모듈 최상단 초기화 제거 → 핫리로드 충돌 방지
 function getClient() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -28,6 +33,12 @@ export async function GET(req: NextRequest) {
     const dps        = detail?.dividendRate   ?? null;
     const exDateRaw  = detail?.exDividendDate ?? null;
     const payDateRaw = calendar?.dividendDate ?? null;
+    const price      = quote.regularMarketPrice ?? null;
+
+    const dividendYield: number | null =
+      detail?.dividendYield ??
+      (quote as any)?.trailingAnnualDividendYield ??
+      (dps != null && price != null && price > 0 ? dps / price : null);
 
     function fmt(d: Date | null | undefined): string | null {
       if (!d) return null;
@@ -40,12 +51,13 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       ticker,
-      name:        quote.longName ?? quote.shortName ?? ticker,
-      price:       quote.regularMarketPrice ?? null,
+      name:          quote.longName ?? quote.shortName ?? ticker,
+      price,
       dps,
-      exDate:      fmt(exDateRaw),
-      paymentDate: fmt(payDateRaw),
-      currency:    quote.currency ?? "USD",
+      dividendYield,
+      exDate:        fmt(exDateRaw),
+      paymentDate:   fmt(payDateRaw),
+      currency:      quote.currency ?? "USD",
     });
   } catch (err: any) {
     // 티커를 찾을 수 없는 경우 사용자 친화적 메시지

@@ -25,3 +25,15 @@ export function addHolding(holding: Omit<Holding, "id">): Holding {
 export function removeHolding(id: string): void {
   saveHoldings(getHoldings().filter((h) => h.id !== id));
 }
+
+const GOAL_KEY = "dividend_insight_goal";
+
+export function getGoal(): number | null {
+  if (typeof window === "undefined") return null;
+  const v = localStorage.getItem(GOAL_KEY);
+  return v ? +v : null;
+}
+
+export function saveGoal(amount: number): void {
+  localStorage.setItem(GOAL_KEY, String(amount));
+}

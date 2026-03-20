@@ -12,10 +12,40 @@ interface StockData {
   market:        string;
 }
 
+// ── 로고 이미지 컴포넌트 (로드 실패 시 이니셜 폴백)
+function StockLogo({ ticker, name, market }: { ticker: string; name: string; market: string }) {
+  const [err, setErr] = useState(false);
+
+  const code = ticker.replace(".KS", "");
+  const src  = market === "KR"
+    ? `https://file.alphasquare.co.kr/media/images/stock_logo/kr/${code}.png`
+    : `https://financialmodelingprep.com/image-stock/${ticker}.png`;
+
+  if (!err) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt={name}
+        className="w-10 h-10 rounded-xl object-contain bg-white p-1 border border-toss-border"
+        onError={() => setErr(true)}
+      />
+    );
+  }
+
+  // 로고 없을 때: 이름 첫 두 글자로 이니셜
+  const initials = name.length >= 2 ? name.slice(0, 2) : name;
+  return (
+    <div className="w-10 h-10 rounded-xl bg-toss-bg flex items-center justify-center text-[12px] font-bold text-toss-text flex-shrink-0 border border-toss-border">
+      {initials}
+    </div>
+  );
+}
+
 function RankingSkeleton() {
   return (
     <div className="space-y-2">
-      {Array.from({ length: 8 }).map((_, i) => (
+      {Array.from({ length: 10 }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 py-3 border-b border-toss-border animate-pulse">
           <div className="w-7 h-5 bg-toss-bg rounded" />
           <div className="w-10 h-10 bg-toss-bg rounded-xl" />
@@ -49,7 +79,7 @@ export default function RankingPage() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`/api/ranking?market=${m}`);
+      const res  = await fetch(`/api/ranking?market=${m}`);
       const json = await res.json();
       setData(json.data ?? []);
     } catch {
@@ -63,7 +93,9 @@ export default function RankingPage() {
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-5">
       <div className="px-2 space-y-1">
         <h1 className="text-2xl font-extrabold text-toss-text">배당 랭킹</h1>
-        <p className="text-sm text-toss-sub">배당 수익률 기준 고배당주 실시간 순위에요.</p>
+        <p className="text-sm text-toss-sub">
+          Yahoo Finance 실시간 데이터 기준 배당 수익률 상위 50위입니다.
+        </p>
       </div>
 
       {/* 탭 */}
@@ -81,6 +113,16 @@ export default function RankingPage() {
             {m === "KR" ? "🇰🇷 한국" : "🇺🇸 미국"}
           </button>
         ))}
+      </div>
+
+      {/* 데이터 소스 안내 */}
+      <div className="flex items-start gap-2 px-3.5 py-3 rounded-xl bg-blue-50 border border-blue-100">
+        <span className="text-blue-400 flex-shrink-0 text-base">ℹ️</span>
+        <p className="text-[12px] text-blue-700 leading-relaxed">
+          <strong>데이터 출처:</strong> Yahoo Finance 실시간 API. 코스피/코스닥 시가총액 상위 종목 풀(70개+)에서
+          배당수익률이 확인된 종목을 수익률 순으로 정렬합니다.
+          무료 API 특성상 일부 종목은 데이터가 누락될 수 있습니다.
+        </p>
       </div>
 
       <ErrorBoundary>
@@ -105,6 +147,7 @@ export default function RankingPage() {
               {data.map((stock, i) => (
                 <div key={stock.ticker}
                   className="flex items-center gap-3 py-3.5 border-b border-toss-border last:border-0">
+
                   {/* 순위 */}
                   <div className="w-7 text-center flex-shrink-0">
                     {i < 3
@@ -113,10 +156,8 @@ export default function RankingPage() {
                     }
                   </div>
 
-                  {/* 아이콘 */}
-                  <div className="w-10 h-10 rounded-xl bg-toss-bg flex items-center justify-center text-[13px] font-bold text-toss-text flex-shrink-0">
-                    {stock.ticker.replace(".KS", "").slice(0, 3)}
-                  </div>
+                  {/* 로고 */}
+                  <StockLogo ticker={stock.ticker} name={stock.name} market={stock.market} />
 
                   {/* 이름 */}
                   <div className="flex-1 min-w-0">
@@ -157,7 +198,8 @@ export default function RankingPage() {
       </ErrorBoundary>
 
       <p className="text-[12px] text-toss-sub text-center px-4">
-        * Yahoo Finance 실시간 데이터 기준. 투자 권유가 아닙니다.
+        * Yahoo Finance 실시간 데이터 기준. 투자 권유가 아닙니다.<br />
+        * 한국 전체 시장 스크리닝은 KRX/DART API 연동 시 가능합니다.
       </p>
     </div>
   );
