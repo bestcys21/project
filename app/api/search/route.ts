@@ -18,8 +18,27 @@ export async function GET(req: NextRequest) {
 
   const yf = getClient();
 
+  // 6자리 숫자 → 한국 티커 직접 조회
+  if (market === "KR" && /^\d{5,6}$/.test(q)) {
+    const padded = q.padStart(6, "0");
+    // .KS 먼저, 실패 시 .KQ
+    for (const suffix of [".KS", ".KQ"]) {
+      try {
+        const quote = await yf.quote(`${padded}${suffix}`);
+        if (quote?.regularMarketPrice != null) {
+          const name = quote.longName ?? quote.shortName ?? padded;
+          return NextResponse.json({
+            results: [{ ticker: padded, name, market: "KR" }],
+          });
+        }
+      } catch { /* try next suffix */ }
+    }
+    return NextResponse.json({ results: [] });
+  }
+
   try {
-    const res = await yf.search(q, { quotesCount: 10, newsCount: 0 });
+    // 영문+한글 검색 모두 시도 (KR은 한글 종목명 검색 지원)
+    const res = await yf.search(q, { quotesCount: 20, newsCount: 0 });
 
     const quotes: any[] = res.quotes ?? [];
 
@@ -37,7 +56,7 @@ export async function GET(req: NextRequest) {
         return { ticker, name, market };
       });
 
-    return NextResponse.json({ results: filtered.slice(0, 8) });
+    return NextResponse.json({ results: filtered.slice(0, 20) });
   } catch {
     return NextResponse.json({ results: [] });
   }

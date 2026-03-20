@@ -140,5 +140,5 @@ export function searchTickers(query: string, market: Market): TickerItem[] {
         t.name.toLowerCase().includes(q) ||
         t.ticker.toLowerCase().includes(q)
     )
-    .slice(0, 8);
+    .slice(0, 20);
 }

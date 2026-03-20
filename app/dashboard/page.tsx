@@ -17,9 +17,11 @@ type ApiEntry = {
   dividendYield?: number | null;
   exDate?: string | null;
   paymentDate?: string | null;
+  payMonths?: number[];
+  dividendFrequency?: string;
 };
 
-/* ── 종목 검색 인풋 (자동완성) ── */
+/* ── 종목 검색 인풋 (자동완성 + Yahoo Finance API 병합) ── */
 function StockSearchInput({
   market,
   onSelect,
@@ -31,7 +33,9 @@ function StockSearchInput({
   const [suggestions, setSuggestions] = useState<StockItem[]>([]);
   const [showDrop,    setShowDrop]    = useState(false);
   const [activeIdx,   setActiveIdx]   = useState(-1);
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const [searching,   setSearching]   = useState(false);
+  const wrapRef   = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const onOut = (e: MouseEvent) => {
@@ -46,17 +50,38 @@ function StockSearchInput({
   function handleChange(val: string) {
     setQuery(val);
     setActiveIdx(-1);
-    const hits = searchStocks(val, market);
-    setSuggestions(hits);
-    setShowDrop(hits.length > 0);
+    const local = searchStocks(val, market);
+    setSuggestions(local);
+    setShowDrop(local.length > 0 || val.trim().length > 0);
+
+    if (searchRef.current) clearTimeout(searchRef.current);
+    if (!val.trim()) { setSearching(false); return; }
+
+    setSearching(true);
+    searchRef.current = setTimeout(async () => {
+      try {
+        const res  = await fetch(`/api/search?q=${encodeURIComponent(val.trim())}&market=${market}`);
+        const data = await res.json();
+        const api: StockItem[] = (data.results ?? []).map((r: any) => ({
+          ticker: r.ticker, name: r.name, market,
+        }));
+        setSuggestions((prev) => {
+          const seen = new Set(prev.map((s) => s.ticker));
+          const merged = [...prev, ...api.filter((a) => !seen.has(a.ticker))];
+          return merged.slice(0, 20);
+        });
+        setShowDrop(true);
+      } catch { /* 무시 */ } finally {
+        setSearching(false);
+      }
+    }, 400);
   }
 
   function handleSelect(item: StockItem) {
-    setQuery(item.name);
     setSuggestions([]);
     setShowDrop(false);
     onSelect(item);
-    setQuery(""); // 선택 후 초기화
+    setQuery("");
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -75,21 +100,27 @@ function StockSearchInput({
         onChange={(e) => handleChange(e.target.value)}
         onFocus={() => suggestions.length > 0 && setShowDrop(true)}
         onKeyDown={handleKeyDown}
-        placeholder={market === "KR" ? "종목명 검색 (예: 삼성전자, 카카오)" : "Search stock (e.g. Apple, JEPI)"}
+        placeholder={market === "KR" ? "종목명 또는 종목코드 (예: DL이앤씨, 375500)" : "Search stock (e.g. Apple, JEPI)"}
         className="toss-input"
         autoComplete="off"
       />
-      {showDrop && suggestions.length > 0 && (
+      {showDrop && (suggestions.length > 0 || searching) && (
         <ul className="absolute z-50 left-0 right-0 top-[calc(100%+6px)]
                        bg-toss-card border border-toss-border rounded-2xl
-                       shadow-[0_8px_32px_rgba(0,0,0,0.12)] overflow-hidden">
+                       shadow-[0_8px_32px_rgba(0,0,0,0.12)] overflow-hidden max-h-72 overflow-y-auto">
+          {searching && suggestions.length === 0 && (
+            <li className="px-4 py-3 text-[13px] text-toss-sub flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full border-2 border-toss-blue border-t-transparent animate-spin" />
+              검색 중...
+            </li>
+          )}
           {suggestions.map((item, i) => (
             <li key={`${item.ticker}-${i}`}>
               <button
                 type="button"
                 onMouseDown={(e) => { e.preventDefault(); handleSelect(item); }}
                 className={`w-full flex items-center justify-between px-4 py-3 text-left transition-colors
-                            ${activeIdx === i ? "bg-blue-50" : "hover:bg-toss-bg"}`}
+                            ${activeIdx === i ? "bg-blue-50 dark:bg-blue-900/20" : "hover:bg-toss-bg"}`}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <StockLogo ticker={item.ticker} name={item.name} market={item.market} size={34} />
@@ -147,10 +178,12 @@ export default function DashboardPage() {
           const data = await res.json();
           if (!data.error && data.dps != null) {
             results[holding.ticker] = {
-              dps:           data.dps,
-              dividendYield: data.dividendYield ?? null,
-              exDate:        data.exDate ?? null,
-              paymentDate:   data.paymentDate ?? null,
+              dps:               data.dps,
+              dividendYield:     data.dividendYield ?? null,
+              exDate:            data.exDate ?? null,
+              paymentDate:       data.paymentDate ?? null,
+              payMonths:         data.payMonths ?? undefined,
+              dividendFrequency: data.dividendFrequency ?? undefined,
             };
           }
         } catch { /* 개별 실패 무시 */ }
@@ -215,19 +248,19 @@ export default function DashboardPage() {
     ? Math.min((annualNet / goalAmount) * 100, 100) : null;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10 space-y-5">
-      <div className="px-2 space-y-1">
+    <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-5">
+      <div className="space-y-1">
         <h1 className="text-2xl font-extrabold text-toss-text">내 배당</h1>
         <p className="text-sm text-toss-sub">보유 종목 기반 연간 배당 수익을 한눈에 확인하세요.</p>
       </div>
 
       {/* 요약 카드 */}
       {initLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {Array.from({ length: 4 }).map((_, i) => <SummaryCardSkeleton key={i} />)}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <SummaryCard label="보유 종목"       value={`${holdings.length}개`} />
           <SummaryCard label="연간 세후 배당"  value={`${Math.round(annualNet).toLocaleString("ko-KR")}원`} highlight />
           <SummaryCard label="평균 배당수익률" value={avgYield != null ? `${(avgYield * 100).toFixed(2)}%` : "-"} />
@@ -238,6 +271,11 @@ export default function DashboardPage() {
           />
         </div>
       )}
+
+      {/* PC: 2열 레이아웃 */}
+      <div className="lg:grid lg:grid-cols-[1fr_400px] lg:gap-6 lg:items-start space-y-5 lg:space-y-0">
+        {/* 왼쪽: 목표 배당금 + 차트 */}
+        <div className="space-y-5">
 
       {/* 목표 배당금 */}
       {!initLoading && (
@@ -258,8 +296,8 @@ export default function DashboardPage() {
                 <input type="number" placeholder="연간 목표 금액 (원)"
                   value={goalInput} onChange={(e) => setGoalInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleGoalSave()}
-                  className="toss-input pr-8 text-[13px]" />
-                <span className="absolute inset-y-0 right-3 flex items-center text-[13px] text-toss-sub pointer-events-none">원</span>
+                  className="toss-input pr-10 text-[13px]" />
+                <span className="absolute inset-y-0 right-4 flex items-center text-[14px] text-toss-sub font-medium pointer-events-none select-none">원</span>
               </div>
               <button onClick={handleGoalSave}
                 className="px-4 py-2 bg-toss-blue text-white font-bold text-[13px] rounded-xl hover:bg-toss-blueDark transition-colors">
@@ -269,31 +307,45 @@ export default function DashboardPage() {
           )}
 
           {goalAmount ? (
-            <div className="space-y-2">
-              <div className="flex justify-between text-[13px]">
-                <span className="text-toss-label font-medium">
-                  달성: <span className="text-toss-blue font-bold">{Math.round(annualNet).toLocaleString("ko-KR")}원</span>
-                </span>
-                <span className="text-toss-sub">목표: {Math.round(goalAmount).toLocaleString("ko-KR")}원</span>
+            <div className="space-y-3">
+              {/* 달성/목표 금액 한 줄 표시 */}
+              <div className="flex items-end justify-between">
+                <div>
+                  <p className="text-[12px] text-toss-sub mb-0.5">현재 달성</p>
+                  <p className="text-[22px] font-extrabold text-toss-blue leading-tight">
+                    {Math.round(annualNet).toLocaleString("ko-KR")}
+                    <span className="text-[14px] font-bold ml-0.5">원</span>
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[12px] text-toss-sub mb-0.5">목표</p>
+                  <p className="text-[16px] font-bold text-toss-text">
+                    {Math.round(goalAmount).toLocaleString("ko-KR")}
+                    <span className="text-[12px] font-semibold ml-0.5">원</span>
+                  </p>
+                </div>
               </div>
-              <div className="h-3 bg-toss-bg rounded-full overflow-hidden">
-                <div className="h-full rounded-full transition-all duration-700"
-                  style={{
-                    width: `${goalProgress ?? 0}%`,
-                    background: (goalProgress ?? 0) >= 100 ? "#22c55e"
-                      : (goalProgress ?? 0) >= 60 ? "#3182F6" : "#f59e0b",
-                  }} />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[12px] text-toss-sub">
-                  {(goalProgress ?? 0) >= 100 ? "🎉 목표 달성!"
-                    : `남은 금액: ${Math.round(Math.max(goalAmount - annualNet, 0)).toLocaleString("ko-KR")}원`}
-                </span>
-                <span className={`text-[14px] font-extrabold ${
-                  (goalProgress ?? 0) >= 100 ? "text-green-500"
-                  : (goalProgress ?? 0) >= 60 ? "text-toss-blue" : "text-amber-500"}`}>
-                  {(goalProgress ?? 0).toFixed(1)}%
-                </span>
+              {/* 프로그레스 바 */}
+              <div className="space-y-1.5">
+                <div className="h-3 bg-toss-bg rounded-full overflow-hidden">
+                  <div className="h-full rounded-full transition-all duration-700"
+                    style={{
+                      width: `${goalProgress ?? 0}%`,
+                      background: (goalProgress ?? 0) >= 100 ? "#22c55e"
+                        : (goalProgress ?? 0) >= 60 ? "#3182F6" : "#f59e0b",
+                    }} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[12px] text-toss-sub">
+                    {(goalProgress ?? 0) >= 100 ? "🎉 목표 달성!"
+                      : `남은 금액 ${Math.round(Math.max(goalAmount - annualNet, 0)).toLocaleString("ko-KR")}원`}
+                  </span>
+                  <span className={`text-[15px] font-extrabold ${
+                    (goalProgress ?? 0) >= 100 ? "text-green-500"
+                    : (goalProgress ?? 0) >= 60 ? "text-toss-blue" : "text-amber-500"}`}>
+                    {(goalProgress ?? 0).toFixed(1)}%
+                  </span>
+                </div>
               </div>
             </div>
           ) : (
@@ -333,7 +385,9 @@ export default function DashboardPage() {
         </div>
       </ErrorBoundary>
 
-      {/* 보유 종목 */}
+        </div>{/* end lg 왼쪽 */}
+
+        {/* 오른쪽: 보유 종목 */}
       <ErrorBoundary>
         <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-4">
           <div className="flex items-center justify-between">
@@ -352,7 +406,7 @@ export default function DashboardPage() {
 
           {/* 종목 추가 폼 */}
           {showForm && (
-            <div className="bg-toss-bg rounded-2xl p-5 space-y-4 border border-toss-border">
+            <div className="bg-toss-card rounded-2xl p-5 space-y-4 border-2 border-toss-blue/30 shadow-card">
               <div className="flex items-center justify-between">
                 <p className="text-[13px] font-bold text-toss-text">종목 추가</p>
                 <button onClick={() => setShowForm(false)}
@@ -375,7 +429,7 @@ export default function DashboardPage() {
                                   ${formMarket === m
                                     ? "border-toss-blue bg-toss-blue text-white"
                                     : "border-toss-border text-toss-label bg-toss-card hover:border-toss-blue hover:text-toss-blue"}`}>
-                      {m === "KR" ? "🇰🇷 한국" : "🇺🇸 미국"}
+                      {m === "KR" ? "한국주식" : "미국주식"}
                     </button>
                   ))}
                 </div>
@@ -411,8 +465,8 @@ export default function DashboardPage() {
                   <div className="relative">
                     <input type="number" min={1} placeholder="0"
                       value={quantity} onChange={(e) => setQuantity(e.target.value)}
-                      className="toss-input pr-8" />
-                    <span className="absolute inset-y-0 right-3 flex items-center text-[13px] text-toss-sub pointer-events-none">주</span>
+                      className="toss-input pr-12" />
+                    <span className="absolute inset-y-0 right-4 flex items-center text-[14px] text-toss-sub font-medium pointer-events-none select-none">주</span>
                   </div>
                 </div>
                 <div>
@@ -475,6 +529,13 @@ export default function DashboardPage() {
                         </div>
                         <p className="text-[12px] text-toss-sub mt-0.5">
                           {e.quantity.toLocaleString()}주 · {e.market}
+                          {apiData[e.ticker]?.dividendFrequency && (
+                            <span className="ml-1 text-[10px] bg-toss-bg px-1.5 py-0.5 rounded-full">
+                              {apiData[e.ticker]!.dividendFrequency === "monthly" ? "월배당" :
+                               apiData[e.ticker]!.dividendFrequency === "quarterly" ? "분기배당" :
+                               apiData[e.ticker]!.dividendFrequency === "semi-annual" ? "반기배당" : "연배당"}
+                            </span>
+                          )}
                           {ddayVal >= 0 && ddayVal <= 30 && (
                             <span className="ml-1.5 text-toss-blue font-semibold">· D-{ddayVal}</span>
                           )}
@@ -504,6 +565,8 @@ export default function DashboardPage() {
           )}
         </div>
       </ErrorBoundary>
+
+      </div>{/* end PC 2열 */}
     </div>
   );
 }

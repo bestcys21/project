@@ -194,22 +194,10 @@ export async function GET(req: NextRequest) {
 
   const results = await Promise.allSettled(
     list.map(async ({ ticker, name: koreanName }) => {
-      const [quote, summary] = await Promise.all([
-        yf.quote(ticker),
-        yf.quoteSummary(ticker, { modules: ["summaryDetail"] }).catch(() => null),
-      ]);
-      const detail = (summary as any)?.summaryDetail;
+      const quote = await yf.quote(ticker);
       const price  = quote?.regularMarketPrice ?? null;
-
-      const dps =
-        detail?.dividendRate ??
-        (quote as any)?.trailingAnnualDividendRate ??
-        null;
-
-      let dividendYield: number | null =
-        detail?.dividendYield ??
-        (quote as any)?.trailingAnnualDividendYield ??
-        null;
+      const dps: number | null = (quote as any)?.trailingAnnualDividendRate ?? null;
+      let dividendYield: number | null = (quote as any)?.trailingAnnualDividendYield ?? null;
 
       if (dividendYield == null && dps != null && price != null && price > 0) {
         dividendYield = dps / price;

@@ -72,16 +72,18 @@ export function holdingsToDividendEvents(
   });
 }
 
-/** 종목별 스택 데이터 (차트용) */
+/** 종목별 스택 데이터 (차트용) — 실제 지급월 반영 */
 export function calcStackedMonthly(
   holdings: Holding[],
-  apiData?: Record<string, { dps: number }>
+  apiData?: Record<string, { dps: number; payMonths?: number[] }>
 ): { stackedData: any[]; tickers: string[] } {
   const tickers = holdings.map((h) => h.name || h.ticker);
   const months  = Array.from({ length: 12 }, (_, i) => `${i + 1}월`);
-  const payMonths: Record<Market, number[]> = {
-    KR: [3, 6, 9, 12],
-    US: [1, 4, 7, 10],
+
+  // 시장별 기본 지급월 (이력 없을 때 폴백)
+  const defaultPayMonths: Record<Market, number[]> = {
+    KR: [12],        // 한국: 기본 연배당 12월
+    US: [3, 6, 9, 12], // 미국: 기본 분기
   };
 
   const stackedData = months.map((month, mi) => {
@@ -89,10 +91,17 @@ export function calcStackedMonthly(
     holdings.forEach((h) => {
       const taxRate  = TAX_RATE[h.market];
       const dps      = apiData?.[h.ticker]?.dps ?? 0;
-      const quarterly = dps * h.quantity * (1 - taxRate) / 4;
-      const val = payMonths[h.market].includes(mi + 1) ? quarterly : 0;
-      row[h.name || h.ticker] = val;
-      row.total += val;
+      // 실제 지급월 (API에서 받아온 이력 우선, 없으면 기본값)
+      const payMos   = apiData?.[h.ticker]?.payMonths ?? defaultPayMonths[h.market];
+      if (!payMos.includes(mi + 1)) {
+        row[h.name || h.ticker] = 0;
+        return;
+      }
+      // 연간 DPS를 지급 횟수로 나눔
+      const timesPerYear = payMos.length || 1;
+      const perPayment   = dps * h.quantity * (1 - taxRate) / timesPerYear;
+      row[h.name || h.ticker] = perPayment;
+      row.total += perPayment;
     });
     return row;
   });

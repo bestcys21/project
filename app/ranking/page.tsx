@@ -61,7 +61,7 @@ export default function RankingPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10 space-y-5">
+    <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 space-y-5">
       <div className="px-2 space-y-1">
         <h1 className="text-2xl font-extrabold text-toss-text">배당 랭킹</h1>
         <p className="text-sm text-toss-sub">
@@ -81,7 +81,7 @@ export default function RankingPage() {
                 : "bg-toss-card text-toss-label border border-toss-border hover:border-toss-blue hover:text-toss-blue"
               }`}
           >
-            {m === "KR" ? "🇰🇷 한국" : "🇺🇸 미국"}
+            {m === "KR" ? "한국주식" : "미국주식"}
           </button>
         ))}
       </div>
@@ -114,10 +114,19 @@ export default function RankingPage() {
               <p className="text-[14px] text-toss-sub">데이터가 없어요.</p>
             </div>
           ) : (
-            <div className="space-y-0">
+            <div>
+              {/* PC 테이블 헤더 */}
+              <div className="hidden md:grid md:grid-cols-[40px_50px_1fr_120px_100px] gap-3 px-2 pb-2 border-b border-toss-border mb-1">
+                <span className="text-[11px] font-semibold text-toss-sub text-center">순위</span>
+                <span />
+                <span className="text-[11px] font-semibold text-toss-sub">종목명</span>
+                <span className="text-[11px] font-semibold text-toss-sub text-right">현재가</span>
+                <span className="text-[11px] font-semibold text-toss-sub text-right">배당수익률</span>
+              </div>
               {data.map((stock, i) => (
                 <div key={stock.ticker}
-                  className="flex items-center gap-3 py-3.5 border-b border-toss-border last:border-0">
+                  className="flex items-center gap-3 py-3.5 border-b border-toss-border last:border-0
+                             md:grid md:grid-cols-[40px_50px_1fr_120px_100px]">
 
                   {/* 순위 */}
                   <div className="w-7 text-center flex-shrink-0">

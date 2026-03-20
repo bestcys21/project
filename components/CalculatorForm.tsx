@@ -22,8 +22,10 @@ export default function CalculatorForm() {
   const [suggestions, setSuggestions] = useState<StockItem[]>([]);
   const [showDrop,    setShowDrop]    = useState(false);
   const [activeIdx,   setActiveIdx]   = useState(-1);
+  const [searching,   setSearching]   = useState(false);
 
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const wrapRef   = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 외부 클릭 시 드롭다운 닫기
   useEffect(() => {
@@ -43,9 +45,34 @@ export default function CalculatorForm() {
     setError("");
     setResult(null);
     setActiveIdx(-1);
-    const hits = searchStocks(val, market);
-    setSuggestions(hits);
-    setShowDrop(hits.length > 0);
+
+    // 로컬 결과 즉시 표시
+    const local = searchStocks(val, market);
+    setSuggestions(local);
+    setShowDrop(local.length > 0 || val.trim().length > 0);
+
+    // debounce로 Yahoo Finance API 검색 병합
+    if (searchRef.current) clearTimeout(searchRef.current);
+    if (!val.trim()) { setSearching(false); return; }
+
+    setSearching(true);
+    searchRef.current = setTimeout(async () => {
+      try {
+        const res  = await fetch(`/api/search?q=${encodeURIComponent(val.trim())}&market=${market}`);
+        const data = await res.json();
+        const api: StockItem[] = (data.results ?? []).map((r: any) => ({
+          ticker: r.ticker, name: r.name, market,
+        }));
+        setSuggestions((prev) => {
+          const seen = new Set(prev.map((s) => s.ticker));
+          const merged = [...prev, ...api.filter((a) => !seen.has(a.ticker))];
+          return merged.slice(0, 20);
+        });
+        setShowDrop(true);
+      } catch { /* 무시 */ } finally {
+        setSearching(false);
+      }
+    }, 400);
   }
 
   function handleSelect(item: StockItem) {
@@ -160,16 +187,22 @@ export default function CalculatorForm() {
               onFocus={() => suggestions.length > 0 && setShowDrop(true)}
               onKeyDown={handleKeyDown}
               placeholder={market === "KR"
-                ? "종목명 검색 (예: 삼성전자, 카카오, 현대차)"
+                ? "종목명 또는 종목코드 (예: 삼성전자, DL이앤씨, 375500)"
                 : "Search stock (e.g. Apple, Coca-Cola, JEPI)"}
               className="toss-input"
               autoComplete="off"
             />
 
-            {showDrop && suggestions.length > 0 && (
+            {showDrop && (suggestions.length > 0 || searching) && (
               <ul className="absolute z-50 left-0 right-0 top-[calc(100%+6px)]
                              bg-toss-card border border-toss-border rounded-2xl
                              shadow-[0_8px_32px_rgba(0,0,0,0.12)] overflow-hidden">
+                {searching && suggestions.length === 0 && (
+                  <li className="px-4 py-3 text-[13px] text-toss-sub flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full border-2 border-toss-blue border-t-transparent animate-spin" />
+                    검색 중...
+                  </li>
+                )}
                 {suggestions.map((item, i) => (
                   <li key={`${item.ticker}-${i}`}>
                     <button
@@ -207,7 +240,7 @@ export default function CalculatorForm() {
                               ? "border-toss-blue bg-toss-blue text-white"
                               : "border-toss-border text-toss-label bg-toss-card hover:border-toss-blue hover:text-toss-blue"}`}
               >
-                {m === "KR" ? "🇰🇷 한국 (KRX)" : "🇺🇸 미국 (NYSE/NASDAQ)"}
+                {m === "KR" ? "한국주식" : "미국주식"}
               </button>
             ))}
           </div>

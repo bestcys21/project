@@ -81,14 +81,89 @@ export async function GET(req: NextRequest) {
     return new Date(+m[1], +m[2] - 1, +m[3]) < sevenDaysAgo;
   }
 
+  // 3단계: 배당 지급 이력으로 실제 지급 월 + 빈도 + 월별 대표 지급일 파악
+  let payMonths: number[] = [];
+  let dividendFrequency: "annual" | "semi-annual" | "quarterly" | "monthly" = "annual";
+  // 월별 대표 지급일 (1~12 → 일(day))
+  const payDayByMonth: Record<number, number> = {};
+
+  try {
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+    const hist = await yf.historical(ticker, {
+      period1: twoYearsAgo.toISOString().split("T")[0],
+      period2: new Date().toISOString().split("T")[0],
+      events: "dividends",
+    });
+    const divRows = ((hist as any[]) ?? []).filter(
+      (h: any) => h.dividends != null && h.dividends > 0
+    );
+    if (divRows.length > 0) {
+      payMonths = [...new Set(divRows.map((h: any) => new Date(h.date).getMonth() + 1 as number))].sort((a, b) => a - b);
+      const avgPerYear = divRows.length / 2;
+      dividendFrequency =
+        avgPerYear >= 10 ? "monthly" :
+        avgPerYear >= 3  ? "quarterly" :
+        avgPerYear >= 1.5 ? "semi-annual" : "annual";
+
+      // 월별 평균 지급일 계산
+      const daySums: Record<number, { sum: number; count: number }> = {};
+      divRows.forEach((h: any) => {
+        const d = new Date(h.date);
+        const mo = d.getMonth() + 1;
+        const day = d.getDate();
+        if (!daySums[mo]) daySums[mo] = { sum: 0, count: 0 };
+        daySums[mo].sum   += day;
+        daySums[mo].count += 1;
+      });
+      Object.entries(daySums).forEach(([mo, { sum, count }]) => {
+        payDayByMonth[parseInt(mo)] = Math.round(sum / count);
+      });
+    }
+  } catch { /* 이력 없으면 기본값 */ }
+
+  // 이력 없으면 시장/지급일 기반 추정
+  if (payMonths.length === 0) {
+    const isKR = ticker.endsWith(".KS") || ticker.endsWith(".KQ");
+    if (!isPast(fmtPayDate) && fmtPayDate) {
+      const m = fmtPayDate.match(/\d{4}\.(\d{2})\.(\d{2})/);
+      if (m) { payMonths = [parseInt(m[1])]; payDayByMonth[parseInt(m[1])] = parseInt(m[2]); }
+    }
+    if (payMonths.length === 0) {
+      payMonths = isKR ? [4] : [3, 6, 9, 12];
+      dividendFrequency = isKR ? "annual" : "quarterly";
+    }
+  }
+
+  // 4단계: 향후 12개월 예상 지급일 생성
+  const today = new Date();
+  const estimatedPayDates: string[] = [];
+  for (let offset = 0; offset <= 12; offset++) {
+    const d = new Date(today.getFullYear(), today.getMonth() + offset, 1);
+    const mo = d.getMonth() + 1;
+    const yr = d.getFullYear();
+    if (payMonths.includes(mo)) {
+      const day = payDayByMonth[mo] ?? 15;
+      const dateStr = `${yr}.${String(mo).padStart(2, "0")}.${String(day).padStart(2, "0")}`;
+      estimatedPayDates.push(dateStr);
+    }
+  }
+
   return NextResponse.json({
     ticker,
-    name:          quote.longName ?? quote.shortName ?? ticker,
+    name:              quote.longName ?? quote.shortName ?? ticker,
     price,
     dps,
-    dividendYield: divYield,
-    exDate:        isPast(fmtExDate)  ? null : fmtExDate,
-    paymentDate:   isPast(fmtPayDate) ? null : fmtPayDate,
-    currency:      quote.currency ?? "USD",
+    dividendYield:     divYield,
+    exDate:            isPast(fmtExDate)  ? null : fmtExDate,
+    paymentDate:       isPast(fmtPayDate) ? null : fmtPayDate,
+    currency:          quote.currency ?? "USD",
+    payMonths,
+    dividendFrequency,
+    estimatedPayDates,  // 향후 12개월 예상 지급일 배열
+  }, {
+    headers: {
+      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+    },
   });
 }
