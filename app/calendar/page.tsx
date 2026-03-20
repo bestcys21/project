@@ -31,23 +31,19 @@ export default function CalendarPage() {
       holdings.map(async (h) => {
         const ticker = h.market === "KR" ? `${h.ticker}.KS` : h.ticker.toUpperCase();
         const taxRate = TAX_RATE[h.market];
-        const fallbackDps = h.market === "KR" ? 361 : 0.24;
-        const fallbackEx  = h.market === "KR" ? "2025.12.28" : "2025.11.14";
-        const fallbackPay = h.market === "KR" ? "2026.04.15" : "2025.12.06";
-
         try {
           const res  = await fetch(`/api/dividend?ticker=${encodeURIComponent(ticker)}`);
           let data: any = {};
           try { data = await res.json(); } catch { /* noop */ }
 
-          const dps = data.dps ?? fallbackDps;
+          const dps = data.dps ?? 0;
           results.push({
             holdingId:   h.id,
             ticker:      h.ticker,
             name:        data.name ?? h.name,
             market:      h.market,
-            exDate:      data.exDate      ?? fallbackEx,
-            paymentDate: data.paymentDate ?? fallbackPay,
+            exDate:      data.exDate      ?? "미정",
+            paymentDate: data.paymentDate ?? "미정",
             dps,
             quantity:    h.quantity,
             netAmount:   dps * h.quantity * (1 - taxRate),
@@ -55,9 +51,9 @@ export default function CalendarPage() {
         } catch {
           results.push({
             holdingId:   h.id, ticker: h.ticker, name: h.name, market: h.market,
-            exDate: fallbackEx, paymentDate: fallbackPay,
-            dps: fallbackDps, quantity: h.quantity,
-            netAmount: fallbackDps * h.quantity * (1 - taxRate),
+            exDate: "미정", paymentDate: "미정",
+            dps: 0, quantity: h.quantity,
+            netAmount: 0,
           });
         }
       })

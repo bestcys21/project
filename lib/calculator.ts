@@ -57,14 +57,14 @@ export function holdingsToDividendEvents(
   return holdings.map((h) => {
     const taxRate = TAX_RATE[h.market];
     const api     = apiData?.[h.ticker];
-    const dps     = api?.dps ?? (h.market === "KR" ? 361 : 0.24);
+    const dps     = api?.dps ?? 0;
     return {
       holdingId:   h.id,
       ticker:      h.ticker,
       name:        h.name,
       market:      h.market,
-      exDate:      api?.exDate      ?? (h.market === "KR" ? "2025.12.28" : "2025.11.14"),
-      paymentDate: api?.paymentDate ?? (h.market === "KR" ? "2026.04.15" : "2025.12.06"),
+      exDate:      api?.exDate      ?? "미정",
+      paymentDate: api?.paymentDate ?? "미정",
       dps,
       quantity:    h.quantity,
       netAmount:   dps * h.quantity * (1 - taxRate),
@@ -88,7 +88,7 @@ export function calcStackedMonthly(
     const row: any = { month, total: 0 };
     holdings.forEach((h) => {
       const taxRate  = TAX_RATE[h.market];
-      const dps      = apiData?.[h.ticker]?.dps ?? (h.market === "KR" ? 361 : 0.24);
+      const dps      = apiData?.[h.ticker]?.dps ?? 0;
       const quarterly = dps * h.quantity * (1 - taxRate) / 4;
       const val = payMonths[h.market].includes(mi + 1) ? quarterly : 0;
       row[h.name || h.ticker] = val;
