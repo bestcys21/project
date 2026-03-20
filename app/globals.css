@@ -1,0 +1,36 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    font-family: "Pretendard", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-toss-bg text-toss-text;
+  }
+}
+
+@layer utilities {
+  .toss-input {
+    @apply w-full rounded-xl border border-toss-border bg-toss-bg
+           px-4 py-3.5 text-[15px] font-medium text-toss-text
+           placeholder:text-toss-sub transition-all duration-150;
+  }
+  .toss-input:focus {
+    @apply outline-none border-toss-blue;
+    box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.15);
+  }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fadeUp 0.3s ease both;
+}
