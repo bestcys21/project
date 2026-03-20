@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getDartDividend } from "@/lib/dart-api";
 
 // SSL 우회 (사내망/개발 환경)
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -77,13 +78,36 @@ export async function GET(req: NextRequest) {
     const det = summary?.summaryDetail;
     const cal = summary?.calendarEvents;
 
-    // 더 정확한 값이 있으면 덮어씀
     if (det?.dividendRate   != null) dps        = det.dividendRate;
     if (det?.dividendYield  != null) divYield   = det.dividendYield;
     if (det?.exDividendDate != null) exDateRaw  = det.exDividendDate;
     if (cal?.dividendDate   != null) payDateRaw = cal.dividendDate;
     else if (det?.dividendDate != null) payDateRaw = det.dividendDate;
   } catch { /* 무시 — quote() 데이터로 진행 */ }
+
+  // 3단계: 한국 주식 → Open DART 공시 데이터로 DPS 검증/보완
+  // Yahoo Finance의 한국 배당 데이터가 부정확한 경우 DART 공식 공시값으로 대체
+  const isKoreanStock = ticker.endsWith(".KS") || ticker.endsWith(".KQ");
+  if (isKoreanStock && process.env.DART_API_KEY) {
+    try {
+      const stockCode = ticker.replace(".KS", "").replace(".KQ", "");
+      const dartData  = await getDartDividend(stockCode);
+      if (dartData) {
+        // DART DPS가 있고 Yahoo 값보다 신뢰도가 높으면 대체
+        if (dartData.dps != null && dartData.dps > 0) {
+          dps = dartData.dps;
+        }
+        // DART 배당수익률로 검증 (Yahoo 값이 없을 때 사용)
+        if (divYield == null && dartData.dividendYield != null) {
+          divYield = dartData.dividendYield;
+        }
+        // price 기준으로 수익률 재계산 (더 정확)
+        if (dps != null && price != null && price > 0) {
+          divYield = dps / price;
+        }
+      }
+    } catch { /* DART 실패 시 Yahoo 데이터로 진행 */ }
+  }
 
   // 과거 배당락일(7일 이상 지난 경우)은 미정 처리 — 2014년 등 과거 날짜 반환 방지
   const fmtExDate = fmt(exDateRaw);
