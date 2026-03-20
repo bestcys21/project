@@ -1,49 +1,79 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Market, DividendResult } from "@/lib/calculator";
-import { searchTickers, TickerItem } from "@/lib/tickers";
 import ResultCard from "./ResultCard";
 
 const TAX_RATE: Record<Market, number> = { KR: 0.154, US: 0.15 };
 
+interface SuggestItem {
+  ticker: string;
+  name:   string;
+  market: string;
+}
+
 export default function CalculatorForm() {
   const today = new Date().toISOString().split("T")[0];
 
-  const [query,       setQuery]       = useState("");          // 입력창에 보이는 텍스트
-  const [ticker,      setTicker]      = useState("");          // 실제 API에 넘길 티커
+  const [query,       setQuery]       = useState("");
+  const [ticker,      setTicker]      = useState("");   // 선택된 실제 티커
   const [qty,         setQty]         = useState("");
   const [date,        setDate]        = useState(today);
   const [market,      setMarket]      = useState<Market>("KR");
   const [result,      setResult]      = useState<DividendResult | null>(null);
   const [error,       setError]       = useState("");
   const [loading,     setLoading]     = useState(false);
-  const [suggestions, setSuggestions] = useState<TickerItem[]>([]);
+  const [suggestions, setSuggestions] = useState<SuggestItem[]>([]);
+  const [searching,   setSearching]   = useState(false);
   const [showDrop,    setShowDrop]    = useState(false);
-  const wrapRef = useRef<HTMLDivElement>(null);
+
+  const wrapRef     = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 외부 클릭 시 드롭다운 닫기
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    function onClickOutside(e: MouseEvent) {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
         setShowDrop(false);
       }
     }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
+
+  // 검색 API 호출 (디바운스 300ms)
+  const fetchSuggestions = useCallback(
+    (q: string, m: Market) => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (!q.trim()) { setSuggestions([]); setShowDrop(false); return; }
+
+      debounceRef.current = setTimeout(async () => {
+        setSearching(true);
+        try {
+          const res  = await fetch(`/api/search?q=${encodeURIComponent(q)}&market=${m}`);
+          const data = await res.json();
+          const hits: SuggestItem[] = data.results ?? [];
+          setSuggestions(hits);
+          setShowDrop(hits.length > 0);
+        } catch {
+          setSuggestions([]);
+        } finally {
+          setSearching(false);
+        }
+      }, 300);
+    },
+    []
+  );
 
   function handleQueryChange(val: string) {
     setQuery(val);
-    setTicker("");        // 직접 입력 중이면 선택 초기화
+    setTicker("");
     setError("");
     setResult(null);
-    const hits = searchTickers(val, market);
-    setSuggestions(hits);
-    setShowDrop(hits.length > 0);
+    fetchSuggestions(val, market);
   }
 
-  function handleSelect(item: TickerItem) {
+  function handleSelect(item: SuggestItem) {
     setQuery(item.name);
     setTicker(item.ticker);
     setSuggestions([]);
@@ -68,7 +98,7 @@ export default function CalculatorForm() {
     if (!qty || +qty <= 0) return setError("수량을 1주 이상 입력해 주세요.");
     if (!date) return setError("매수 예정일을 선택해 주세요.");
 
-    // 자동완성으로 선택했으면 ticker 사용, 아니면 query를 티커로 간주
+    // 자동완성 선택 시 ticker 사용, 직접 입력 시 query를 티커로
     const rawTicker = ticker || query.trim();
     const apiTicker =
       market === "KR"
@@ -80,9 +110,7 @@ export default function CalculatorForm() {
       const res = await fetch(`/api/dividend?ticker=${encodeURIComponent(apiTicker)}`);
 
       let data: any;
-      try {
-        data = await res.json();
-      } catch {
+      try { data = await res.json(); } catch {
         setError("서버 응답을 읽을 수 없습니다. 잠시 후 다시 시도해 주세요.");
         return;
       }
@@ -126,8 +154,8 @@ export default function CalculatorForm() {
 
   const placeholder =
     market === "KR"
-      ? "종목명 또는 코드 검색 (예: 삼성전자)"
-      : "종목명 또는 티커 검색 (예: Coca-Cola)";
+      ? "종목명 검색 (예: 삼성전자, 카카오)"
+      : "종목명 검색 (예: Apple, Coca-Cola)";
 
   return (
     <div className="space-y-5">
@@ -135,9 +163,7 @@ export default function CalculatorForm() {
 
         {/* 종목 검색 */}
         <div className="space-y-1.5">
-          <label className="block text-[13px] font-semibold text-toss-label">
-            종목명
-          </label>
+          <label className="block text-[13px] font-semibold text-toss-label">종목명</label>
 
           <div ref={wrapRef} className="relative">
             <input
@@ -146,13 +172,24 @@ export default function CalculatorForm() {
               onChange={(e) => handleQueryChange(e.target.value)}
               onFocus={() => suggestions.length > 0 && setShowDrop(true)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") { setShowDrop(false); handleCalculate(); }
+                if (e.key === "Enter")  { setShowDrop(false); handleCalculate(); }
                 if (e.key === "Escape") setShowDrop(false);
               }}
               placeholder={placeholder}
               className="toss-input"
               autoComplete="off"
             />
+
+            {/* 검색 중 스피너 */}
+            {searching && (
+              <span className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                <svg className="animate-spin w-4 h-4 text-toss-sub" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4l3-3-3-3V4a10 10 0 00-10 10h4z" />
+                </svg>
+              </span>
+            )}
 
             {/* 자동완성 드롭다운 */}
             {showDrop && suggestions.length > 0 && (
@@ -174,7 +211,9 @@ export default function CalculatorForm() {
                         </div>
                         <span className="text-[14px] font-semibold text-toss-text">{item.name}</span>
                       </div>
-                      <span className="text-[12px] text-toss-sub font-medium">{item.ticker}</span>
+                      <span className="text-[12px] text-toss-sub font-medium ml-2 flex-shrink-0">
+                        {item.ticker}
+                      </span>
                     </button>
                   </li>
                 ))}
@@ -208,34 +247,24 @@ export default function CalculatorForm() {
             <label className="block text-[13px] font-semibold text-toss-label">보유 수량</label>
             <div className="relative">
               <input
-                type="number"
-                min={1}
-                value={qty}
+                type="number" min={1} value={qty}
                 onChange={(e) => setQty(e.target.value)}
-                placeholder="0"
-                className="toss-input pr-10"
+                placeholder="0" className="toss-input pr-10"
               />
               <span className="absolute inset-y-0 right-4 flex items-center text-[13px] text-toss-sub font-medium pointer-events-none">주</span>
             </div>
           </div>
           <div className="space-y-1.5">
             <label className="block text-[13px] font-semibold text-toss-label">매수 예정일</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="toss-input"
-            />
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="toss-input" />
           </div>
         </div>
 
         {/* 세율 안내 */}
         <div className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl
           ${market === "KR" ? "bg-blue-50" : "bg-green-50"}`}>
-          <svg
-            className={`w-4 h-4 flex-shrink-0 ${market === "KR" ? "text-toss-blue" : "text-green-700"}`}
-            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-          >
+          <svg className={`w-4 h-4 flex-shrink-0 ${market === "KR" ? "text-toss-blue" : "text-green-700"}`}
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round"
               d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 110 20A10 10 0 0112 2z" />
           </svg>
@@ -269,7 +298,6 @@ export default function CalculatorForm() {
   );
 }
 
-/** 매수 예정일이 배당락일 전인지 확인 */
 function isEligible(purchaseDateStr: string, exDateStr: string): boolean {
   if (exDateStr === "미정") return true;
   const pMatch = purchaseDateStr.match(/(\d{4})-(\d{2})-(\d{2})/);
