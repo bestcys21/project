@@ -2,109 +2,113 @@ import CalculatorForm from "@/components/CalculatorForm";
 
 export default function Home() {
   return (
-    <div className="min-h-screen px-4 md:px-8 lg:px-10 py-8">
-      <div className="grid lg:grid-cols-[minmax(0,580px)_1fr] gap-10 items-start max-w-6xl mx-auto">
+    <div className="min-h-screen">
 
-        {/* 왼쪽: 계산기 — 핵심 */}
-        <div className="space-y-5">
-          <div className="space-y-1">
-            <h1 className="text-[26px] font-extrabold text-toss-text leading-tight">
-              몇 주, 언제 사면 <span className="text-toss-blue">얼마 받을까?</span>
-            </h1>
-            <p className="text-[14px] text-toss-sub">
-              종목·수량·매수일 입력 → 세후 배당금 즉시 계산
-            </p>
+      {/* ── 히어로 섹션 ── */}
+      <div className="relative overflow-hidden">
+        {/* 배경 그라디언트 */}
+        <div
+          className="absolute inset-0 -z-10"
+          style={{
+            background: "linear-gradient(135deg, #0f1f3d 0%, #1a3a6b 40%, #1B64DA 75%, #3182F6 100%)",
+          }}
+        />
+        {/* 장식 원형 블러 */}
+        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-20 -z-10"
+          style={{ background: "radial-gradient(circle, #60a5fa, transparent 70%)" }} />
+        <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full opacity-15 -z-10"
+          style={{ background: "radial-gradient(circle, #a78bfa, transparent 70%)" }} />
+
+        <div className="max-w-6xl mx-auto px-6 md:px-10 pt-14 pb-16">
+          {/* 뱃지 */}
+          <div className="flex justify-center mb-6">
+            <span className="inline-flex items-center gap-2 bg-white/10 border border-white/20
+                             text-white text-[13px] font-semibold px-4 py-1.5 rounded-full backdrop-blur-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              Yahoo Finance 실시간 배당 데이터
+            </span>
           </div>
-          <CalculatorForm />
-        </div>
 
-        {/* 오른쪽: 정보 (서브, 데스크톱 전용) */}
-        <div className="hidden lg:flex flex-col gap-3 sticky top-8">
+          {/* 메인 헤드라인 */}
+          <h1 className="text-center text-[36px] md:text-[52px] font-extrabold text-white leading-[1.15] mb-4">
+            몇 주, 언제 사면<br />
+            <span style={{ color: "#93C5FD" }}>얼마 받을까?</span>
+          </h1>
+          <p className="text-center text-[16px] md:text-[18px] text-blue-200 mb-10">
+            종목·수량·매수일만 입력하면 세후 배당금을 즉시 알려드려요.
+          </p>
 
-          {/* 배당 수령 흐름 — 인포그래픽 스타일 */}
-          <div className="bg-toss-card rounded-2xl shadow-card p-5">
-            <p className="text-[13px] font-bold text-toss-text mb-4">배당 수령 흐름</p>
+          {/* 계산기 폼 — 중앙 정렬, 최대 너비 제한 */}
+          <div className="max-w-xl mx-auto">
+            <CalculatorForm />
+          </div>
 
-            <div className="relative">
-              {/* 수직 연결선 */}
-              <div className="absolute left-[18px] top-5 bottom-5 w-px bg-toss-border" />
-
-              <div className="space-y-0">
-                {[
-                  { icon: "🛒", step: "매수", desc: "배당락일 D-1까지 완료", color: "#3182F6", bg: "#EBF3FE" },
-                  { icon: "📌", step: "배당락일", desc: "이날부터 매수 시 미수령", color: "#8B5CF6", bg: "#F5F3FF" },
-                  { icon: "📋", step: "기준일", desc: "주주명부 공식 등재", color: "#F59E0B", bg: "#FFFBEB" },
-                  { icon: "💰", step: "지급일", desc: "세후 배당금 자동 입금", color: "#10B981", bg: "#ECFDF5" },
-                ].map((item, i) => (
-                  <div key={item.step} className="flex items-center gap-3 py-2.5 relative">
-                    <div
-                      className="w-9 h-9 rounded-full flex items-center justify-center text-base flex-shrink-0 relative z-10"
-                      style={{ background: item.bg }}
-                    >
-                      {item.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-bold text-toss-text">{item.step}</p>
-                      <p className="text-[12px] text-toss-sub">{item.desc}</p>
-                    </div>
-                    <span
-                      className="text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
-                      style={{ color: item.color, background: item.bg }}
-                    >
-                      {i + 1}단계
-                    </span>
-                  </div>
-                ))}
+          {/* 배당 사이클 흐름 — 히어로 하단 인라인 */}
+          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
+            {[
+              { icon: "🛒", step: "1. 매수", desc: "배당락일 D-1까지" },
+              { icon: "📌", step: "2. 배당락일", desc: "권리 소멸 기준일" },
+              { icon: "📋", step: "3. 기준일", desc: "주주명부 등재" },
+              { icon: "💰", step: "4. 지급일", desc: "세후 배당금 입금" },
+            ].map((item) => (
+              <div key={item.step}
+                className="bg-white/10 backdrop-blur-sm border border-white/15
+                           rounded-2xl p-4 text-center space-y-1">
+                <p className="text-2xl">{item.icon}</p>
+                <p className="text-[13px] font-bold text-white">{item.step}</p>
+                <p className="text-[12px] text-blue-200">{item.desc}</p>
               </div>
-            </div>
+            ))}
           </div>
-
-          {/* 배당소득세 */}
-          <div className="bg-toss-card rounded-2xl shadow-card p-5">
-            <p className="text-[13px] font-bold text-toss-text mb-3">배당소득세 자동 적용</p>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between py-2 border-b border-toss-border">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">🇰🇷</span>
-                  <div>
-                    <p className="text-[13px] font-semibold text-toss-text">한국주식</p>
-                    <p className="text-[11px] text-toss-sub">소득세 14% + 지방세 1.4%</p>
-                  </div>
-                </div>
-                <span className="text-[16px] font-extrabold text-toss-blue">15.4%</span>
-              </div>
-              <div className="flex items-center justify-between py-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">🇺🇸</span>
-                  <div>
-                    <p className="text-[13px] font-semibold text-toss-text">미국주식</p>
-                    <p className="text-[11px] text-toss-sub">한미 조세조약 원천징수</p>
-                  </div>
-                </div>
-                <span className="text-[16px] font-extrabold text-green-600">15%</span>
-              </div>
-            </div>
-          </div>
-
-          {/* 이런 분께 추천 */}
-          <div className="bg-toss-card rounded-2xl shadow-card p-5">
-            <p className="text-[13px] font-bold text-toss-text mb-3">이런 분께 추천해요</p>
-            <div className="space-y-2">
-              {[
-                "매수 전 배당 수령 가능 여부 확인",
-                "세후 실수령액 정확히 알고 싶을 때",
-                "한·미 배당금 한 곳에서 관리",
-              ].map((t) => (
-                <div key={t} className="flex items-start gap-2">
-                  <span className="text-toss-blue mt-0.5 flex-shrink-0 text-sm">✓</span>
-                  <p className="text-[13px] text-toss-label leading-relaxed">{t}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
         </div>
       </div>
+
+      {/* ── 배당소득세 안내 (히어로 하단 서브섹션) ── */}
+      <div className="bg-toss-card border-b border-toss-border">
+        <div className="max-w-3xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-center gap-6">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🇰🇷</span>
+            <div>
+              <p className="text-[14px] font-bold text-toss-text">한국주식</p>
+              <p className="text-[12px] text-toss-sub">소득세 14% + 지방세 1.4%</p>
+            </div>
+            <span className="text-[20px] font-extrabold text-toss-blue ml-2">15.4%</span>
+          </div>
+          <div className="hidden sm:block w-px h-10 bg-toss-border" />
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🇺🇸</span>
+            <div>
+              <p className="text-[14px] font-bold text-toss-text">미국주식</p>
+              <p className="text-[12px] text-toss-sub">한미 조세조약 원천징수</p>
+            </div>
+            <span className="text-[20px] font-extrabold text-green-600 ml-2">15%</span>
+          </div>
+          <div className="hidden sm:block w-px h-10 bg-toss-border" />
+          <p className="text-[13px] text-toss-sub text-center">
+            세후 실수령액 <span className="text-toss-text font-semibold">자동 계산</span>됩니다
+          </p>
+        </div>
+      </div>
+
+      {/* ── 이런 분께 추천 ── */}
+      <div className="max-w-3xl mx-auto px-6 py-8">
+        <p className="text-[13px] font-bold text-toss-sub text-center mb-5 uppercase tracking-wider">이런 분께 추천해요</p>
+        <div className="grid sm:grid-cols-3 gap-4">
+          {[
+            { icon: "🔍", title: "매수 전 확인", desc: "배당락일 전날까지 사야\n수령 가능한지 즉시 확인" },
+            { icon: "💵", title: "세후 실수령액", desc: "한국 15.4%, 미국 15%\n자동 공제된 실수령액 계산" },
+            { icon: "📅", title: "일정 관리", desc: "캘린더에서 배당락일·\n지급일을 한눈에 확인" },
+          ].map((item) => (
+            <div key={item.title}
+              className="bg-toss-card rounded-2xl shadow-card p-5 text-center space-y-2">
+              <p className="text-3xl">{item.icon}</p>
+              <p className="text-[14px] font-bold text-toss-text">{item.title}</p>
+              <p className="text-[13px] text-toss-sub whitespace-pre-line leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 }

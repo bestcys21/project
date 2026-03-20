@@ -2,43 +2,49 @@ interface LogoIconProps {
   size?: number;
 }
 
-/** 배당노트 아이콘 (노트 + 배당 코인 뱃지) */
+/** 배당노트 아이콘 — 세련된 배당 성장 심볼 */
 export function LogoIcon({ size = 32 }: LogoIconProps) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 36 36"
+      viewBox="0 0 40 40"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* 배경 */}
-      <rect width="36" height="36" rx="10" fill="#3182F6" />
+      {/* 배경 — 부드러운 그라디언트 */}
+      <defs>
+        <linearGradient id="bgGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#3182F6" />
+          <stop offset="100%" stopColor="#1B64DA" />
+        </linearGradient>
+        <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="white" stopOpacity="1" />
+          <stop offset="100%" stopColor="white" stopOpacity="0.6" />
+        </linearGradient>
+      </defs>
+      <rect width="40" height="40" rx="12" fill="url(#bgGrad)" />
 
-      {/* 노트 본체 */}
-      <rect x="7" y="7" width="16" height="20" rx="2.5" fill="white" fillOpacity="0.15" />
-      <rect x="7" y="7" width="16" height="20" rx="2.5" stroke="white" strokeWidth="1.6" />
+      {/* 상승 막대 차트 — 배당 성장 상징 */}
+      <rect x="8"  y="24" width="5" height="9"  rx="2" fill="white" fillOpacity="0.45" />
+      <rect x="15" y="18" width="5" height="15" rx="2" fill="white" fillOpacity="0.65" />
+      <rect x="22" y="13" width="5" height="20" rx="2" fill="white" fillOpacity="0.85" />
 
-      {/* 노트 라인 3줄 */}
-      <line x1="10.5" y1="12.5" x2="19.5" y2="12.5" stroke="white" strokeWidth="1.4" strokeLinecap="round" />
-      <line x1="10.5" y1="16.5" x2="19.5" y2="16.5" stroke="white" strokeWidth="1.4" strokeLinecap="round" />
-      <line x1="10.5" y1="20.5" x2="16"   y2="20.5" stroke="white" strokeWidth="1.4" strokeLinecap="round" />
-
-      {/* 배당 코인 뱃지 (우하단) */}
-      <circle cx="25.5" cy="25.5" r="7.5" fill="#1B64DA" />
-      <circle cx="25.5" cy="25.5" r="6"   fill="#3182F6" />
-
-      {/* 코인 안 상승 화살표 */}
+      {/* 우상향 꺾은선 — 성장 트렌드 */}
       <polyline
-        points="22,27.5 25.5,23.5 29,27.5"
+        points="10.5,24 17.5,18 24.5,13 31,8"
         stroke="white"
-        strokeWidth="1.6"
+        strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       />
-      <line x1="25.5" y1="23.5" x2="25.5" y2="28.5"
-        stroke="white" strokeWidth="1.6" strokeLinecap="round" />
+      {/* 끝점 강조 */}
+      <circle cx="31" cy="8" r="2.5" fill="white" />
+
+      {/* 원화 기호 작게 (우하단) */}
+      <text x="29" y="34" fontSize="8" fontWeight="800" fill="white" fillOpacity="0.9"
+        fontFamily="system-ui, sans-serif" textAnchor="middle">₩</text>
     </svg>
   );
 }
@@ -49,11 +55,11 @@ export function LogoFull({ iconSize = 28 }: { iconSize?: number }) {
     <div className="flex items-center gap-2.5">
       <LogoIcon size={iconSize} />
       <div className="flex flex-col leading-none">
-        <span className="text-[15px] font-extrabold text-toss-text tracking-tight">
+        <span className="text-[16px] font-extrabold text-toss-text tracking-tight">
           배당노트
         </span>
-        <span className="text-[10px] font-medium text-toss-sub tracking-wide">
-          Baedang Note
+        <span className="text-[10px] font-semibold text-toss-sub tracking-widest uppercase">
+          Dividend Note
         </span>
       </div>
     </div>

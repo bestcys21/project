@@ -156,6 +156,9 @@ export default function DashboardPage() {
   const [goalInput,   setGoalInput]   = useState("");
   const [editingGoal, setEditingGoal] = useState(false);
 
+  // 종목 필터
+  const [filterMarket, setFilterMarket] = useState<"ALL" | "KR" | "US">("ALL");
+
   useEffect(() => {
     const h = getHoldings();
     setHoldings(h);
@@ -390,17 +393,41 @@ export default function DashboardPage() {
         {/* 오른쪽: 보유 종목 */}
       <ErrorBoundary>
         <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[14px] font-bold text-toss-text">보유 종목</p>
-            {!showForm && (
-              <button onClick={openForm}
-                className="flex items-center gap-1.5 text-[13px] font-semibold text-toss-blue
-                           bg-blue-50 px-3 py-1.5 rounded-xl hover:bg-blue-100 transition-colors">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
-                종목 추가
-              </button>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-[14px] font-bold text-toss-text">
+                보유 종목
+                {filterMarket !== "ALL" && (
+                  <span className="ml-2 text-[12px] font-semibold text-toss-blue">
+                    {filterMarket === "KR" ? "한국주식" : "미국주식"}
+                  </span>
+                )}
+              </p>
+              {!showForm && (
+                <button onClick={openForm}
+                  className="flex items-center gap-1.5 text-[13px] font-semibold text-toss-blue
+                             bg-blue-50 px-3 py-1.5 rounded-xl hover:bg-blue-100 transition-colors">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  종목 추가
+                </button>
+              )}
+            </div>
+            {/* 필터 탭 */}
+            {events.length > 0 && (
+              <div className="flex gap-1.5">
+                {(["ALL", "KR", "US"] as const).map((f) => (
+                  <button key={f}
+                    onClick={() => setFilterMarket(f)}
+                    className={`px-3 py-1 rounded-lg text-[12px] font-semibold transition-all
+                      ${filterMarket === f
+                        ? "bg-toss-blue text-white"
+                        : "bg-toss-bg text-toss-sub hover:text-toss-text"}`}>
+                    {f === "ALL" ? "전체" : f === "KR" ? "한국" : "미국"}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 
@@ -502,7 +529,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="divide-y divide-toss-border">
-              {events.map((e, i) => {
+              {events.filter(e => filterMarket === "ALL" || e.market === filterMarket).map((e, i) => {
                 const color     = STOCK_COLORS[i % STOCK_COLORS.length];
                 const isLive    = !!apiData[e.ticker];
                 const ddayVal   = getDday(e.paymentDate);

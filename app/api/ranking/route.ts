@@ -187,24 +187,56 @@ const US_TICKERS = [
   { ticker: "FCX",  name: "Freeport-McMoRan" },
 ];
 
+// 배치 처리 (rate limit 방지)
+async function batchFetch<T>(
+  items: T[],
+  fn: (item: T) => Promise<any>,
+  batchSize = 10,
+  delayMs = 300
+): Promise<PromiseSettledResult<any>[]> {
+  const results: PromiseSettledResult<any>[] = [];
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    const batchResults = await Promise.allSettled(batch.map(fn));
+    results.push(...batchResults);
+    if (i + batchSize < items.length) {
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+  }
+  return results;
+}
+
 export async function GET(req: NextRequest) {
   const market = req.nextUrl.searchParams.get("market") ?? "US";
   const list   = market === "KR" ? KR_TICKERS : US_TICKERS;
   const yf     = getClient();
 
-  const results = await Promise.allSettled(
-    list.map(async ({ ticker, name: koreanName }) => {
+  const results = await batchFetch(
+    list,
+    async ({ ticker, name: koreanName }) => {
       const quote = await yf.quote(ticker);
-      const price  = quote?.regularMarketPrice ?? null;
-      const dps: number | null = (quote as any)?.trailingAnnualDividendRate ?? null;
-      let dividendYield: number | null = (quote as any)?.trailingAnnualDividendYield ?? null;
+      const price = quote?.regularMarketPrice ?? null;
+
+      // DPS: trailingAnnualDividendRate 또는 dividendRate
+      const dps: number | null =
+        (quote as any)?.trailingAnnualDividendRate ??
+        (quote as any)?.dividendRate ??
+        null;
+
+      // Yield: trailingAnnualDividendYield → 계산 fallback
+      let dividendYield: number | null =
+        (quote as any)?.trailingAnnualDividendYield ??
+        (quote as any)?.dividendYield ??
+        null;
 
       if (dividendYield == null && dps != null && price != null && price > 0) {
         dividendYield = dps / price;
       }
 
       return { ticker, name: koreanName, dividendYield, dps, price, market };
-    })
+    },
+    10,  // 배치 크기
+    200  // 배치 간 딜레이 ms
   );
 
   const data = results
@@ -212,7 +244,7 @@ export async function GET(req: NextRequest) {
     .map((r) => r.value)
     .filter((d) => d.dividendYield != null && d.dividendYield > 0)
     .sort((a, b) => b.dividendYield - a.dividendYield)
-    .slice(0, 50); // 상위 50개만 반환
+    .slice(0, 50);
 
   return NextResponse.json({ market, data });
 }
