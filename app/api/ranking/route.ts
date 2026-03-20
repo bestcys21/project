@@ -217,20 +217,25 @@ export async function GET(req: NextRequest) {
       const quote = await yf.quote(ticker);
       const price = quote?.regularMarketPrice ?? null;
 
-      // DPS: trailingAnnualDividendRate 또는 dividendRate
+      // DPS: 연간 주당배당금 (원화 or 달러)
       const dps: number | null =
         (quote as any)?.trailingAnnualDividendRate ??
         (quote as any)?.dividendRate ??
         null;
 
-      // Yield: trailingAnnualDividendYield → 계산 fallback
-      let dividendYield: number | null =
-        (quote as any)?.trailingAnnualDividendYield ??
-        (quote as any)?.dividendYield ??
-        null;
-
-      if (dividendYield == null && dps != null && price != null && price > 0) {
+      // Yield: DPS/가격으로 직접 계산 (Yahoo Finance가 이미 % 단위로 줄 때 오류 방지)
+      let dividendYield: number | null = null;
+      if (dps != null && price != null && price > 0) {
         dividendYield = dps / price;
+      } else {
+        const raw =
+          (quote as any)?.trailingAnnualDividendYield ??
+          (quote as any)?.dividendYield ??
+          null;
+        if (raw != null) {
+          // 1 이상이면 이미 % 단위로 반환된 것 → 100으로 나눔
+          dividendYield = raw > 1 ? raw / 100 : raw;
+        }
       }
 
       return { ticker, name: koreanName, dividendYield, dps, price, market };
