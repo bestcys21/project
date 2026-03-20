@@ -26,9 +26,10 @@ export async function GET(req: NextRequest) {
       try {
         const quote = await yf.quote(`${padded}${suffix}`);
         if (quote?.regularMarketPrice != null) {
-          const name = quote.longName ?? quote.shortName ?? padded;
+          const name     = quote.longName ?? quote.shortName ?? padded;
+          const exchange = suffix === ".KS" ? "KS" : "KQ";
           return NextResponse.json({
-            results: [{ ticker: padded, name, market: "KR" }],
+            results: [{ ticker: padded, name, market: "KR", exchange }],
           });
         }
       } catch { /* try next suffix */ }
@@ -51,9 +52,10 @@ export async function GET(req: NextRequest) {
       })
       .map((item) => {
         const sym: string = item.symbol ?? "";
-        const ticker = sym.replace(".KS", "").replace(".KQ", "");
-        const name   = item.longname ?? item.shortname ?? sym;
-        return { ticker, name, market };
+        const exchange = sym.endsWith(".KQ") ? "KQ" : sym.endsWith(".KS") ? "KS" : null;
+        const ticker   = sym.replace(".KS", "").replace(".KQ", "");
+        const name     = item.longname ?? item.shortname ?? sym;
+        return { ticker, name, market, exchange };
       });
 
     return NextResponse.json({ results: filtered.slice(0, 20) });

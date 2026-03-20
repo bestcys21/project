@@ -13,6 +13,7 @@ export default function CalculatorForm() {
 
   const [query,       setQuery]       = useState("");
   const [ticker,      setTicker]      = useState("");
+  const [exchange,    setExchange]    = useState<"KS" | "KQ" | undefined>(undefined);
   const [qty,         setQty]         = useState("");
   const [date,        setDate]        = useState(today);
   const [market,      setMarket]      = useState<Market>("KR");
@@ -61,7 +62,7 @@ export default function CalculatorForm() {
         const res  = await fetch(`/api/search?q=${encodeURIComponent(val.trim())}&market=${market}`);
         const data = await res.json();
         const api: StockItem[] = (data.results ?? []).map((r: any) => ({
-          ticker: r.ticker, name: r.name, market,
+          ticker: r.ticker, name: r.name, market, exchange: r.exchange,
         }));
         setSuggestions((prev) => {
           const seen = new Set(prev.map((s) => s.ticker));
@@ -78,6 +79,7 @@ export default function CalculatorForm() {
   function handleSelect(item: StockItem) {
     setQuery(item.name);
     setTicker(item.ticker);
+    setExchange(item.exchange);
     setSuggestions([]);
     setShowDrop(false);
     setActiveIdx(-1);
@@ -87,6 +89,7 @@ export default function CalculatorForm() {
     setMarket(m);
     setQuery("");
     setTicker("");
+    setExchange(undefined);
     setError("");
     setResult(null);
     setSuggestions([]);
@@ -124,7 +127,9 @@ export default function CalculatorForm() {
 
     const rawTicker = ticker || query.trim();
     const apiTicker = market === "KR"
-      ? (rawTicker.includes(".") ? rawTicker : `${rawTicker}.KS`)
+      ? (rawTicker.includes(".")
+          ? rawTicker
+          : `${rawTicker}.${exchange ?? "KS"}`)  // 검색에서 exchange 정보 활용, 없으면 .KS 기본
       : rawTicker.toUpperCase();
 
     setLoading(true);
@@ -187,7 +192,7 @@ export default function CalculatorForm() {
               onFocus={() => suggestions.length > 0 && setShowDrop(true)}
               onKeyDown={handleKeyDown}
               placeholder={market === "KR"
-                ? "종목명 또는 종목코드 (예: 삼성전자, DL이앤씨, 375500)"
+                ? "종목명 또는 종목코드 (예: 삼성전자, 375500)"
                 : "Search stock (e.g. Apple, Coca-Cola, JEPI)"}
               className="toss-input"
               autoComplete="off"
@@ -210,7 +215,7 @@ export default function CalculatorForm() {
                       onMouseDown={(e) => { e.preventDefault(); handleSelect(item); }}
                       className={`w-full flex items-center justify-between px-4 py-3 text-left
                                   transition-colors
-                                  ${activeIdx === i ? "bg-blue-50" : "hover:bg-toss-bg"}`}
+                                  ${activeIdx === i ? "bg-blue-50 dark:bg-blue-900/20" : "hover:bg-toss-bg"}`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <StockLogo ticker={item.ticker} name={item.name} market={item.market} size={34} />
@@ -271,7 +276,7 @@ export default function CalculatorForm() {
 
         {/* 세율 안내 */}
         <div className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl
-          ${market === "KR" ? "bg-blue-50" : "bg-green-50"}`}>
+          ${market === "KR" ? "bg-blue-50 dark:bg-blue-900/20" : "bg-green-50 dark:bg-green-900/20"}`}>
           <svg className={`w-4 h-4 flex-shrink-0 ${market === "KR" ? "text-toss-blue" : "text-green-700"}`}
             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round"
@@ -284,7 +289,7 @@ export default function CalculatorForm() {
 
         {/* 에러 */}
         {error && (
-          <div className="flex items-start gap-2 px-3.5 py-2.5 rounded-xl bg-red-50 border border-red-100">
+          <div className="flex items-start gap-2 px-3.5 py-2.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800">
             <span className="text-red-400 mt-0.5 flex-shrink-0 text-sm">⚠</span>
             <p className="text-[13px] text-red-500 font-medium leading-relaxed">{error}</p>
           </div>

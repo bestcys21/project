@@ -1,9 +1,10 @@
 import { Market } from "./types";
 
 export interface StockItem {
-  ticker: string; // Yahoo Finance 용 (접미사 없음)
-  name:   string;
-  market: Market;
+  ticker:   string;           // Yahoo Finance 용 (접미사 없음)
+  name:     string;
+  market:   Market;
+  exchange?: "KS" | "KQ";    // 한국 주식 거래소 (KOSPI=KS, KOSDAQ=KQ)
 }
 
 // ── KOSPI / KOSDAQ 주요 종목 (500+)
@@ -248,6 +249,29 @@ export const KR_STOCKS: StockItem[] = [
   { ticker: "357430", name: "디앤디플랫폼리츠",          market: "KR" },
   { ticker: "334890", name: "이지스밸류리츠",           market: "KR" },
   // KOSDAQ 주요
+  { ticker: "277810", name: "레인보우로보틱스",          market: "KR" },
+  { ticker: "066970", name: "엘엔에프",               market: "KR" },
+  { ticker: "214450", name: "파마리서치",              market: "KR" },
+  { ticker: "248070", name: "솔루엠",                 market: "KR" },
+  { ticker: "141080", name: "리가켐바이오",             market: "KR" },
+  { ticker: "237690", name: "에스티팜",               market: "KR" },
+  { ticker: "272290", name: "이녹스첨단소재",           market: "KR" },
+  { ticker: "090460", name: "비에이치",               market: "KR" },
+  { ticker: "241710", name: "코스메카코리아",           market: "KR" },
+  { ticker: "204270", name: "제이앤티씨",              market: "KR" },
+  { ticker: "108860", name: "셀바스AI",               market: "KR" },
+  { ticker: "031980", name: "피에스케이홀딩스",          market: "KR" },
+  { ticker: "054080", name: "에이피시스템",             market: "KR" },
+  { ticker: "192820", name: "코스맥스",               market: "KR" },
+  { ticker: "084110", name: "휴온스글로벌",             market: "KR" },
+  { ticker: "234080", name: "JW생명과학",              market: "KR" },
+  { ticker: "064760", name: "씨에스윈드",              market: "KR" },
+  { ticker: "145090", name: "비에스한일시멘트",          market: "KR" },
+  { ticker: "285130", name: "SK바이오팜",              market: "KR" },
+  { ticker: "039200", name: "오스코텍",               market: "KR" },
+  { ticker: "203690", name: "스피어파워",              market: "KR" },
+  { ticker: "050890", name: "쏠리드",                 market: "KR" },
+  { ticker: "123410", name: "코리아에프티",             market: "KR" },
   { ticker: "086520", name: "에코프로",               market: "KR" },
   { ticker: "247540", name: "에코프로비엠",             market: "KR" },
   { ticker: "373220", name: "LG에너지솔루션",           market: "KR" },

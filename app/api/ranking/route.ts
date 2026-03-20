@@ -10,8 +10,9 @@ function getClient() {
   return new YahooFinance({ suppressNotices: ["yahooSurvey"] });
 }
 
-// ── 한국 KOSPI/KOSDAQ 주요 고배당 후보 (70개 이상 — Yahoo Finance 필터 후 상위 50개 반환)
-const KR_TICKERS = [
+// ── 한국 KOSPI/KOSDAQ 주요 고배당 후보 (Yahoo Finance 필터 후 상위 50개 반환)
+// 중복 방지: 티커를 Set으로 관리하여 동일 종목 중복 제거
+const KR_TICKERS_RAW = [
   // 우선주 (배당의 꽃 — 수익률 높음)
   { ticker: "005935.KS", name: "삼성전자우" },
   { ticker: "005385.KS", name: "현대차우" },
@@ -24,7 +25,13 @@ const KR_TICKERS = [
   { ticker: "096775.KS", name: "SK이노베이션우" },
   { ticker: "138041.KS", name: "메리츠금융지주우" },
   { ticker: "006405.KS", name: "삼성SDI우" },
-  { ticker: "000080.KS", name: "하이트진로우" },
+  { ticker: "000070.KS", name: "하이트진로우" },   // 하이트진로우 = 000070, 하이트진로(보통주) = 000080
+  { ticker: "000725.KS", name: "현대건설우" },
+  { ticker: "003555.KS", name: "LG우" },
+  { ticker: "003547.KS", name: "대웅제약우" },
+  { ticker: "001465.KS", name: "현대해상우" },
+  { ticker: "007575.KS", name: "이수화학우" },
+  { ticker: "004545.KS", name: "삼양사우" },
   // 은행/금융
   { ticker: "105560.KS", name: "KB금융" },
   { ticker: "055550.KS", name: "신한지주" },
@@ -35,6 +42,7 @@ const KR_TICKERS = [
   { ticker: "139130.KS", name: "DGB금융지주" },
   { ticker: "175330.KS", name: "JB금융지주" },
   { ticker: "138040.KS", name: "메리츠금융지주" },
+  { ticker: "071050.KS", name: "한국금융지주" },
   // 보험
   { ticker: "032830.KS", name: "삼성생명" },
   { ticker: "088350.KS", name: "한화생명" },
@@ -42,20 +50,28 @@ const KR_TICKERS = [
   { ticker: "000810.KS", name: "삼성화재" },
   { ticker: "001450.KS", name: "현대해상" },
   { ticker: "000060.KS", name: "메리츠화재" },
+  { ticker: "082640.KS", name: "동양생명" },
   // 통신
   { ticker: "017670.KS", name: "SK텔레콤" },
   { ticker: "030200.KS", name: "KT" },
   { ticker: "032640.KS", name: "LG유플러스" },
   // 담배/소비재
   { ticker: "033780.KS", name: "KT&G" },
-  // 인프라/유틸리티
+  // 인프라/유틸리티/리츠
   { ticker: "088980.KS", name: "맥쿼리인프라" },
   { ticker: "015760.KS", name: "한국전력" },
   { ticker: "036460.KS", name: "한국가스공사" },
+  { ticker: "330590.KS", name: "롯데리츠" },
+  { ticker: "395400.KS", name: "SK리츠" },
+  { ticker: "432320.KS", name: "KB스타리츠" },
+  { ticker: "350520.KS", name: "이지스레지던스리츠" },
+  { ticker: "334890.KS", name: "이지스밸류리츠" },
+  { ticker: "293940.KS", name: "신한알파리츠" },
   // 에너지/정유
   { ticker: "010950.KS", name: "S-Oil" },
   { ticker: "096770.KS", name: "SK이노베이션" },
   { ticker: "078930.KS", name: "GS" },
+  { ticker: "078935.KS", name: "GS우" },
   // 철강/소재
   { ticker: "005490.KS", name: "POSCO홀딩스" },
   { ticker: "010130.KS", name: "고려아연" },
@@ -67,6 +83,7 @@ const KR_TICKERS = [
   { ticker: "005380.KS", name: "현대차" },
   { ticker: "012330.KS", name: "현대모비스" },
   { ticker: "161390.KS", name: "한국타이어앤테크놀로지" },
+  { ticker: "204320.KS", name: "HL만도" },
   // 지주사
   { ticker: "034730.KS", name: "SK" },
   { ticker: "003550.KS", name: "LG" },
@@ -77,6 +94,7 @@ const KR_TICKERS = [
   { ticker: "028260.KS", name: "삼성물산" },
   { ticker: "267250.KS", name: "HD현대" },
   { ticker: "004800.KS", name: "효성" },
+  { ticker: "004835.KS", name: "효성우" },
   // 전자/반도체
   { ticker: "005930.KS", name: "삼성전자" },
   { ticker: "009150.KS", name: "삼성전기" },
@@ -91,6 +109,8 @@ const KR_TICKERS = [
   { ticker: "000080.KS", name: "하이트진로" },
   { ticker: "004170.KS", name: "신세계" },
   { ticker: "069960.KS", name: "현대백화점" },
+  { ticker: "007310.KS", name: "오뚜기" },
+  { ticker: "002380.KS", name: "KCC" },
   // 엔터/레저
   { ticker: "035250.KS", name: "강원랜드" },
   // 건설/방산/조선
@@ -101,6 +121,7 @@ const KR_TICKERS = [
   { ticker: "064350.KS", name: "현대로템" },
   // 바이오/의약
   { ticker: "000100.KS", name: "유한양행" },
+  { ticker: "003000.KS", name: "부광약품" },
   // 화학/소재
   { ticker: "051910.KS", name: "LG화학" },
   { ticker: "006400.KS", name: "삼성SDI" },
@@ -110,6 +131,14 @@ const KR_TICKERS = [
   { ticker: "003490.KS", name: "대한항공" },
   { ticker: "034020.KS", name: "두산에너빌리티" },
 ];
+
+// 중복 제거: 동일 ticker는 첫 번째만 유지
+const seenKR = new Set<string>();
+const KR_TICKERS = KR_TICKERS_RAW.filter(({ ticker }) => {
+  if (seenKR.has(ticker)) return false;
+  seenKR.add(ticker);
+  return true;
+});
 
 // ── 미국 고배당 후보 (70개 이상)
 const US_TICKERS = [

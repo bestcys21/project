@@ -21,32 +21,45 @@ function fmt(d: unknown): string | null {
   } catch { return null; }
 }
 
+async function fetchQuote(yf: any, ticker: string): Promise<any> {
+  const quote = await yf.quote(ticker);
+  if (!quote?.regularMarketPrice) throw new Error("No price data");
+  return quote;
+}
+
 export async function GET(req: NextRequest) {
-  const ticker = req.nextUrl.searchParams.get("ticker");
-  if (!ticker) {
+  const rawTicker = req.nextUrl.searchParams.get("ticker");
+  if (!rawTicker) {
     return NextResponse.json({ error: "ticker 파라미터가 필요합니다." }, { status: 400 });
   }
 
   const yf = getClient();
 
-  // 1단계: quote() — 기본 주가·배당 정보
+  // 한국 주식(.KS 전용으로 왔을 때 .KQ 자동 fallback)
+  const isKorean = rawTicker.endsWith(".KS") || rawTicker.endsWith(".KQ");
+  const tickerCandidates: string[] = isKorean
+    ? rawTicker.endsWith(".KS")
+      ? [rawTicker, rawTicker.replace(".KS", ".KQ")]  // .KS 먼저, 실패 시 .KQ
+      : [rawTicker, rawTicker.replace(".KQ", ".KS")]  // .KQ 먼저, 실패 시 .KS
+    : [rawTicker];
+
   let quote: any;
-  try {
-    quote = await yf.quote(ticker);
-  } catch (e: any) {
-    const msg = e?.message ?? "";
-    const notFound = msg.includes("No fundamentals") || msg.includes("404") ||
-                     msg.includes("Not Found") || msg.includes("Will not feed");
-    return NextResponse.json(
-      { error: notFound
-          ? "종목을 찾을 수 없습니다. 종목명 또는 티커를 다시 확인해 주세요."
-          : "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요." },
-      { status: 500 }
-    );
+  let ticker = rawTicker;
+  for (const candidate of tickerCandidates) {
+    try {
+      const q = await fetchQuote(yf, candidate);
+      quote = q;
+      ticker = candidate;  // 성공한 티커로 확정
+      break;
+    } catch { /* try next */ }
   }
 
   if (!quote) {
-    return NextResponse.json({ error: "종목을 찾을 수 없습니다. 종목명 또는 티커를 다시 확인해 주세요." }, { status: 404 });
+    // 마지막 에러 응답
+    return NextResponse.json(
+      { error: "종목을 찾을 수 없습니다. 종목명 또는 티커를 다시 확인해 주세요." },
+      { status: 404 }
+    );
   }
 
   // quote()에서 배당 정보 추출 (항상 사용 가능)
