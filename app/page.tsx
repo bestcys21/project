@@ -33,11 +33,31 @@ export default function Home() {
             {[
               {
                 icon: (
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-2"
-                    style={{ background: "linear-gradient(135deg, #3182F6, #1B64DA)" }}>
-                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round"
-                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  <div className="mx-auto mb-3" style={{ width: 56, height: 56, filter: "drop-shadow(0 6px 12px rgba(49,130,246,0.45))" }}>
+                    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <linearGradient id="bag-bg" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#60A5FA"/>
+                          <stop offset="100%" stopColor="#1B64DA"/>
+                        </linearGradient>
+                        <linearGradient id="bag-body" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#EFF6FF"/>
+                          <stop offset="100%" stopColor="#BFDBFE"/>
+                        </linearGradient>
+                      </defs>
+                      {/* 배경 */}
+                      <rect width="56" height="56" rx="16" fill="url(#bag-bg)"/>
+                      {/* 상단 광택 */}
+                      <rect x="6" y="4" width="44" height="22" rx="12" fill="white" opacity="0.18"/>
+                      {/* 쇼핑백 몸통 */}
+                      <rect x="13" y="26" width="30" height="22" rx="5" fill="url(#bag-body)"/>
+                      {/* 쇼핑백 상단 테두리 */}
+                      <rect x="13" y="26" width="30" height="6" rx="3" fill="#93C5FD"/>
+                      {/* 손잡이 */}
+                      <path d="M20 26 C20 17 36 17 36 26" stroke="#1D4ED8" strokeWidth="3" strokeLinecap="round" fill="none"/>
+                      <path d="M20 26 C20 18 36 18 36 26" stroke="white" strokeWidth="1.2" strokeLinecap="round" fill="none" opacity="0.6"/>
+                      {/* 원화 기호 */}
+                      <text x="28" y="41" textAnchor="middle" fill="#1E40AF" fontSize="11" fontWeight="800">₩</text>
                     </svg>
                   </div>
                 ),
@@ -46,11 +66,34 @@ export default function Home() {
               },
               {
                 icon: (
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-2"
-                    style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
-                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round"
-                        d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                  <div className="mx-auto mb-3" style={{ width: 56, height: 56, filter: "drop-shadow(0 6px 12px rgba(245,158,11,0.45))" }}>
+                    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <linearGradient id="cal-bg" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#FCD34D"/>
+                          <stop offset="100%" stopColor="#D97706"/>
+                        </linearGradient>
+                        <linearGradient id="cal-body" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#FFFFFF"/>
+                          <stop offset="100%" stopColor="#FEF3C7"/>
+                        </linearGradient>
+                      </defs>
+                      <rect width="56" height="56" rx="16" fill="url(#cal-bg)"/>
+                      <rect x="6" y="4" width="44" height="22" rx="12" fill="white" opacity="0.18"/>
+                      {/* 캘린더 몸통 */}
+                      <rect x="11" y="18" width="34" height="28" rx="5" fill="url(#cal-body)"/>
+                      {/* 캘린더 헤더 */}
+                      <rect x="11" y="18" width="34" height="10" rx="5" fill="#F59E0B"/>
+                      <rect x="11" y="23" width="34" height="5" fill="#F59E0B"/>
+                      {/* 링 */}
+                      <rect x="20" y="13" width="4" height="9" rx="2" fill="#92400E"/>
+                      <rect x="32" y="13" width="4" height="9" rx="2" fill="#92400E"/>
+                      {/* X 표시 (배당락일 = 권리 소멸) */}
+                      <line x1="22" y1="33" x2="28" y2="39" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round"/>
+                      <line x1="28" y1="33" x2="22" y2="39" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round"/>
+                      {/* 날짜 점 */}
+                      <rect x="32" y="33" width="4" height="4" rx="1" fill="#D97706" opacity="0.5"/>
+                      <rect x="32" y="40" width="4" height="4" rx="1" fill="#D97706" opacity="0.5"/>
                     </svg>
                   </div>
                 ),
@@ -59,11 +102,31 @@ export default function Home() {
               },
               {
                 icon: (
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-2"
-                    style={{ background: "linear-gradient(135deg, #8B5CF6, #7C3AED)" }}>
-                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round"
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  <div className="mx-auto mb-3" style={{ width: 56, height: 56, filter: "drop-shadow(0 6px 12px rgba(139,92,246,0.45))" }}>
+                    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <linearGradient id="clip-bg" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#A78BFA"/>
+                          <stop offset="100%" stopColor="#6D28D9"/>
+                        </linearGradient>
+                        <linearGradient id="clip-body" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#FFFFFF"/>
+                          <stop offset="100%" stopColor="#EDE9FE"/>
+                        </linearGradient>
+                      </defs>
+                      <rect width="56" height="56" rx="16" fill="url(#clip-bg)"/>
+                      <rect x="6" y="4" width="44" height="22" rx="12" fill="white" opacity="0.18"/>
+                      {/* 클립보드 */}
+                      <rect x="13" y="16" width="30" height="32" rx="5" fill="url(#clip-body)"/>
+                      {/* 클립 */}
+                      <rect x="21" y="12" width="14" height="8" rx="4" fill="#8B5CF6"/>
+                      <rect x="23" y="14" width="10" height="4" rx="2" fill="#C4B5FD"/>
+                      {/* 라인들 */}
+                      <rect x="18" y="26" width="20" height="2.5" rx="1.25" fill="#DDD6FE"/>
+                      <rect x="18" y="31" width="14" height="2.5" rx="1.25" fill="#DDD6FE"/>
+                      {/* 체크마크 */}
+                      <circle cx="34" cy="38" r="7" fill="#7C3AED"/>
+                      <path d="M30.5 38 L33 40.5 L37.5 35.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
                 ),
@@ -72,11 +135,35 @@ export default function Home() {
               },
               {
                 icon: (
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-2"
-                    style={{ background: "linear-gradient(135deg, #10B981, #059669)" }}>
-                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round"
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <div className="mx-auto mb-3" style={{ width: 56, height: 56, filter: "drop-shadow(0 6px 12px rgba(16,185,129,0.45))" }}>
+                    <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <linearGradient id="coin-bg" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#34D399"/>
+                          <stop offset="100%" stopColor="#059669"/>
+                        </linearGradient>
+                        <linearGradient id="coin-face" x1="0.2" y1="0" x2="0.8" y2="1">
+                          <stop offset="0%" stopColor="#FDE68A"/>
+                          <stop offset="60%" stopColor="#F59E0B"/>
+                          <stop offset="100%" stopColor="#D97706"/>
+                        </linearGradient>
+                        <linearGradient id="coin-side" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#92400E"/>
+                          <stop offset="100%" stopColor="#78350F"/>
+                        </linearGradient>
+                      </defs>
+                      <rect width="56" height="56" rx="16" fill="url(#coin-bg)"/>
+                      <rect x="6" y="4" width="44" height="22" rx="12" fill="white" opacity="0.18"/>
+                      {/* 동전 측면 (두께감) */}
+                      <ellipse cx="28" cy="35" rx="14" ry="4" fill="url(#coin-side)"/>
+                      {/* 동전 앞면 */}
+                      <ellipse cx="28" cy="28" rx="14" ry="9" fill="url(#coin-face)"/>
+                      {/* 동전 테두리 */}
+                      <ellipse cx="28" cy="28" rx="14" ry="9" stroke="#D97706" strokeWidth="1" fill="none"/>
+                      {/* 동전 광택 */}
+                      <ellipse cx="24" cy="24" rx="5" ry="3" fill="white" opacity="0.3" transform="rotate(-20 24 24)"/>
+                      {/* 원화 기호 */}
+                      <text x="28" y="32" textAnchor="middle" fill="#92400E" fontSize="11" fontWeight="900">₩</text>
                     </svg>
                   </div>
                 ),
