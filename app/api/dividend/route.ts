@@ -45,6 +45,10 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  if (!quote) {
+    return NextResponse.json({ error: "종목을 찾을 수 없습니다. 종목명 또는 티커를 다시 확인해 주세요." }, { status: 404 });
+  }
+
   // quote()에서 배당 정보 추출 (항상 사용 가능)
   const price         = quote.regularMarketPrice          ?? null;
   let   dps: number | null = (quote as any).trailingAnnualDividendRate ?? null;

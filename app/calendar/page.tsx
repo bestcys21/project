@@ -12,6 +12,7 @@ const TAX_RATE = { KR: 0.154, US: 0.15 };
 // 캘린더용 이벤트 (예상 지급일 포함)
 interface CalEvent extends DividendEvent {
   estimated?: boolean; // 예상 날짜 여부
+  koreanName?: string;  // 한글 종목명 (localStorage 기준)
 }
 
 export default function CalendarPage() {
@@ -36,6 +37,8 @@ export default function CalendarPage() {
       holdings.map(async (h) => {
         const ticker  = h.market === "KR" ? `${h.ticker}.KS` : h.ticker.toUpperCase();
         const taxRate = TAX_RATE[h.market];
+        // 한글 이름은 localStorage 기준 우선 사용
+        const koreanName = h.name;
         try {
           const res  = await fetch(`/api/dividend?ticker=${encodeURIComponent(ticker)}`);
           let data: any = {};
@@ -49,7 +52,7 @@ export default function CalendarPage() {
           if (data.paymentDate) {
             results.push({
               holdingId: h.id, ticker: h.ticker,
-              name: data.name ?? h.name, market: h.market,
+              name: koreanName, market: h.market, koreanName,
               exDate: data.exDate ?? "미정", paymentDate: data.paymentDate,
               dps, quantity: h.quantity, netAmount, estimated: false,
             });
@@ -58,7 +61,7 @@ export default function CalendarPage() {
             estimatedDates.forEach((pd) => {
               results.push({
                 holdingId: h.id, ticker: h.ticker,
-                name: data.name ?? h.name, market: h.market,
+                name: koreanName, market: h.market, koreanName,
                 exDate: data.exDate ?? "미정", paymentDate: pd,
                 dps, quantity: h.quantity, netAmount, estimated: true,
               });
@@ -66,14 +69,14 @@ export default function CalendarPage() {
           } else {
             results.push({
               holdingId: h.id, ticker: h.ticker,
-              name: data.name ?? h.name, market: h.market,
+              name: koreanName, market: h.market, koreanName,
               exDate: data.exDate ?? "미정", paymentDate: "미정",
               dps: 0, quantity: h.quantity, netAmount: 0,
             });
           }
         } catch {
           results.push({
-            holdingId: h.id, ticker: h.ticker, name: h.name, market: h.market,
+            holdingId: h.id, ticker: h.ticker, name: koreanName, market: h.market, koreanName,
             exDate: "미정", paymentDate: "미정",
             dps: 0, quantity: h.quantity, netAmount: 0,
           });
@@ -132,15 +135,32 @@ export default function CalendarPage() {
     return e.paymentDate.startsWith(key) ? sum + e.netAmount : sum;
   }, 0);
 
+  // 이번 달 전체 이벤트 목록 (날짜순 정렬)
+  const monthKey = `${year}.${String(month + 1).padStart(2, "0")}`;
+  const monthEvents = events
+    .filter((e) => e.paymentDate.startsWith(monthKey) || e.exDate.startsWith(monthKey))
+    .sort((a, b) => {
+      const da = a.paymentDate.startsWith(monthKey) ? a.paymentDate : a.exDate;
+      const db = b.paymentDate.startsWith(monthKey) ? b.paymentDate : b.exDate;
+      return da.localeCompare(db);
+    });
+
+  // 날짜 포맷: "2025.04.15" → "4월 15일"
+  function fmtDate(d: string) {
+    const m = d.match(/\d{4}\.(\d{2})\.(\d{2})/);
+    if (!m) return d;
+    return `${parseInt(m[1])}월 ${parseInt(m[2])}일`;
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-5">
       <div className="space-y-1">
-        <h1 className="text-2xl font-extrabold text-toss-text">배당 캘린더</h1>
-        <p className="text-sm text-toss-sub">배당락일과 지급일을 한눈에 확인하세요.</p>
+        <h1 className="text-3xl font-extrabold text-toss-text">배당 캘린더</h1>
+        <p className="text-base text-toss-sub">배당락일과 지급일을 한눈에 확인하세요.</p>
       </div>
 
       {/* PC: 2열 레이아웃 */}
-      <div className="lg:grid lg:grid-cols-[1fr_300px] lg:gap-6 lg:items-start space-y-5 lg:space-y-0">
+      <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-6 lg:items-start space-y-5 lg:space-y-0">
         <div className="space-y-5">
 
       {/* 이번 달 요약 */}
@@ -216,7 +236,7 @@ export default function CalendarPage() {
           ) : (
             <div className="grid grid-cols-7 gap-y-1">
               {cells.map((day, idx) => {
-                if (!day) return <div key={`e-${idx}`} className="h-12" />;
+                if (!day) return <div key={`e-${idx}`} className="h-14" />;
                 const key = dateKey(year, month, day);
                 const { exDate, payDate } = getEventsForDate(day);
                 const isToday    = key === todayKey;
@@ -231,7 +251,7 @@ export default function CalendarPage() {
                 return (
                   <button key={day} onClick={() => handleDayClick(day)}
                     className={`relative flex flex-col items-center justify-center h-14 rounded-xl transition-colors
-                      ${isSelected ? "bg-blue-50" : "hover:bg-toss-bg"}
+                      ${isSelected ? "bg-blue-50 dark:bg-blue-900/20" : "hover:bg-toss-bg"}
                       ${isToday ? "ring-1 ring-toss-blue" : ""}`}>
                     <span className={`text-[14px] font-semibold leading-none
                       ${isToday ? "text-toss-blue" : col === 0 ? "text-red-400" : col === 6 ? "text-blue-400" : "text-toss-text"}`}>
@@ -262,9 +282,77 @@ export default function CalendarPage() {
         </div>
       )}
 
+      {/* ── 이번 달 전체 일정 목록 ── */}
+      {!loading && monthEvents.length > 0 && (
+        <div className="bg-toss-card rounded-2xl shadow-card p-5 space-y-3">
+          <p className="text-[15px] font-extrabold text-toss-text">{year}년 {month + 1}월 전체 일정</p>
+          <div className="space-y-2">
+            {monthEvents.map((e, i) => {
+              const color = holdingColor(e.holdingId);
+              const isPayInMonth = e.paymentDate.startsWith(monthKey);
+              const isExInMonth  = e.exDate.startsWith(monthKey);
+              const isEst = !!(e as CalEvent).estimated;
+              return (
+                <div key={i} className="flex items-center gap-3 py-2.5 border-b border-toss-border last:border-0">
+                  {/* 날짜 배지 */}
+                  <div className="flex-shrink-0 w-14 text-center">
+                    {isPayInMonth && (
+                      <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-lg"
+                        style={{ background: color + "22", color }}>
+                        {fmtDate(e.paymentDate)}
+                      </span>
+                    )}
+                    {!isPayInMonth && isExInMonth && (
+                      <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500">
+                        {fmtDate(e.exDate)}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* 종목 */}
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                    style={{ background: color }}>
+                    {(e.koreanName ?? e.name).slice(0, 2)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <p className="text-[14px] font-bold text-toss-text truncate">{e.koreanName ?? e.name}</p>
+                      {isPayInMonth && (
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0
+                          ${isEst ? "text-amber-600 bg-amber-50 dark:bg-amber-900/20" : "text-toss-blue bg-blue-50 dark:bg-blue-900/20"}`}>
+                          {isEst ? "예상 지급일" : "실제 지급일"}
+                        </span>
+                      )}
+                      {!isPayInMonth && isExInMonth && (
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 text-red-500 bg-red-50 dark:bg-red-900/20">
+                          배당락일
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[12px] text-toss-sub mt-0.5">
+                      {e.quantity.toLocaleString()}주 · 주당 {e.market === "KR" ? `${e.dps}원` : `$${e.dps}`}
+                    </p>
+                  </div>
+                  {isPayInMonth && (
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-[15px] font-extrabold" style={{ color }}>
+                        {e.market === "KR"
+                          ? `${Math.round(e.netAmount).toLocaleString("ko-KR")}원`
+                          : `$${e.netAmount.toFixed(2)}`}
+                      </p>
+                      <p className="text-[11px] text-toss-sub">{isEst ? "예상 세후" : "세후"}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
         </div>{/* end lg 왼쪽 */}
 
-        {/* 오른쪽: 선택된 날짜 상세 (PC) + 범례 */}
+        {/* 오른쪽: 선택된 날짜 상세 (PC) */}
         <div className="space-y-4">
           {selected && selected.length > 0 && (
             <div className="bg-toss-card rounded-2xl shadow-card p-5 space-y-3 fade-up">
@@ -277,17 +365,20 @@ export default function CalendarPage() {
                   <div key={i} className="flex items-center gap-3 py-2.5 border-b border-toss-border last:border-0">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
                       style={{ background: color }}>
-                      {e.ticker.slice(0, 2)}
+                      {(e.koreanName ?? e.name).slice(0, 2)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <p className="text-[14px] font-bold text-toss-text truncate">{e.name}</p>
+                        <p className="text-[14px] font-bold text-toss-text truncate">{e.koreanName ?? e.name}</p>
                         {isEst && (
-                          <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full flex-shrink-0">예상</span>
+                          <span className="text-[10px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 rounded-full flex-shrink-0">예상</span>
                         )}
                       </div>
                       <p className="text-[12px] text-toss-sub mt-0.5">
-                        {isEx ? "📌 배당락일" : "💰 배당 지급일"}
+                        {isEx
+                          ? <><span className="text-red-500 font-semibold">📌 배당락일</span></>
+                          : <><span className="text-toss-blue font-semibold">💰 배당 지급일</span></>
+                        }
                         &nbsp;·&nbsp;{e.quantity.toLocaleString()}주
                         &nbsp;·&nbsp;주당 {e.market === "KR" ? `${e.dps}원` : `$${e.dps}`}
                       </p>

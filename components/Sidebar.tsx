@@ -26,17 +26,16 @@ export default function Sidebar({ isOpen, onClose }: Props) {
       className={`
         fixed top-0 left-0 h-full w-64 z-40
         flex flex-col transition-transform duration-300 ease-in-out
-        border-r border-toss-border
+        border-r border-toss-border sidebar-bg
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
         md:translate-x-0
       `}
-      style={{
-        background: "linear-gradient(180deg, #ffffff 0%, #f8faff 60%, #f2f6ff 100%)",
-      }}
     >
       {/* 로고 */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-toss-border">
-        <LogoFull iconSize={28} />
+        <Link href="/landing" onClick={onClose}>
+          <LogoFull iconSize={28} />
+        </Link>
         <div className="flex items-center gap-1">
           {/* 다크모드 토글 */}
           <ThemeToggle />
@@ -71,7 +70,7 @@ export default function Sidebar({ isOpen, onClose }: Props) {
                 relative flex items-center gap-3 px-4 py-3 rounded-xl text-[15px] font-semibold
                 transition-all duration-150
                 ${active
-                  ? "bg-blue-50 text-toss-blue"
+                  ? "bg-blue-50 dark:bg-blue-900/20 text-toss-blue"
                   : "text-toss-label hover:bg-toss-bg hover:text-toss-text"
                 }
               `}

@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-// 랭킹은 1시간 캐시 (Yahoo Finance 호출 최소화)
-export const revalidate = 3600;
+// 캐시 없음 — 항상 최신 데이터 (Yahoo Finance 실시간)
+export const dynamic = "force-dynamic";
 
 function getClient() {
   const YahooFinance = require("yahoo-finance2").default;
@@ -12,6 +12,19 @@ function getClient() {
 
 // ── 한국 KOSPI/KOSDAQ 주요 고배당 후보 (70개 이상 — Yahoo Finance 필터 후 상위 50개 반환)
 const KR_TICKERS = [
+  // 우선주 (배당의 꽃 — 수익률 높음)
+  { ticker: "005935.KS", name: "삼성전자우" },
+  { ticker: "005385.KS", name: "현대차우" },
+  { ticker: "005387.KS", name: "현대차2우B" },
+  { ticker: "000215.KS", name: "DL이앤씨우" },
+  { ticker: "051915.KS", name: "LG화학우" },
+  { ticker: "000885.KS", name: "한화우" },
+  { ticker: "032835.KS", name: "삼성생명우" },
+  { ticker: "009155.KS", name: "삼성전기우" },
+  { ticker: "096775.KS", name: "SK이노베이션우" },
+  { ticker: "138041.KS", name: "메리츠금융지주우" },
+  { ticker: "006405.KS", name: "삼성SDI우" },
+  { ticker: "000080.KS", name: "하이트진로우" },
   // 은행/금융
   { ticker: "105560.KS", name: "KB금융" },
   { ticker: "055550.KS", name: "신한지주" },

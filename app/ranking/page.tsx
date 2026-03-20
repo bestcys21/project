@@ -63,9 +63,9 @@ export default function RankingPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 space-y-5">
       <div className="px-2 space-y-1">
-        <h1 className="text-2xl font-extrabold text-toss-text">배당 랭킹</h1>
-        <p className="text-sm text-toss-sub">
-          Yahoo Finance 실시간 데이터 기준 배당 수익률 상위 50위입니다.
+        <h1 className="text-3xl font-extrabold text-toss-text">배당 랭킹</h1>
+        <p className="text-base text-toss-sub">
+          배당수익률 기준 상위 50위 종목입니다. (우선주 포함)
         </p>
       </div>
 
@@ -87,10 +87,10 @@ export default function RankingPage() {
       </div>
 
       {/* 데이터 소스 안내 */}
-      <div className="flex items-start gap-2 px-3.5 py-3 rounded-xl bg-blue-50 border border-blue-100">
+      <div className="flex items-start gap-2 px-3.5 py-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
         <span className="text-blue-400 flex-shrink-0 text-base">ℹ️</span>
-        <p className="text-[12px] text-blue-700 leading-relaxed">
-          <strong>데이터 출처:</strong> Yahoo Finance 실시간 API. 코스피/코스닥 시가총액 상위 종목 풀(70개+)에서
+        <p className="text-[12px] text-blue-700 dark:text-blue-300 leading-relaxed">
+          <strong>데이터 출처:</strong> Yahoo Finance 실시간 API. 코스피/코스닥 주요 종목 및 우선주를 포함한 풀에서
           배당수익률이 확인된 종목을 수익률 순으로 정렬합니다.
           무료 API 특성상 일부 종목은 데이터가 누락될 수 있습니다.
         </p>
@@ -116,7 +116,7 @@ export default function RankingPage() {
           ) : (
             <div>
               {/* PC 테이블 헤더 */}
-              <div className="hidden md:grid md:grid-cols-[40px_50px_1fr_120px_100px] gap-3 px-2 pb-2 border-b border-toss-border mb-1">
+              <div className="hidden md:grid md:grid-cols-[40px_50px_1fr_110px_110px] gap-3 px-2 pb-2 border-b border-toss-border mb-1">
                 <span className="text-[11px] font-semibold text-toss-sub text-center">순위</span>
                 <span />
                 <span className="text-[11px] font-semibold text-toss-sub">종목명</span>
@@ -126,10 +126,10 @@ export default function RankingPage() {
               {data.map((stock, i) => (
                 <div key={stock.ticker}
                   className="flex items-center gap-3 py-3.5 border-b border-toss-border last:border-0
-                             md:grid md:grid-cols-[40px_50px_1fr_120px_100px]">
+                             md:grid md:grid-cols-[40px_50px_1fr_110px_110px]">
 
                   {/* 순위 */}
-                  <div className="w-7 text-center flex-shrink-0">
+                  <div className="w-7 text-center flex-shrink-0 md:w-auto">
                     {i < 3
                       ? <span className="text-lg">{MEDAL[i]}</span>
                       : <span className="text-[14px] font-bold text-toss-sub">{i + 1}</span>
@@ -139,34 +139,48 @@ export default function RankingPage() {
                   {/* 로고 */}
                   <StockLogo ticker={stock.ticker} name={stock.name} market={stock.market} size={40} />
 
-                  {/* 이름 */}
+                  {/* 이름 + 티커 */}
                   <div className="flex-1 min-w-0">
                     <p className="text-[15px] font-bold text-toss-text truncate">{stock.name}</p>
-                    <p className="text-[13px] text-toss-sub mt-0.5">
-                      {stock.ticker.replace(".KS", "")}
-                      {stock.price != null && (
-                        <span className="ml-1.5">
-                          · {market === "KR"
-                            ? `${stock.price.toLocaleString("ko-KR")}원`
-                            : `$${stock.price.toFixed(2)}`}
-                        </span>
-                      )}
+                    <p className="text-[12px] text-toss-sub mt-0.5">
+                      {stock.ticker.replace(/\.(KS|KQ)$/, "")}
                     </p>
                   </div>
 
-                  {/* 수익률 + DPS */}
-                  <div className="text-right flex-shrink-0">
+                  {/* 현재가 */}
+                  <div className="hidden md:block text-right flex-shrink-0">
+                    {stock.price != null ? (
+                      <p className="text-[14px] font-semibold text-toss-text">
+                        {market === "KR"
+                          ? `${stock.price.toLocaleString("ko-KR")}원`
+                          : `$${stock.price.toFixed(2)}`}
+                      </p>
+                    ) : (
+                      <p className="text-[13px] text-toss-sub">—</p>
+                    )}
+                    {stock.dps != null && (
+                      <p className="text-[11px] text-toss-sub mt-0.5">
+                        연 {market === "KR"
+                          ? `${stock.dps.toLocaleString("ko-KR")}원`
+                          : `$${stock.dps.toFixed(2)}`}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* 배당수익률 */}
+                  <div className="text-right flex-shrink-0 ml-auto md:ml-0">
                     <p className={`text-[16px] font-extrabold ${
                       stock.dividendYield >= 0.07 ? "text-red-500" :
                       stock.dividendYield >= 0.04 ? "text-toss-blue" : "text-toss-text"
                     }`}>
                       {(stock.dividendYield * 100).toFixed(2)}%
                     </p>
-                    {stock.dps != null && (
-                      <p className="text-[12px] text-toss-sub mt-0.5">
-                        연 {market === "KR"
-                          ? `${stock.dps.toLocaleString("ko-KR")}원`
-                          : `$${stock.dps.toFixed(2)}`}
+                    {/* 모바일에서만 현재가 표시 */}
+                    {stock.price != null && (
+                      <p className="text-[11px] text-toss-sub mt-0.5 md:hidden">
+                        {market === "KR"
+                          ? `${stock.price.toLocaleString("ko-KR")}원`
+                          : `$${stock.price.toFixed(2)}`}
                       </p>
                     )}
                   </div>
@@ -178,8 +192,7 @@ export default function RankingPage() {
       </ErrorBoundary>
 
       <p className="text-[12px] text-toss-sub text-center px-4">
-        * Yahoo Finance 실시간 데이터 기준. 투자 권유가 아닙니다.<br />
-        * 한국 전체 시장 스크리닝은 KRX/DART API 연동 시 가능합니다.
+        * 실시간 시장 데이터 기준. 투자 권유가 아닙니다.
       </p>
     </div>
   );

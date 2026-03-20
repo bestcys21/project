@@ -199,14 +199,14 @@ export default function WikiPage() {
     <div className="px-4 md:px-8 lg:px-10 py-8 max-w-6xl mx-auto space-y-10">
       {/* 헤더 */}
       <div className="space-y-1.5">
-        <h1 className="text-[28px] font-extrabold text-toss-text">배당 위키</h1>
-        <p className="text-[15px] text-toss-sub">배당 투자에 필요한 모든 것을 쉽게 알아보세요.</p>
+        <h1 className="text-3xl font-extrabold text-toss-text">배당 위키</h1>
+        <p className="text-base text-toss-sub">배당 투자에 필요한 모든 것을 쉽게 알아보세요.</p>
       </div>
 
       {ARTICLES.map((section) => (
         <div key={section.category} className="space-y-4">
-          {/* 섹션 헤더 — 막대 없이 */}
-          <h2 className="text-[17px] font-extrabold text-toss-text">{section.category}</h2>
+          {/* 섹션 헤더 */}
+          <h2 className="text-[19px] font-extrabold text-toss-text">{section.category}</h2>
 
           {/* 3열 그리드 (데스크톱) */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -215,21 +215,17 @@ export default function WikiPage() {
                 key={item.q}
                 className="bg-toss-card rounded-2xl shadow-card p-6 space-y-3 hover:shadow-card-hover transition-shadow"
               >
-                <div
-                  className="w-8 h-8 rounded-xl flex items-center justify-center"
-                  style={{ background: section.bgColor }}
-                >
-                  <span className="text-sm font-bold" style={{ color: section.color }}>Q</span>
-                </div>
-                <h3 className="text-[15px] font-bold text-toss-text leading-snug">{item.q}</h3>
-                <p className="text-[13px] text-toss-label leading-relaxed">{item.a}</p>
+                <h3 className="text-[16px] font-bold leading-snug" style={{ color: section.color }}>
+                  Q. {item.q}
+                </h3>
+                <p className="text-[14px] text-toss-label leading-relaxed">{item.a}</p>
               </article>
             ))}
           </div>
         </div>
       ))}
 
-      <p className="text-center text-[12px] text-toss-sub py-4 border-t border-toss-border">
+      <p className="text-center text-[13px] text-toss-sub py-4 border-t border-toss-border">
         본 내용은 투자 권유가 아닌 교육 목적의 정보입니다.
       </p>
     </div>

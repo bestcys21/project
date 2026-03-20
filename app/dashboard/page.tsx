@@ -9,6 +9,9 @@ import StockLogo from "@/components/StockLogo";
 import DividendChart, { STOCK_COLORS } from "@/components/DividendChart";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { SummaryCardSkeleton, ChartSkeleton, HoldingRowSkeleton } from "@/components/Skeleton";
+import {
+  RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip as ReTooltip,
+} from "recharts";
 
 const TAX_RATE: Record<Market, number> = { KR: 0.154, US: 0.15 };
 
@@ -253,8 +256,8 @@ export default function DashboardPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-5">
       <div className="space-y-1">
-        <h1 className="text-2xl font-extrabold text-toss-text">내 배당</h1>
-        <p className="text-sm text-toss-sub">보유 종목 기반 연간 배당 수익을 한눈에 확인하세요.</p>
+        <h1 className="text-3xl font-extrabold text-toss-text">내 배당</h1>
+        <p className="text-base text-toss-sub">보유 종목 기반 연간 배당 수익을 한눈에 확인하세요.</p>
       </div>
 
       {/* 요약 카드 */}
@@ -287,7 +290,7 @@ export default function DashboardPage() {
             <p className="text-[14px] font-bold text-toss-text">연간 목표 배당금</p>
             <button
               onClick={() => { setEditingGoal(v => !v); setGoalInput(goalAmount ? Math.round(goalAmount).toString() : ""); }}
-              className="text-[12px] font-semibold text-toss-blue bg-blue-50 px-3 py-1.5 rounded-xl hover:bg-blue-100 transition-colors"
+              className="text-[12px] font-semibold text-toss-blue bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
             >
               {goalAmount ? "수정" : "목표 설정"}
             </button>
@@ -406,7 +409,7 @@ export default function DashboardPage() {
               {!showForm && (
                 <button onClick={openForm}
                   className="flex items-center gap-1.5 text-[13px] font-semibold text-toss-blue
-                             bg-blue-50 px-3 py-1.5 rounded-xl hover:bg-blue-100 transition-colors">
+                             bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
@@ -504,7 +507,7 @@ export default function DashboardPage() {
               </div>
 
               {formError && (
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-50 border border-red-100">
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800">
                   <span className="text-red-400 text-sm">⚠</span>
                   <p className="text-[13px] text-red-500 font-medium">{formError}</p>
                 </div>
@@ -542,13 +545,13 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <p className="text-[14px] font-bold text-toss-text truncate">{e.name}</p>
                           {isLive && (
-                            <span className="text-[10px] font-bold text-green-600 bg-green-50
+                            <span className="text-[10px] font-bold text-green-600 bg-green-50 dark:bg-green-900/20
                                              px-1.5 py-0.5 rounded-full flex-shrink-0">실시간</span>
                           )}
                           {yieldRate != null && (
                             <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${
-                              yieldRate >= 0.07 ? "bg-red-50 text-red-500"
-                              : yieldRate >= 0.04 ? "bg-blue-50 text-toss-blue"
+                              yieldRate >= 0.07 ? "bg-red-50 dark:bg-red-900/20 text-red-500"
+                              : yieldRate >= 0.04 ? "bg-blue-50 dark:bg-blue-900/20 text-toss-blue"
                               : "bg-toss-bg text-toss-label"}`}>
                               {(yieldRate * 100).toFixed(2)}%
                             </span>
@@ -579,7 +582,7 @@ export default function DashboardPage() {
                         <p className="text-[12px] text-toss-sub">세후 배당</p>
                       </div>
                       <button onClick={() => handleRemove(e.holdingId)}
-                        className="p-2 rounded-xl hover:bg-red-50 text-toss-sub hover:text-red-400 transition-colors">
+                        className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-toss-sub hover:text-red-400 transition-colors">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -594,6 +597,15 @@ export default function DashboardPage() {
       </ErrorBoundary>
 
       </div>{/* end PC 2열 */}
+
+      {/* 또래 평균 비교 인사이트 */}
+      {!initLoading && holdings.length > 0 && (
+        <PeerInsight
+          annualNet={annualNet}
+          avgYield={avgYield}
+          stockCount={holdings.length}
+        />
+      )}
     </div>
   );
 }
@@ -641,6 +653,138 @@ function EmptyChart() {
     <div className="h-[200px] flex flex-col items-center justify-center text-toss-sub space-y-2">
       <span className="text-4xl">📊</span>
       <p className="text-[14px]">종목을 추가하면 배당 차트가 표시돼요.</p>
+    </div>
+  );
+}
+
+/* ── 또래 평균 비교 인사이트 ── */
+// 30대 배당 투자자 mock 평균 데이터
+const PEER_MOCK = {
+  yield:  3.8,   // 평균 배당수익률 %
+  annual: 840000, // 연간 배당금 (원)
+  stocks: 4,     // 평균 보유 종목 수
+};
+
+function scorify(value: number, peer: number, max: number): number {
+  // 0~100 점수로 정규화. peer가 기준(60점)
+  const ratio = value / peer;
+  return Math.min(Math.round(ratio * 60), 100);
+}
+
+function PeerInsight({
+  annualNet,
+  avgYield,
+  stockCount,
+}: {
+  annualNet:  number;
+  avgYield:   number | null;
+  stockCount: number;
+}) {
+  const yieldPct  = avgYield != null ? avgYield * 100 : 0;
+  const myScores  = {
+    yield:  scorify(yieldPct,    PEER_MOCK.yield,   10),
+    annual: scorify(annualNet,   PEER_MOCK.annual,  5_000_000),
+    stocks: scorify(stockCount,  PEER_MOCK.stocks,  10),
+  };
+
+  const radarData = [
+    { subject: "배당수익률",  me: myScores.yield,  peer: 60 },
+    { subject: "연간배당금",  me: myScores.annual, peer: 60 },
+    { subject: "종목 분산",   me: myScores.stocks, peer: 60 },
+  ];
+
+  // 부족한 항목 → 팁 생성
+  const tips: { icon: string; label: string; text: string }[] = [];
+  if (myScores.yield < 50)
+    tips.push({ icon: "📈", label: "배당수익률", text: `현재 수익률(${yieldPct.toFixed(1)}%)이 또래 평균(${PEER_MOCK.yield}%)보다 낮아요. 고배당 ETF(SCHD, JEPI 등)를 일부 편입하면 수익률을 높일 수 있어요.` });
+  if (myScores.annual < 50)
+    tips.push({ icon: "💰", label: "연간 배당금", text: `연간 배당금이 또래 평균(${(PEER_MOCK.annual / 10000).toFixed(0)}만 원)에 미치지 않아요. 꾸준한 적립식 매수로 배당 규모를 키워 나가 보세요.` });
+  if (myScores.stocks < 50)
+    tips.push({ icon: "🗂️", label: "종목 분산", text: `보유 종목(${stockCount}개)이 또래 평균(${PEER_MOCK.stocks}개)보다 적어요. 섹터를 다양화하면 배당 안정성이 높아져요.` });
+  if (tips.length === 0)
+    tips.push({ icon: "🎉", label: "잘 하고 있어요!", text: "배당수익률·연간 배당금·종목 분산 모두 또래 평균을 웃돌고 있어요. 지금 페이스를 유지하세요!" });
+
+  return (
+    <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-5">
+      {/* 헤더 */}
+      <div className="flex items-center gap-2">
+        <span className="text-xl">🔍</span>
+        <div>
+          <p className="text-[14px] font-bold text-toss-text">또래 배당러 비교 인사이트</p>
+          <p className="text-[12px] text-toss-sub">30대 배당 투자자 평균 데이터와 나를 비교해요 (Mock)</p>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-[1fr_1fr] gap-6 items-center">
+        {/* 레이더 차트 */}
+        <div className="h-[220px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
+              <PolarGrid stroke="var(--toss-border)" />
+              <PolarAngleAxis dataKey="subject"
+                tick={{ fontSize: 12, fill: "var(--toss-sub)", fontWeight: 600 }} />
+              <Radar name="또래 평균" dataKey="peer"
+                stroke="#E5E8EB" fill="#E5E8EB" fillOpacity={0.4} strokeWidth={1.5} />
+              <Radar name="나" dataKey="me"
+                stroke="#3182F6" fill="#3182F6" fillOpacity={0.25} strokeWidth={2} />
+              <ReTooltip
+                content={({ active, payload }) => {
+                  if (!active || !payload?.length) return null;
+                  const subject = (payload[0]?.payload as any)?.subject ?? "";
+                  const me   = payload.find((p: any) => p.name === "나")?.value ?? 0;
+                  const peer = payload.find((p: any) => p.name === "또래 평균")?.value ?? 0;
+                  return (
+                    <div className="bg-toss-card rounded-xl shadow-card border border-toss-border px-3 py-2 text-[12px]">
+                      <p className="font-bold text-toss-text mb-1">{subject}</p>
+                      <p className="text-toss-blue font-semibold">나: {me}점</p>
+                      <p className="text-toss-sub">평균: {peer}점</p>
+                    </div>
+                  );
+                }}
+              />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* 팁 카드 */}
+        <div className="space-y-3">
+          <p className="text-[12px] font-bold text-toss-sub uppercase tracking-wider">이런 점을 보완하면 좋아요</p>
+          {tips.map((tip) => (
+            <div key={tip.label}
+              className="flex gap-3 p-3.5 rounded-xl bg-toss-bg border border-toss-border">
+              <span className="text-xl flex-shrink-0 mt-0.5">{tip.icon}</span>
+              <div>
+                <p className="text-[13px] font-bold text-toss-text mb-0.5">{tip.label}</p>
+                <p className="text-[12px] text-toss-sub leading-relaxed">{tip.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 비교 바 */}
+      <div className="space-y-3 pt-1 border-t border-toss-border">
+        {[
+          { label: "배당수익률", my: `${yieldPct.toFixed(1)}%`, peer: `${PEER_MOCK.yield}%`, score: myScores.yield },
+          { label: "연간 배당금", my: `${Math.round(annualNet / 10000)}만원`, peer: `${PEER_MOCK.annual / 10000}만원`, score: myScores.annual },
+          { label: "종목 수",    my: `${stockCount}개`, peer: `${PEER_MOCK.stocks}개`, score: myScores.stocks },
+        ].map(({ label, my, peer, score }) => (
+          <div key={label} className="space-y-1">
+            <div className="flex items-center justify-between text-[12px]">
+              <span className="font-semibold text-toss-label">{label}</span>
+              <span className="text-toss-sub">나 <span className="font-bold text-toss-text">{my}</span> · 평균 <span className="font-medium">{peer}</span></span>
+            </div>
+            <div className="relative h-2 bg-toss-bg rounded-full overflow-hidden">
+              {/* 평균 기준선 */}
+              <div className="absolute top-0 left-0 h-full rounded-full bg-toss-border" style={{ width: "60%" }} />
+              {/* 나의 점수 */}
+              <div className="absolute top-0 left-0 h-full rounded-full transition-all duration-700"
+                style={{ width: `${score}%`, background: score >= 60 ? "#3182F6" : score >= 40 ? "#f59e0b" : "#f87171" }} />
+            </div>
+          </div>
+        ))}
+        <p className="text-[11px] text-toss-sub pt-1">* 30대 배당 투자자 표본 기반 추정 데이터 (Mock). 실제 통계와 다를 수 있습니다.</p>
+      </div>
     </div>
   );
 }
