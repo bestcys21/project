@@ -13,6 +13,7 @@ export default function DashboardPage() {
   const [apiData,     setApiData]    = useState<Record<string, { dps: number }>>({});
   const [loadingApi,  setLoadingApi] = useState(false);
   const [form, setForm] = useState({ ticker: "", name: "", market: "KR" as Market, quantity: "", purchaseDate: "" });
+  const [formError, setFormError] = useState("");
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
@@ -41,12 +42,17 @@ export default function DashboardPage() {
   }
 
   function handleAdd() {
-    if (!form.ticker || !form.name || !form.quantity) return;
-    addHolding({ ...form, quantity: +form.quantity, purchaseDate: form.purchaseDate || new Date().toISOString().split("T")[0] });
+    setFormError("");
+    if (!form.ticker.trim()) return setFormError("티커를 입력해 주세요.");
+    if (!form.name.trim())   return setFormError("종목명을 입력해 주세요.");
+    if (!form.quantity || +form.quantity <= 0) return setFormError("수량을 1주 이상 입력해 주세요.");
+
+    addHolding({ ...form, ticker: form.ticker.trim(), name: form.name.trim(), quantity: +form.quantity, purchaseDate: form.purchaseDate || new Date().toISOString().split("T")[0] });
     const updated = getHoldings();
     setHoldings(updated);
     fetchApiData(updated);
     setForm({ ticker: "", name: "", market: "KR", quantity: "", purchaseDate: "" });
+    setFormError("");
     setShowForm(false);
   }
 
@@ -140,6 +146,9 @@ export default function DashboardPage() {
               <input type="date" value={form.purchaseDate} onChange={(e) => setForm({ ...form, purchaseDate: e.target.value })}
                 className="toss-input text-[13px]" />
             </div>
+            {formError && (
+              <p className="text-[13px] text-red-500 font-medium px-1">{formError}</p>
+            )}
             <button onClick={handleAdd}
               className="w-full bg-toss-blue text-white font-bold text-[14px] py-3 rounded-xl hover:bg-toss-blueDark transition-colors">
               추가하기
