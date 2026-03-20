@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";
+import { LogoFull } from "./Logo";
 
 const NAV = [
   { href: "/",          icon: "🧮", label: "배당 계산기" },
@@ -31,17 +32,7 @@ export default function Sidebar({ isOpen, onClose }: Props) {
     >
       {/* 로고 */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-toss-border">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-toss-blue rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round"
-                d="M12 8c-2.21 0-4 1.34-4 3s1.79 3 4 3 4 1.34 4 3-1.79 3-4 3m0-15v1.5M12 21v-1.5" />
-            </svg>
-          </div>
-          <span className="text-[15px] font-bold text-toss-text tracking-tight">
-            Dividend Insight
-          </span>
-        </div>
+        <LogoFull iconSize={28} />
         <div className="flex items-center gap-1">
           {/* 다크모드 토글 */}
           <ThemeToggle />

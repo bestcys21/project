@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// 개발 환경: 기업 프록시/인트라넷 SSL 인증서 우회
 if (process.env.NODE_ENV !== "production") {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-// 모듈 최상단 초기화 제거 → 핫리로드 충돌 방지
 function getClient() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const YahooFinance = require("yahoo-finance2").default;
   return new YahooFinance({ suppressNotices: ["yahooSurvey"] });
+}
+
+function fmt(d: Date | null | undefined): string | null {
+  if (!d) return null;
+  const date = new Date(d);
+  const y    = date.getFullYear();
+  const m    = String(date.getMonth() + 1).padStart(2, "0");
+  const day  = String(date.getDate()).padStart(2, "0");
+  return `${y}.${m}.${day}`;
 }
 
 export async function GET(req: NextRequest) {
@@ -22,32 +29,44 @@ export async function GET(req: NextRequest) {
   const yf = getClient();
 
   try {
-    const [quote, summary] = await Promise.all([
-      yf.quote(ticker),
-      yf.quoteSummary(ticker, { modules: ["summaryDetail", "calendarEvents"] }),
-    ]);
+    // quote는 필수, quoteSummary는 실패해도 계속 진행
+    const quote = await yf.quote(ticker);
 
-    const detail   = summary.summaryDetail;
-    const calendar = summary.calendarEvents;
+    // summaryDetail + calendarEvents 동시 시도, 실패 시 summaryDetail만 재시도
+    const summary = await yf
+      .quoteSummary(ticker, { modules: ["summaryDetail", "calendarEvents"] })
+      .catch(() =>
+        yf.quoteSummary(ticker, { modules: ["summaryDetail"] }).catch(() => null)
+      );
 
-    const dps        = detail?.dividendRate   ?? null;
-    const exDateRaw  = detail?.exDividendDate ?? null;
-    const payDateRaw = calendar?.dividendDate ?? null;
-    const price      = quote.regularMarketPrice ?? null;
+    const detail   = (summary as any)?.summaryDetail   ?? null;
+    const calendar = (summary as any)?.calendarEvents  ?? null;
 
+    const price = quote.regularMarketPrice ?? null;
+
+    // DPS: summaryDetail → quote 필드 순으로 폴백
+    const dps: number | null =
+      detail?.dividendRate ??
+      (quote as any)?.trailingAnnualDividendRate ??
+      null;
+
+    // 배당수익률: summaryDetail → quote 필드 → 직접 계산 순으로 폴백
     const dividendYield: number | null =
       detail?.dividendYield ??
       (quote as any)?.trailingAnnualDividendYield ??
       (dps != null && price != null && price > 0 ? dps / price : null);
 
-    function fmt(d: Date | null | undefined): string | null {
-      if (!d) return null;
-      const date = new Date(d);
-      const y    = date.getFullYear();
-      const m    = String(date.getMonth() + 1).padStart(2, "0");
-      const day  = String(date.getDate()).padStart(2, "0");
-      return `${y}.${m}.${day}`;
-    }
+    // 배당락일: summaryDetail → quote 필드 순으로 폴백
+    const exDateRaw: Date | null =
+      detail?.exDividendDate ??
+      (quote as any)?.exDividendDate ??
+      null;
+
+    // 지급일: calendarEvents → summaryDetail 순으로 폴백
+    const payDateRaw: Date | null =
+      calendar?.dividendDate ??
+      detail?.dividendDate ??
+      null;
 
     return NextResponse.json({
       ticker,
@@ -60,18 +79,18 @@ export async function GET(req: NextRequest) {
       currency:      quote.currency ?? "USD",
     });
   } catch (err: any) {
-    // 티커를 찾을 수 없는 경우 사용자 친화적 메시지
     const message = err?.message ?? "";
     const isNotFound =
       message.includes("No fundamentals") ||
       message.includes("Not Found") ||
-      message.includes("404");
+      message.includes("404") ||
+      message.includes("Will not feed");
 
     return NextResponse.json(
       {
         error: isNotFound
-          ? "종목을 찾을 수 없습니다. 올바른 티커를 입력해 주세요."
-          : `데이터를 가져오지 못했습니다: ${message}`,
+          ? "종목을 찾을 수 없습니다. 올바른 종목명 또는 티커를 입력해 주세요."
+          : "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
       },
       { status: 500 }
     );
