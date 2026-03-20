@@ -21,6 +21,7 @@ export interface DividendResult {
   netAmount: number;
   taxRate: number;
   currency: string;
+  eligible: boolean; // 배당락일 전 매수 여부
 }
 
 const TAX_RATE: Record<Market, number> = { KR: 0.154, US: 0.15 };
@@ -45,6 +46,7 @@ export function calculateDividend(input: DividendInput): DividendResult {
     netAmount: grossAmount * (1 - taxRate),
     taxRate,
     currency: CURRENCY[input.market],
+    eligible: true,
   };
 }
 

@@ -47,9 +47,14 @@ export default function CalculatorForm() {
         return;
       }
 
-      const taxRate     = TAX_RATE[market];
-      const dps         = data.dps ?? 0;
-      const grossAmount = dps * +qty;
+      const taxRate  = TAX_RATE[market];
+      const dps      = data.dps ?? 0;
+      const exDate   = data.exDate      ?? "미정";
+      const payDate  = data.paymentDate ?? "미정";
+
+      // 배당락일 vs 매수 예정일 비교 → 수령 가능 여부 판단
+      const eligible = isEligible(date, exDate);
+      const grossAmount = eligible ? dps * +qty : 0;
 
       setResult({
         stock:        data.name ?? stock.trim(),
@@ -57,12 +62,13 @@ export default function CalculatorForm() {
         purchaseDate: date,
         market,
         dps,
-        exDate:       data.exDate      ?? "미정",
-        paymentDate:  data.paymentDate ?? "미정",
+        exDate,
+        paymentDate:  payDate,
         grossAmount,
         netAmount:    grossAmount * (1 - taxRate),
         taxRate,
         currency:     data.currency ?? (market === "KR" ? "KRW" : "USD"),
+        eligible,
       });
 
       // 배당 데이터 없는 종목 안내
@@ -179,6 +185,18 @@ export default function CalculatorForm() {
       {result && <ResultCard result={result} />}
     </div>
   );
+}
+
+/** 매수 예정일이 배당락일 전인지 확인 (전날까지 매수해야 수령 가능) */
+function isEligible(purchaseDateStr: string, exDateStr: string): boolean {
+  if (exDateStr === "미정") return true; // 락일 모르면 일단 가능으로 표시
+  // purchaseDate: "YYYY-MM-DD", exDate: "YYYY.MM.DD"
+  const pMatch = purchaseDateStr.match(/(\d{4})-(\d{2})-(\d{2})/);
+  const eMatch = exDateStr.match(/(\d{4})\.(\d{2})\.(\d{2})/);
+  if (!pMatch || !eMatch) return true;
+  const purchase = new Date(+pMatch[1], +pMatch[2] - 1, +pMatch[3]);
+  const exDiv    = new Date(+eMatch[1], +eMatch[2] - 1, +eMatch[3]);
+  return purchase < exDiv; // 배당락일 당일은 이미 늦음
 }
 
 function Spinner() {
