@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import StockLogo from "@/components/StockLogo";
 
 interface StockData {
   ticker:        string;
@@ -10,36 +11,6 @@ interface StockData {
   dps:           number | null;
   price:         number | null;
   market:        string;
-}
-
-// ── 로고 이미지 컴포넌트 (로드 실패 시 이니셜 폴백)
-function StockLogo({ ticker, name, market }: { ticker: string; name: string; market: string }) {
-  const [err, setErr] = useState(false);
-
-  const code = ticker.replace(".KS", "");
-  const src  = market === "KR"
-    ? `https://file.alphasquare.co.kr/media/images/stock_logo/kr/${code}.png`
-    : `https://financialmodelingprep.com/image-stock/${ticker}.png`;
-
-  if (!err) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={src}
-        alt={name}
-        className="w-10 h-10 rounded-xl object-contain bg-white p-1 border border-toss-border"
-        onError={() => setErr(true)}
-      />
-    );
-  }
-
-  // 로고 없을 때: 이름 첫 두 글자로 이니셜
-  const initials = name.length >= 2 ? name.slice(0, 2) : name;
-  return (
-    <div className="w-10 h-10 rounded-xl bg-toss-bg flex items-center justify-center text-[12px] font-bold text-toss-text flex-shrink-0 border border-toss-border">
-      {initials}
-    </div>
-  );
 }
 
 function RankingSkeleton() {
@@ -157,7 +128,7 @@ export default function RankingPage() {
                   </div>
 
                   {/* 로고 */}
-                  <StockLogo ticker={stock.ticker} name={stock.name} market={stock.market} />
+                  <StockLogo ticker={stock.ticker} name={stock.name} market={stock.market} size={40} />
 
                   {/* 이름 */}
                   <div className="flex-1 min-w-0">

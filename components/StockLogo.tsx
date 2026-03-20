@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Props {
   ticker: string;
@@ -23,9 +23,10 @@ function colorFor(name: string) {
 export default function StockLogo({ ticker, name, market, size = 36 }: Props) {
   const [err, setErr] = useState(false);
 
-  const src = market === "KR"
-    ? `https://file.alphasquare.co.kr/media/images/stock_logo/kr/${ticker}.png`
-    : `https://financialmodelingprep.com/image-stock/${ticker}.png`;
+  const src = `/api/logo?ticker=${encodeURIComponent(ticker)}&market=${market}`;
+
+  // ticker/market이 바뀌면 err 상태 리셋 → 새 로고 재시도
+  useEffect(() => { setErr(false); }, [src]);
 
   const radius = Math.round(size * 0.28); // ~28% → rounded-lg feel
   const fontSize = Math.round(size * 0.33);

@@ -68,14 +68,27 @@ export async function GET(req: NextRequest) {
     else if (det?.dividendDate != null) payDateRaw = det.dividendDate;
   } catch { /* 무시 — quote() 데이터로 진행 */ }
 
+  // 과거 배당락일(7일 이상 지난 경우)은 미정 처리 — 2014년 등 과거 날짜 반환 방지
+  const fmtExDate = fmt(exDateRaw);
+  const fmtPayDate = fmt(payDateRaw);
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  function isPast(dateStr: string | null): boolean {
+    if (!dateStr) return false;
+    const m = dateStr.match(/(\d{4})\.(\d{2})\.(\d{2})/);
+    if (!m) return false;
+    return new Date(+m[1], +m[2] - 1, +m[3]) < sevenDaysAgo;
+  }
+
   return NextResponse.json({
     ticker,
     name:          quote.longName ?? quote.shortName ?? ticker,
     price,
     dps,
     dividendYield: divYield,
-    exDate:        fmt(exDateRaw),
-    paymentDate:   fmt(payDateRaw),
+    exDate:        isPast(fmtExDate)  ? null : fmtExDate,
+    paymentDate:   isPast(fmtPayDate) ? null : fmtPayDate,
     currency:      quote.currency ?? "USD",
   });
 }
