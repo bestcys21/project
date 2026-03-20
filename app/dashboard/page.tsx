@@ -5,6 +5,7 @@ import { getHoldings, addHolding, removeHolding, getGoal, saveGoal } from "@/lib
 import { calcStackedMonthly, holdingsToDividendEvents } from "@/lib/calculator";
 import { Holding, Market, DividendEvent } from "@/lib/types";
 import { searchStocks, StockItem } from "@/lib/stocks";
+import StockLogo from "@/components/StockLogo";
 import DividendChart, { STOCK_COLORS } from "@/components/DividendChart";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { SummaryCardSkeleton, ChartSkeleton, HoldingRowSkeleton } from "@/components/Skeleton";
@@ -91,10 +92,7 @@ function StockSearchInput({
                             ${activeIdx === i ? "bg-blue-50" : "hover:bg-toss-bg"}`}
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-toss-bg flex-shrink-0 flex items-center
-                                  justify-center text-[11px] font-bold text-toss-label">
-                    {item.name.slice(0, 2)}
-                  </div>
+                  <StockLogo ticker={item.ticker} name={item.name} market={item.market} size={34} />
                   <span className="text-[14px] font-semibold text-toss-text truncate">{item.name}</span>
                 </div>
                 <span className="text-[12px] text-toss-sub font-medium ml-3 flex-shrink-0">{item.ticker}</span>
@@ -390,10 +388,7 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between bg-toss-card border border-toss-blue
                                   rounded-xl px-4 py-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[11px]
-                                      font-bold text-white bg-toss-blue flex-shrink-0">
-                        {selected.name.slice(0, 2)}
-                      </div>
+                      <StockLogo ticker={selected.ticker} name={selected.name} market={formMarket} size={36} />
                       <div>
                         <p className="text-[14px] font-bold text-toss-text">{selected.name}</p>
                         <p className="text-[11px] text-toss-sub">{selected.ticker}</p>
@@ -461,11 +456,7 @@ export default function DashboardPage() {
                 return (
                   <div key={e.holdingId} className="flex items-center justify-between py-3.5">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center
-                                      text-sm font-bold text-white flex-shrink-0"
-                        style={{ background: color }}>
-                        {e.name.slice(0, 2)}
-                      </div>
+                      <StockLogo ticker={e.ticker} name={e.name} market={e.market} size={40} />
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <p className="text-[14px] font-bold text-toss-text truncate">{e.name}</p>

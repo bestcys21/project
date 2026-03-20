@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Market, DividendResult } from "@/lib/calculator";
 import { searchStocks, StockItem } from "@/lib/stocks";
+import StockLogo from "./StockLogo";
 import ResultCard from "./ResultCard";
 
 const TAX_RATE: Record<Market, number> = { KR: 0.154, US: 0.15 };
@@ -179,10 +180,7 @@ export default function CalculatorForm() {
                                   ${activeIdx === i ? "bg-blue-50" : "hover:bg-toss-bg"}`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 rounded-lg bg-toss-bg flex-shrink-0 flex items-center
-                                        justify-center text-[11px] font-bold text-toss-label">
-                          {item.name.slice(0, 2)}
-                        </div>
+                        <StockLogo ticker={item.ticker} name={item.name} market={item.market} size={34} />
                         <span className="text-[14px] font-semibold text-toss-text truncate">
                           {item.name}
                         </span>
