@@ -230,14 +230,14 @@ export default function CalendarPage() {
 
                 return (
                   <button key={day} onClick={() => handleDayClick(day)}
-                    className={`relative flex flex-col items-center justify-start h-12 py-1.5 rounded-xl transition-colors
+                    className={`relative flex flex-col items-center justify-center h-14 rounded-xl transition-colors
                       ${isSelected ? "bg-blue-50" : "hover:bg-toss-bg"}
                       ${isToday ? "ring-1 ring-toss-blue" : ""}`}>
-                    <span className={`text-[13px] font-semibold
+                    <span className={`text-[14px] font-semibold leading-none
                       ${isToday ? "text-toss-blue" : col === 0 ? "text-red-400" : col === 6 ? "text-blue-400" : "text-toss-text"}`}>
                       {day}
                     </span>
-                    <div className="flex gap-0.5 mt-0.5 h-2">
+                    <div className="flex gap-0.5 mt-1.5 h-2 items-center">
                       {allDots.slice(0, 3).map((dot, di) => {
                         const bg = dot.isExDate ? "#f87171" : holdingColor(dot.holdingId);
                         return dot.estimated

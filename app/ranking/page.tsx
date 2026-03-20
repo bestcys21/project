@@ -141,8 +141,8 @@ export default function RankingPage() {
 
                   {/* 이름 */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-bold text-toss-text truncate">{stock.name}</p>
-                    <p className="text-[12px] text-toss-sub mt-0.5">
+                    <p className="text-[15px] font-bold text-toss-text truncate">{stock.name}</p>
+                    <p className="text-[13px] text-toss-sub mt-0.5">
                       {stock.ticker.replace(".KS", "")}
                       {stock.price != null && (
                         <span className="ml-1.5">
@@ -163,7 +163,7 @@ export default function RankingPage() {
                       {(stock.dividendYield * 100).toFixed(2)}%
                     </p>
                     {stock.dps != null && (
-                      <p className="text-[11px] text-toss-sub mt-0.5">
+                      <p className="text-[12px] text-toss-sub mt-0.5">
                         연 {market === "KR"
                           ? `${stock.dps.toLocaleString("ko-KR")}원`
                           : `$${stock.dps.toFixed(2)}`}

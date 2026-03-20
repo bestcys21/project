@@ -419,7 +419,7 @@ export default function DashboardPage() {
 
               {/* 시장 선택 */}
               <div>
-                <label className="block text-[12px] font-semibold text-toss-label mb-1.5">시장</label>
+                <label className="block text-[13px] font-semibold text-toss-label mb-1.5">시장</label>
                 <div className="flex gap-2">
                   {(["KR", "US"] as Market[]).map((m) => (
                     <button key={m}
@@ -437,7 +437,7 @@ export default function DashboardPage() {
 
               {/* 종목 검색 */}
               <div>
-                <label className="block text-[12px] font-semibold text-toss-label mb-1.5">종목명</label>
+                <label className="block text-[13px] font-semibold text-toss-label mb-1.5">종목명</label>
                 {selected ? (
                   <div className="flex items-center justify-between bg-toss-card border border-toss-blue
                                   rounded-xl px-4 py-3">
@@ -461,7 +461,7 @@ export default function DashboardPage() {
               {/* 수량 + 매수일 */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[12px] font-semibold text-toss-label mb-1.5">수량</label>
+                  <label className="block text-[13px] font-semibold text-toss-label mb-1.5">수량</label>
                   <div className="relative">
                     <input type="number" min={1} placeholder="0"
                       value={quantity} onChange={(e) => setQuantity(e.target.value)}
@@ -470,7 +470,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[12px] font-semibold text-toss-label mb-1.5">매수일 (선택)</label>
+                  <label className="block text-[13px] font-semibold text-toss-label mb-1.5">매수일 (선택)</label>
                   <input type="date" value={buyDate} onChange={(e) => setBuyDate(e.target.value)}
                     className="toss-input" />
                 </div>
@@ -527,10 +527,10 @@ export default function DashboardPage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-[12px] text-toss-sub mt-0.5">
+                        <p className="text-[13px] text-toss-sub mt-0.5">
                           {e.quantity.toLocaleString()}주 · {e.market}
                           {apiData[e.ticker]?.dividendFrequency && (
-                            <span className="ml-1 text-[10px] bg-toss-bg px-1.5 py-0.5 rounded-full">
+                            <span className="ml-1 text-[11px] bg-toss-bg px-1.5 py-0.5 rounded-full">
                               {apiData[e.ticker]!.dividendFrequency === "monthly" ? "월배당" :
                                apiData[e.ticker]!.dividendFrequency === "quarterly" ? "분기배당" :
                                apiData[e.ticker]!.dividendFrequency === "semi-annual" ? "반기배당" : "연배당"}
@@ -549,7 +549,7 @@ export default function DashboardPage() {
                             ? `${Math.round(e.netAmount).toLocaleString("ko-KR")}원`
                             : `$${e.netAmount.toFixed(2)}`}
                         </p>
-                        <p className="text-[11px] text-toss-sub">세후 배당</p>
+                        <p className="text-[12px] text-toss-sub">세후 배당</p>
                       </div>
                       <button onClick={() => handleRemove(e.holdingId)}
                         className="p-2 rounded-xl hover:bg-red-50 text-toss-sub hover:text-red-400 transition-colors">
