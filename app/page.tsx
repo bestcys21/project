@@ -5,22 +5,17 @@ export default function Home() {
     <div className="min-h-screen">
 
       {/* ── 히어로 섹션 ── */}
-      <div className="relative overflow-hidden bg-toss-bg dark:bg-[#0d1b35]">
-        {/* 장식 원형 블러 (다크모드 전용) */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-0 dark:opacity-10 pointer-events-none"
-          style={{ background: "radial-gradient(circle, #60a5fa, transparent 70%)" }} />
-        <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full opacity-0 dark:opacity-10 pointer-events-none"
-          style={{ background: "radial-gradient(circle, #a78bfa, transparent 70%)" }} />
+      <div className="relative overflow-hidden bg-toss-bg dark:bg-toss-bg">
 
-        <div className="max-w-6xl mx-auto px-6 md:px-10 pt-14 pb-16">
+        <div className="max-w-6xl mx-auto px-6 md:px-10 pt-10 pb-14">
 
           {/* 메인 헤드라인 */}
-          <h1 className="text-center text-[36px] md:text-[52px] font-extrabold text-toss-text dark:text-white leading-[1.15] mb-4">
-            몇 주, 언제 사면<br />
-            <span className="text-toss-blue">얼마 받을까?</span>
+          <h1 className="text-center text-[34px] md:text-[48px] font-extrabold text-toss-text dark:text-white leading-[1.15] mb-2">
+            나의 배당금,<br />
+            <span className="text-toss-blue">얼마나 받을까?</span>
           </h1>
-          <p className="text-center text-[16px] md:text-[18px] text-toss-sub dark:text-blue-200 mb-10">
-            종목·수량·매수일만 입력하면 세후 배당금을 즉시 알려드려요.
+          <p className="text-center text-[15px] md:text-[17px] text-toss-sub dark:text-toss-sub mb-7">
+            종목, 수량, 매수일만 입력하면 세후 배당금을 즉시 알려드려요.
           </p>
 
           {/* 계산기 폼 — 중앙 정렬, 최대 너비 제한 */}
@@ -29,7 +24,7 @@ export default function Home() {
           </div>
 
           {/* 배당 사이클 흐름 — 히어로 하단 인라인 */}
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
             {[
               {
                 icon: (
@@ -172,11 +167,16 @@ export default function Home() {
               },
             ].map((item) => (
               <div key={item.step}
-                className="bg-white dark:bg-white/10 border border-toss-border dark:border-white/15
-                           rounded-2xl p-4 text-center shadow-card dark:shadow-none dark:backdrop-blur-sm">
-                {item.icon}
-                <p className="text-[13px] font-bold text-toss-text dark:text-white">{item.step}</p>
-                <p className="text-[12px] text-toss-sub dark:text-blue-200 mt-0.5">{item.desc}</p>
+                className="group bg-white dark:bg-toss-card border border-toss-border dark:border-toss-border
+                           rounded-2xl p-4 text-center cursor-default
+                           shadow-[0_2px_12px_rgba(0,0,0,0.07)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.4)]
+                           hover:shadow-[0_8px_28px_rgba(49,130,246,0.18)] dark:hover:shadow-[0_8px_28px_rgba(49,130,246,0.25)]
+                           hover:-translate-y-1 transition-all duration-200 ease-out">
+                <div className="group-hover:scale-110 transition-transform duration-200 ease-out">
+                  {item.icon}
+                </div>
+                <p className="text-[13px] font-bold text-toss-text dark:text-toss-text">{item.step}</p>
+                <p className="text-[12px] text-toss-sub mt-0.5">{item.desc}</p>
               </div>
             ))}
           </div>

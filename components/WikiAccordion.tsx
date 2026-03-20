@@ -26,7 +26,7 @@ export default function WikiAccordion({ articles }: { articles: ArticleSection[]
       {articles.map((section) => (
         <div key={section.category} className="space-y-2">
           {/* 섹션 헤더 */}
-          <h2 className="text-[19px] font-extrabold text-toss-text mb-3">{section.category}</h2>
+          <h2 className="text-[21px] font-extrabold text-toss-text mb-3">{section.category}</h2>
 
           {/* 아코디언 목록 */}
           <div className="rounded-2xl overflow-hidden border border-toss-border bg-toss-card shadow-card divide-y divide-toss-border">
@@ -42,10 +42,10 @@ export default function WikiAccordion({ articles }: { articles: ArticleSection[]
                     className="w-full flex items-center justify-between px-5 py-4 text-left gap-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                   >
                     <span
-                      className="text-[14px] font-semibold leading-snug flex-1"
+                      className="text-[15px] font-semibold leading-snug flex-1"
                       style={{ color: isOpen ? section.color : undefined }}
                     >
-                      <span className="mr-1.5 opacity-60 text-[13px]">Q.</span>
+                      <span className="mr-1.5 opacity-60 text-[14px]">Q.</span>
                       {item.q}
                     </span>
 
@@ -70,7 +70,7 @@ export default function WikiAccordion({ articles }: { articles: ArticleSection[]
                     style={{ maxHeight: isOpen ? "500px" : "0px" }}
                   >
                     <div
-                      className="px-5 pt-1 pb-4 text-[13px] text-toss-label leading-relaxed border-l-[3px] ml-5 mr-5 mb-3 rounded-r-lg pl-4"
+                      className="px-5 pt-1 pb-4 text-[14px] text-toss-label leading-relaxed border-l-[3px] ml-5 mr-5 mb-3 rounded-r-lg pl-4"
                       style={{ borderColor: section.color, backgroundColor: section.bgColor }}
                     >
                       {item.a}

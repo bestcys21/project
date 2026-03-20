@@ -14,6 +14,7 @@ export default function CalculatorForm() {
   const [query,       setQuery]       = useState("");
   const [ticker,      setTicker]      = useState("");
   const [exchange,    setExchange]    = useState<"KS" | "KQ" | undefined>(undefined);
+  const [showUSTip,   setShowUSTip]   = useState(false);
   const [qty,         setQty]         = useState("");
   const [date,        setDate]        = useState(today);
   const [market,      setMarket]      = useState<Market>("KR");
@@ -152,7 +153,7 @@ export default function CalculatorForm() {
       const grossAmount = eligible ? dps * +qty : 0;
 
       setResult({
-        stock:        data.name ?? query.trim(),
+        stock:        query.trim() || data.name ?? ticker,  // 검색어(한국어 종목명) 우선 사용
         quantity:     +qty,
         purchaseDate: date,
         market,
@@ -192,8 +193,8 @@ export default function CalculatorForm() {
               onFocus={() => suggestions.length > 0 && setShowDrop(true)}
               onKeyDown={handleKeyDown}
               placeholder={market === "KR"
-                ? "종목명 또는 종목코드 (예: 삼성전자, 375500)"
-                : "Search stock (e.g. Apple, Coca-Cola, JEPI)"}
+                ? "종목명 또는 코드 (예: 삼성전자, 005930)"
+                : "종목명 또는 코드 (예: Apple, AAPL, JEPI)"}
               className="toss-input"
               autoComplete="off"
             />
@@ -234,20 +235,36 @@ export default function CalculatorForm() {
           </div>
 
           {/* 시장 선택 */}
-          <div className="flex gap-2">
-            {(["KR", "US"] as Market[]).map((m) => (
+          <div className="flex gap-2 items-center">
+            <button
+              onClick={() => { handleMarketChange("KR"); setShowUSTip(false); }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
+                          border transition-all duration-150
+                          ${market === "KR"
+                            ? "border-toss-blue bg-toss-blue text-white"
+                            : "border-toss-border text-toss-label bg-toss-card hover:border-toss-blue hover:text-toss-blue"}`}
+            >
+              한국주식
+            </button>
+
+            {/* 미국주식 — 준비 중 툴팁 */}
+            <div className="relative">
               <button
-                key={m}
-                onClick={() => handleMarketChange(m)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
-                            border transition-all duration-150
-                            ${market === m
-                              ? "border-toss-blue bg-toss-blue text-white"
-                              : "border-toss-border text-toss-label bg-toss-card hover:border-toss-blue hover:text-toss-blue"}`}
+                onClick={() => { setShowUSTip((v) => !v); }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
+                           border border-toss-border text-toss-sub bg-toss-card opacity-60 cursor-pointer"
               >
-                {m === "KR" ? "한국주식" : "미국주식"}
+                미국주식
               </button>
-            ))}
+              {showUSTip && (
+                <div className="absolute left-0 top-[calc(100%+6px)] z-50 w-48
+                               bg-toss-text dark:bg-toss-card text-white dark:text-toss-text
+                               text-[12px] font-medium px-3 py-2 rounded-xl shadow-lg
+                               border border-toss-border whitespace-nowrap">
+                  🚧 미국 주식 서비스 준비 중입니다
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -303,7 +320,7 @@ export default function CalculatorForm() {
                      text-white font-bold text-[16px] py-4 rounded-2xl
                      transition-all duration-150 flex items-center justify-center gap-2"
         >
-          {loading ? <><Spinner />계산 중...</> : "배당 수익 계산하기"}
+          {loading ? <><Spinner />계산 중...</> : "내 배당금 계산하기"}
         </button>
       </div>
 
