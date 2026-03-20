@@ -50,7 +50,7 @@ export function calculateDividend(input: DividendInput): DividendResult {
 
 export function holdingsToDividendEvents(
   holdings: Holding[],
-  apiData?: Record<string, { dps: number; exDate: string | null; paymentDate: string | null }>
+  apiData?: Record<string, { dps: number; exDate?: string | null; paymentDate?: string | null }>
 ): DividendEvent[] {
   return holdings.map((h) => {
     const taxRate = TAX_RATE[h.market];

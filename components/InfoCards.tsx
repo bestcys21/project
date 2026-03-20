@@ -22,7 +22,7 @@ export default function InfoCards() {
       {INFO.map((item) => (
         <div
           key={item.title}
-          className="bg-white rounded-2xl shadow-card p-4 space-y-2
+          className="bg-toss-card rounded-2xl shadow-card p-4 space-y-2
                      hover:shadow-card-hover transition-shadow cursor-pointer"
         >
           <div className="text-2xl">{item.icon}</div>

@@ -8,7 +8,7 @@ export default function ResultCard({ result }: Props) {
   const { stock, quantity, purchaseDate, market, dps, exDate, paymentDate, grossAmount, netAmount, taxRate } = result;
 
   return (
-    <div className="fade-up bg-white rounded-2xl shadow-card p-6 space-y-4">
+    <div className="fade-up bg-toss-card rounded-2xl shadow-card p-6 space-y-4">
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <span className="text-[13px] font-semibold text-toss-label">계산 결과</span>

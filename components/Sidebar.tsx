@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import ThemeToggle from "./ThemeToggle";
 
 const NAV = [
   { href: "/",          icon: "🧮", label: "배당 계산기" },
   { href: "/dashboard", icon: "📊", label: "내 배당" },
   { href: "/calendar",  icon: "📅", label: "배당 캘린더" },
+  { href: "/ranking",   icon: "🏆", label: "배당 랭킹" },
   { href: "/wiki",      icon: "📚", label: "배당 위키" },
 ];
 
@@ -21,7 +23,7 @@ export default function Sidebar({ isOpen, onClose }: Props) {
   return (
     <aside
       className={`
-        fixed top-0 left-0 h-full w-64 bg-white border-r border-toss-border z-40
+        fixed top-0 left-0 h-full w-64 bg-toss-card border-r border-toss-border z-40
         flex flex-col transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
         md:translate-x-0
@@ -61,7 +63,7 @@ export default function Sidebar({ isOpen, onClose }: Props) {
                 flex items-center gap-3 px-4 py-3 rounded-xl text-[15px] font-semibold
                 transition-colors duration-150
                 ${active
-                  ? "bg-blue-50 text-toss-blue"
+                  ? "bg-blue-50 dark:bg-blue-900/20 text-toss-blue"
                   : "text-toss-label hover:bg-toss-bg hover:text-toss-text"
                 }
               `}
@@ -73,11 +75,12 @@ export default function Sidebar({ isOpen, onClose }: Props) {
         })}
       </nav>
 
-      {/* 하단 BETA 뱃지 */}
-      <div className="px-6 py-5 border-t border-toss-border">
+      {/* 하단 */}
+      <div className="px-6 py-5 border-t border-toss-border flex items-center justify-between">
         <span className="text-xs font-medium text-toss-sub bg-toss-bg px-3 py-1.5 rounded-full">
           BETA v0.1
         </span>
+        <ThemeToggle />
       </div>
     </aside>
   );

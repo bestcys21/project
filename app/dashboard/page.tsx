@@ -12,7 +12,7 @@ const TAX_RATE: Record<Market, number> = { KR: 0.154, US: 0.15 };
 
 export default function DashboardPage() {
   const [holdings,   setHoldings]   = useState<Holding[]>([]);
-  const [apiData,    setApiData]    = useState<Record<string, { dps: number }>>({});
+  const [apiData,    setApiData]    = useState<Record<string, { dps: number; exDate?: string | null; paymentDate?: string | null }>>({});
   const [initLoading, setInitLoading] = useState(true);   // 첫 로드
   const [apiLoading,  setApiLoading]  = useState(false);  // API 갱신
   const [form, setForm]     = useState({ ticker: "", name: "", market: "KR" as Market, quantity: "", purchaseDate: "" });
@@ -113,7 +113,7 @@ export default function DashboardPage() {
 
       {/* 월별 차트 */}
       <ErrorBoundary>
-        <div className="bg-white rounded-2xl shadow-card p-6">
+        <div className="bg-toss-card rounded-2xl shadow-card p-6">
           <div className="flex items-center justify-between mb-4">
             <p className="text-[14px] font-bold text-toss-text">월별 예상 배당금</p>
             {apiLoading && (
@@ -146,7 +146,7 @@ export default function DashboardPage() {
 
       {/* 보유 종목 목록 */}
       <ErrorBoundary>
-        <div className="bg-white rounded-2xl shadow-card p-6 space-y-4">
+        <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-[14px] font-bold text-toss-text">보유 종목</p>
             <button onClick={() => { setShowForm((v) => !v); setFormError(""); }}
@@ -170,7 +170,7 @@ export default function DashboardPage() {
                   {(["KR", "US"] as Market[]).map((m) => (
                     <button key={m} onClick={() => setForm({ ...form, market: m })}
                       className={`flex-1 text-xs font-semibold py-2 rounded-lg border transition-colors
-                        ${form.market === m ? "bg-toss-blue text-white border-toss-blue" : "bg-white text-toss-label border-toss-border"}`}>
+                        ${form.market === m ? "bg-toss-blue text-white border-toss-blue" : "bg-toss-card text-toss-label border-toss-border"}`}>
                       {m === "KR" ? "🇰🇷 KR" : "🇺🇸 US"}
                     </button>
                   ))}
@@ -271,7 +271,7 @@ function getDday(dateStr: string): number {
 /* ── sub components ── */
 function SummaryCard({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className="bg-white rounded-2xl shadow-card p-4 space-y-1.5">
+    <div className="bg-toss-card rounded-2xl shadow-card p-4 space-y-1.5">
       <p className="text-[12px] text-toss-sub font-medium">{label}</p>
       <p className={`text-[16px] font-extrabold leading-tight ${highlight ? "text-toss-blue" : "text-toss-text"}`}>{value}</p>
     </div>

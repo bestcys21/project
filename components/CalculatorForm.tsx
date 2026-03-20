@@ -86,7 +86,7 @@ export default function CalculatorForm() {
 
   return (
     <div className="space-y-5">
-      <div className="bg-white rounded-2xl shadow-card p-6 space-y-5">
+      <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-5">
 
         {/* 종목 입력 */}
         <div className="space-y-1.5">
@@ -120,7 +120,7 @@ export default function CalculatorForm() {
                             border transition-all duration-150
                             ${market === m
                               ? "border-toss-blue bg-toss-blue text-white"
-                              : "border-toss-border text-toss-label bg-white"}`}>
+                              : "border-toss-border text-toss-label bg-toss-card"}`}>
                 {m === "KR" ? "🇰🇷 한국 (KRX)" : "🇺🇸 미국 (NYSE/NASDAQ)"}
               </button>
             ))}

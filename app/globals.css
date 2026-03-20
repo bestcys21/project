@@ -1,5 +1,27 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
+:root {
+  --toss-blue:      #3182F6;
+  --toss-blue-dark: #1B64DA;
+  --toss-bg:        #F2F4F6;
+  --toss-card:      #FFFFFF;
+  --toss-text:      #191F28;
+  --toss-label:     #6B7684;
+  --toss-border:    #E5E8EB;
+  --toss-sub:       #8B95A1;
+}
+
+.dark {
+  --toss-blue:      #4D9FFF;
+  --toss-blue-dark: #3182F6;
+  --toss-bg:        #0F1116;
+  --toss-card:      #1C2028;
+  --toss-text:      #E8EDF2;
+  --toss-label:     #9BA8B5;
+  --toss-border:    #2C3540;
+  --toss-sub:       #6B7684;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -16,6 +38,10 @@
 }
 
 @layer utilities {
+  .dark .shadow-card {
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.35);
+  }
+
   .toss-input {
     @apply w-full rounded-xl border border-toss-border bg-toss-bg
            px-4 py-3.5 text-[15px] font-medium text-toss-text

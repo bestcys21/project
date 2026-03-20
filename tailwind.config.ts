@@ -5,6 +5,7 @@ const config: Config = {
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
       fontFamily: {
@@ -12,14 +13,14 @@ const config: Config = {
       },
       colors: {
         toss: {
-          blue:     "#3182F6",
-          blueDark: "#1B64DA",
-          bg:       "#F2F4F6",
-          card:     "#FFFFFF",
-          label:    "#6B7684",
-          border:   "#E5E8EB",
-          text:     "#191F28",
-          sub:      "#8B95A1",
+          blue:     "var(--toss-blue)",
+          blueDark: "var(--toss-blue-dark)",
+          bg:       "var(--toss-bg)",
+          card:     "var(--toss-card)",
+          label:    "var(--toss-label)",
+          border:   "var(--toss-border)",
+          text:     "var(--toss-text)",
+          sub:      "var(--toss-sub)",
         },
       },
       boxShadow: {

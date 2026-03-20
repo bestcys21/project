@@ -95,7 +95,7 @@ export default function CalendarPage() {
     setSelectedDate(all.length > 0 ? key : "");
   }
 
-  const cells    = Array.from({ length: firstDay }, () => null)
+  const cells = (Array.from({ length: firstDay }, () => null) as (null | number)[])
     .concat(Array.from({ length: daysInMonth }, (_, i) => i + 1));
   const todayKey = dateKey(today.getFullYear(), today.getMonth(), today.getDate());
 
@@ -125,7 +125,7 @@ export default function CalendarPage() {
       )}
 
       <ErrorBoundary>
-        <div className="bg-white rounded-2xl shadow-card p-5 space-y-4">
+        <div className="bg-toss-card rounded-2xl shadow-card p-5 space-y-4">
           {/* 월 네비게이션 */}
           <div className="flex items-center justify-between">
             <button onClick={prevMonth} className="p-2 rounded-xl hover:bg-toss-bg transition-colors">
@@ -220,7 +220,7 @@ export default function CalendarPage() {
 
       {/* 선택된 날짜 상세 */}
       {selected && selected.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-card p-5 space-y-3 fade-up">
+        <div className="bg-toss-card rounded-2xl shadow-card p-5 space-y-3 fade-up">
           <p className="text-[14px] font-bold text-toss-text">{selectedDate} 배당 일정</p>
           {selected.map((e, i) => {
             const eIdx  = events.findIndex((ev) => ev.holdingId === e.holdingId);
@@ -258,7 +258,7 @@ export default function CalendarPage() {
 
       {/* 종목 없을 때 */}
       {!loading && events.length === 0 && (
-        <div className="bg-white rounded-2xl shadow-card p-10 text-center space-y-3">
+        <div className="bg-toss-card rounded-2xl shadow-card p-10 text-center space-y-3">
           <p className="text-4xl">📅</p>
           <p className="text-[15px] font-bold text-toss-text">등록된 종목이 없어요</p>
           <p className="text-[13px] text-toss-sub">내 배당 탭에서 종목을 추가하면<br />캘린더에 일정이 자동으로 표시돼요.</p>
