@@ -14,7 +14,6 @@ export default function CalculatorForm() {
   const [query,       setQuery]       = useState("");
   const [ticker,      setTicker]      = useState("");
   const [exchange,    setExchange]    = useState<"KS" | "KQ" | undefined>(undefined);
-  const [showUSTip,   setShowUSTip]   = useState(false);
   const [qty,         setQty]         = useState("");
   const [date,        setDate]        = useState(today);
   const [market,      setMarket]      = useState<Market>("KR");
@@ -237,7 +236,7 @@ export default function CalculatorForm() {
           {/* 시장 선택 */}
           <div className="flex gap-2 items-center">
             <button
-              onClick={() => { handleMarketChange("KR"); setShowUSTip(false); }}
+              onClick={() => handleMarketChange("KR")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
                           border transition-all duration-150
                           ${market === "KR"
@@ -247,24 +246,16 @@ export default function CalculatorForm() {
               한국주식
             </button>
 
-            {/* 미국주식 — 준비 중 툴팁 */}
-            <div className="relative">
-              <button
-                onClick={() => { setShowUSTip((v) => !v); }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
-                           border border-toss-border text-toss-sub bg-toss-card opacity-60 cursor-pointer"
-              >
-                미국주식
-              </button>
-              {showUSTip && (
-                <div className="absolute left-0 top-[calc(100%+6px)] z-50 w-48
-                               bg-toss-text dark:bg-toss-card text-white dark:text-toss-text
-                               text-[12px] font-medium px-3 py-2 rounded-xl shadow-lg
-                               border border-toss-border whitespace-nowrap">
-                  🚧 미국 주식 서비스 준비 중입니다
-                </div>
-              )}
-            </div>
+            <button
+              onClick={() => { handleMarketChange("US"); setShowUSTip(false); }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
+                          border transition-all duration-150
+                          ${market === "US"
+                            ? "border-toss-blue bg-toss-blue text-white"
+                            : "border-toss-border text-toss-label bg-toss-card hover:border-toss-blue hover:text-toss-blue"}`}
+            >
+              미국주식
+            </button>
           </div>
         </div>
 
