@@ -746,7 +746,7 @@ function SummaryCard({ label, value, highlight, hero, tooltip }: {
 }) {
   return (
     <div className={`relative bg-toss-card rounded-2xl shadow-card group cursor-default
-      ${hero ? "col-span-2 p-5 flex flex-col justify-between min-h-[90px] border border-toss-blue/20 bg-gradient-to-br from-blue-50/60 to-white dark:from-blue-900/10 dark:to-toss-card"
+      ${hero ? "p-5 flex flex-col justify-between min-h-[90px] border border-toss-blue/20 bg-gradient-to-br from-blue-50/60 to-white dark:from-blue-900/10 dark:to-toss-card"
              : "p-4 space-y-1.5"}`}>
       <p className={`font-medium leading-tight ${hero ? "text-[13px] text-toss-blue" : "text-[12px] text-toss-sub"}`}>
         {label}
