@@ -10,11 +10,11 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 md:px-10 pt-10 pb-14">
 
           {/* 메인 헤드라인 */}
-          <h1 className="text-center text-[34px] md:text-[48px] font-extrabold text-toss-text dark:text-white leading-[1.15] mb-2">
+          <h1 className="text-center text-[36px] md:text-[52px] font-extrabold text-toss-text dark:text-white leading-[1.15] mb-3">
             나의 배당금,<br />
             <span className="text-toss-blue">얼마나 받을까?</span>
           </h1>
-          <p className="text-center text-[15px] md:text-[17px] text-toss-sub dark:text-toss-sub mb-7">
+          <p className="text-center text-[17px] md:text-[19px] text-toss-sub dark:text-toss-sub mb-8">
             종목, 수량, 매수일만 입력하면 세후 배당금을 즉시 알려드려요.
           </p>
 
@@ -175,55 +175,65 @@ export default function Home() {
                 <div className="group-hover:scale-110 transition-transform duration-200 ease-out">
                   {item.icon}
                 </div>
-                <p className="text-[13px] font-bold text-toss-text dark:text-toss-text">{item.step}</p>
-                <p className="text-[12px] text-toss-sub mt-0.5">{item.desc}</p>
+                <p className="text-[15px] font-bold text-toss-text dark:text-toss-text">{item.step}</p>
+                <p className="text-[13px] text-toss-sub mt-1">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ── 배당소득세 안내 (히어로 하단 서브섹션) ── */}
-      <div className="bg-toss-card border-b border-toss-border">
-        <div className="max-w-3xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-center gap-6">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🇰🇷</span>
-            <div>
-              <p className="text-[14px] font-bold text-toss-text">한국주식</p>
-              <p className="text-[12px] text-toss-sub">소득세 14% + 지방세 1.4%</p>
-            </div>
-            <span className="text-[20px] font-extrabold text-toss-blue ml-2">15.4%</span>
-          </div>
-          <div className="hidden sm:block w-px h-10 bg-toss-border" />
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🇺🇸</span>
-            <div>
-              <p className="text-[14px] font-bold text-toss-text">미국주식</p>
-              <p className="text-[12px] text-toss-sub">한미 조세조약 원천징수</p>
-            </div>
-            <span className="text-[20px] font-extrabold text-green-600 ml-2">15%</span>
-          </div>
-          <div className="hidden sm:block w-px h-10 bg-toss-border" />
-          <p className="text-[13px] text-toss-sub text-center">
-            세후 실수령액 <span className="text-toss-text font-semibold">자동 계산</span>됩니다
-          </p>
-        </div>
+      {/* ── 세율 안내 — 미니멀 칩 (덜 중요한 정보라 작게) ── */}
+      <div className="flex items-center justify-center gap-2 flex-wrap py-4 border-b border-toss-border bg-toss-card">
+        <span className="text-[13px] text-toss-sub">세후 자동 계산</span>
+        <span className="text-toss-border">·</span>
+        <span className="inline-flex items-center gap-1 text-[13px] text-toss-sub font-medium">
+          🇰🇷 한국주식 <strong className="text-toss-text font-bold">15.4%</strong>
+        </span>
+        <span className="text-toss-border">·</span>
+        <span className="inline-flex items-center gap-1 text-[13px] text-toss-sub font-medium">
+          🇺🇸 미국주식 <strong className="text-toss-text font-bold">15%</strong>
+        </span>
+        <span className="text-toss-border hidden sm:inline">·</span>
+        <span className="text-[13px] text-toss-sub hidden sm:inline">원천징수 기준</span>
       </div>
 
       {/* ── 이런 분께 추천 ── */}
-      <div className="max-w-3xl mx-auto px-6 py-8">
-        <p className="text-[13px] font-bold text-toss-sub text-center mb-5 uppercase tracking-wider">이런 분께 추천해요</p>
-        <div className="grid sm:grid-cols-3 gap-4">
+      <div className="max-w-5xl mx-auto px-6 py-12">
+        <p className="text-[15px] font-bold text-toss-sub text-center mb-8 tracking-wide">이런 분께 추천해요</p>
+        <div className="grid sm:grid-cols-3 gap-5">
           {[
-            { icon: "🔍", title: "매수 전 확인", desc: "배당락일 전날까지 사야\n수령 가능한지 즉시 확인" },
-            { icon: "💵", title: "세후 실수령액", desc: "한국 15.4%, 미국 15%\n자동 공제된 실수령액 계산" },
-            { icon: "📅", title: "일정 관리", desc: "캘린더에서 배당락일·\n지급일을 한눈에 확인" },
+            {
+              icon: "🔍",
+              title: "매수 전 빠른 확인",
+              desc: "배당락일 전날까지 사야 수령 가능한지\n종목·날짜만 입력하면 즉시 알 수 있어요",
+              link: null,
+            },
+            {
+              icon: "💵",
+              title: "세후 실수령액 계산",
+              desc: "한국 15.4%, 미국 15%\n세금을 자동 공제한 실수령액을 확인해요",
+              link: null,
+            },
+            {
+              icon: "📅",
+              title: "배당 일정 관리",
+              desc: "캘린더에서 배당락일·지급일을\n한눈에 보고 포트폴리오를 관리해요",
+              link: "/calendar",
+            },
           ].map((item) => (
             <div key={item.title}
-              className="bg-toss-card rounded-2xl shadow-card p-5 text-center space-y-2">
-              <p className="text-3xl">{item.icon}</p>
-              <p className="text-[14px] font-bold text-toss-text">{item.title}</p>
-              <p className="text-[13px] text-toss-sub whitespace-pre-line leading-relaxed">{item.desc}</p>
+              className="bg-toss-card rounded-2xl shadow-card p-7 text-center space-y-3
+                         hover:shadow-[0_6px_24px_rgba(49,130,246,0.12)] hover:-translate-y-0.5 transition-all duration-200">
+              <p className="text-4xl">{item.icon}</p>
+              <p className="text-[18px] font-bold text-toss-text">{item.title}</p>
+              <p className="text-[15px] text-toss-sub whitespace-pre-line leading-relaxed">{item.desc}</p>
+              {item.link && (
+                <a href={item.link}
+                  className="inline-flex items-center gap-1 text-[14px] font-semibold text-toss-blue mt-1">
+                  바로 가기 →
+                </a>
+              )}
             </div>
           ))}
         </div>
@@ -231,14 +241,14 @@ export default function Home() {
 
       {/* ── 포트폴리오 유도 배너 ── */}
       <div className="bg-toss-blue">
-        <div className="max-w-3xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-5">
           <div className="text-white text-center sm:text-left">
-            <p className="text-[18px] font-extrabold">내 배당 포트폴리오 만들기</p>
-            <p className="text-[13px] opacity-80 mt-1">종목을 추가하고 월별 배당 흐름을 한눈에 관리해요</p>
+            <p className="text-[22px] font-extrabold leading-snug">내 배당 포트폴리오 만들기</p>
+            <p className="text-[16px] opacity-80 mt-1.5">종목을 추가하고 월별 배당 흐름을 한눈에 관리해요</p>
           </div>
           <a href="/dashboard"
-            className="flex-shrink-0 bg-white text-toss-blue font-bold text-[14px]
-                       px-6 py-3 rounded-2xl hover:bg-blue-50 transition-colors whitespace-nowrap">
+            className="flex-shrink-0 bg-white text-toss-blue font-bold text-[16px]
+                       px-8 py-3.5 rounded-2xl hover:bg-blue-50 transition-colors whitespace-nowrap shadow-md">
             내 배당 보러가기 →
           </a>
         </div>

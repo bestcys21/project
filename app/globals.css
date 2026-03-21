@@ -34,7 +34,15 @@
 
   body {
     @apply bg-toss-bg text-toss-text;
-    font-size: 16px;
+    font-size: 16px; /* 모바일 기본 */
+  }
+
+  /* PC에서 전체 폰트 크기 확대 — 어르신·가독성 고려 */
+  @media (min-width: 768px) {
+    body { font-size: 17px; }
+  }
+  @media (min-width: 1024px) {
+    body { font-size: 18px; }
   }
 }
 
@@ -45,7 +53,7 @@
 
   .toss-input {
     @apply w-full rounded-xl border border-toss-border bg-toss-bg
-           px-4 py-3.5 text-[15px] font-medium text-toss-text
+           px-4 py-3.5 text-[16px] font-medium text-toss-text
            placeholder:text-toss-sub transition-all duration-150;
   }
   .toss-input:focus {
@@ -79,38 +87,49 @@
 @layer components {
   /* 페이지 타이틀 */
   .heading-xl {
-    @apply text-[32px] md:text-[40px] font-extrabold text-toss-text leading-tight tracking-tight;
+    @apply text-[36px] md:text-[46px] font-extrabold text-toss-text leading-tight tracking-tight;
   }
   /* 섹션 헤더 */
   .heading-lg {
-    @apply text-[22px] md:text-[26px] font-extrabold text-toss-text leading-tight;
+    @apply text-[24px] md:text-[28px] font-extrabold text-toss-text leading-tight;
   }
   /* 카드 헤더 */
   .heading-md {
-    @apply text-[18px] font-bold text-toss-text leading-snug;
+    @apply text-[20px] font-bold text-toss-text leading-snug;
   }
   /* 서브 헤더 */
   .heading-sm {
-    @apply text-[15px] font-bold text-toss-text;
+    @apply text-[17px] font-bold text-toss-text;
   }
   /* 본문 */
   .text-body {
-    @apply text-[15px] text-toss-text leading-relaxed;
+    @apply text-[16px] text-toss-text leading-relaxed;
   }
   /* 작은 본문 */
   .text-body-sm {
-    @apply text-[14px] text-toss-text leading-relaxed;
+    @apply text-[15px] text-toss-text leading-relaxed;
   }
-  /* 캡션 */
+  /* 캡션 (최소 가독 크기) */
   .text-caption {
-    @apply text-[12px] text-toss-sub leading-relaxed;
+    @apply text-[13px] text-toss-sub leading-relaxed;
   }
   /* 라벨 */
   .text-label-md {
-    @apply text-[13px] font-semibold text-toss-label;
+    @apply text-[14px] font-semibold text-toss-label;
   }
   /* 오버라인 (섹션 구분용) */
   .text-overline {
-    @apply text-[11px] font-bold text-toss-sub uppercase tracking-wider;
+    @apply text-[12px] font-bold text-toss-sub uppercase tracking-wider;
   }
+}
+
+/* ── 전역 최소 폰트 보정 — PC 가독성 강화 ── */
+/* 절대 px 값으로 작성된 요소들 중 너무 작은 것 보정 */
+@media (min-width: 1024px) {
+  /* 배지, 태그, 보조 텍스트가 10px·11px인 경우 최소 12px 확보 */
+  [class*="text-[10px]"] { font-size: 12px !important; }
+  [class*="text-[11px]"] { font-size: 13px !important; }
+  [class*="text-[12px]"] { font-size: 14px !important; }
+  [class*="text-[13px]"] { font-size: 15px !important; }
+  [class*="text-[14px]"] { font-size: 16px !important; }
 }
