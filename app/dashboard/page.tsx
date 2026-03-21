@@ -6,7 +6,7 @@ import { calcStackedMonthly, holdingsToDividendEvents } from "@/lib/calculator";
 import { Holding, Market, DividendEvent } from "@/lib/types";
 import { searchStocks, StockItem } from "@/lib/stocks";
 import StockLogo from "@/components/StockLogo";
-import DividendChart, { STOCK_COLORS } from "@/components/DividendChart";
+import DividendChart, { STOCK_COLORS, ChartPeriod } from "@/components/DividendChart";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { SummaryCardSkeleton, ChartSkeleton, HoldingRowSkeleton } from "@/components/Skeleton";
 import {
@@ -162,6 +162,12 @@ export default function DashboardPage() {
   // 종목 필터
   const [filterMarket, setFilterMarket] = useState<"ALL" | "KR" | "US">("ALL");
 
+  // 차트 기간 필터 (N12M = 향후 12개월, THIS_YEAR = 올해)
+  const [chartPeriod, setChartPeriod] = useState<ChartPeriod>("N12M");
+
+  // 보유 종목 뷰 모드
+  const [viewMode, setViewMode] = useState<"card" | "compact">("card");
+
   useEffect(() => {
     const h = getHoldings();
     setHoldings(h);
@@ -246,12 +252,17 @@ export default function DashboardPage() {
 
   const events      = holdingsToDividendEvents(holdings, apiData);
   const { stackedData, tickers } = calcStackedMonthly(holdings, apiData);
-  const annualNet   = stackedData.reduce((s, m) => s + m.total, 0);
+  // N12M: 향후 12개월 합계 (전체), THIS_YEAR: 이번 연도 남은 월 합계
+  const currentMonthIdx = new Date().getMonth(); // 0-indexed (March=2)
+  const annualNet = chartPeriod === "THIS_YEAR"
+    ? stackedData.slice(currentMonthIdx).reduce((s, m) => s + m.total, 0)
+    : stackedData.reduce((s, m) => s + m.total, 0); // N12M & LAST_YEAR = full year
   const nextEvent   = getNextEvent(events);
   const dday        = nextEvent ? getDday(nextEvent.paymentDate) : null;
   const avgYield    = calcAvgYield(holdings, apiData, events);
   const goalProgress = goalAmount && goalAmount > 0
     ? Math.min((annualNet / goalAmount) * 100, 100) : null;
+  const fullYearNet = stackedData.reduce((s, m) => s + m.total, 0);
 
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-5">
@@ -267,13 +278,32 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <SummaryCard label="보유 종목"       value={`${holdings.length}개`} />
-          <SummaryCard label="연간 세후 배당"  value={`${Math.round(annualNet).toLocaleString("ko-KR")}원`} highlight />
-          <SummaryCard label="평균 배당수익률" value={avgYield != null ? `${(avgYield * 100).toFixed(2)}%` : "-"} />
+          {/* 연간 세후 배당 — 주인공 카드 (col-span-2) */}
+          <SummaryCard
+            label={
+              chartPeriod === "N12M" ? "향후 12개월 세후 배당"
+              : chartPeriod === "THIS_YEAR" ? `${new Date().getFullYear()}년 기준 세후 배당`
+              : "최근 1년 세후 배당"
+            }
+            value={`${Math.round(annualNet).toLocaleString("ko-KR")}원`}
+            hero
+            tooltip={`DPS × 수량 × (1-세율)\n연간 합계: ${Math.round(fullYearNet).toLocaleString("ko-KR")}원`}
+          />
+          <SummaryCard
+            label="보유 종목"
+            value={`${holdings.length}개`}
+            tooltip={`총 ${holdings.length}개 종목 보유 중`}
+          />
+          <SummaryCard
+            label="평균 배당수익률"
+            value={avgYield != null ? `${(avgYield * 100).toFixed(2)}%` : "-"}
+            tooltip={avgYield != null ? `배당수익률 = 연간 배당금 / 현재가\n포트폴리오 가중평균` : "데이터 로딩 중"}
+          />
           <SummaryCard
             label="다음 배당 D-day"
             value={dday !== null ? (dday === 0 ? "오늘! 🎉" : `D-${dday}`) : "-"}
             highlight={dday !== null && dday <= 7}
+            tooltip={nextEvent ? `${nextEvent.name} 배당 예정일: ${nextEvent.paymentDate}` : "예정 배당 없음"}
           />
         </div>
       )}
@@ -387,7 +417,8 @@ export default function DashboardPage() {
           )}
           {initLoading ? <ChartSkeleton />
             : holdings.length === 0 ? <EmptyChart />
-            : <DividendChart data={[]} stackedData={stackedData} tickers={tickers} />}
+            : <DividendChart data={[]} stackedData={stackedData} tickers={tickers}
+                period={chartPeriod} onPeriodChange={setChartPeriod} />}
         </div>
       </ErrorBoundary>
 
@@ -406,16 +437,40 @@ export default function DashboardPage() {
                   </span>
                 )}
               </p>
-              {!showForm && (
-                <button onClick={openForm}
-                  className="flex items-center gap-1.5 text-[13px] font-semibold text-toss-blue
-                             bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                  </svg>
-                  종목 추가
-                </button>
-              )}
+              <div className="flex items-center gap-2">
+                {/* 뷰 모드 토글 */}
+                {holdings.length > 0 && !showForm && (
+                  <div className="flex bg-toss-bg rounded-lg p-0.5">
+                    <button
+                      onClick={() => setViewMode("card")}
+                      title="카드 뷰"
+                      className={`p-1.5 rounded-md transition-colors ${viewMode === "card" ? "bg-toss-card shadow-sm text-toss-text" : "text-toss-sub hover:text-toss-label"}`}>
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => setViewMode("compact")}
+                      title="컴팩트 뷰"
+                      className={`p-1.5 rounded-md transition-colors ${viewMode === "compact" ? "bg-toss-card shadow-sm text-toss-text" : "text-toss-sub hover:text-toss-label"}`}>
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+                {!showForm && (
+                  <button onClick={openForm}
+                    className="flex items-center gap-1.5 text-[13px] font-semibold text-toss-blue
+                               bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    종목 추가
+                  </button>
+                )}
+              </div>
             </div>
             {/* 필터 탭 */}
             {events.length > 0 && (
@@ -530,7 +585,52 @@ export default function DashboardPage() {
               <p className="text-[14px] font-semibold text-toss-text">등록된 종목이 없어요</p>
               <p className="text-[13px] text-toss-sub">종목을 추가하면 배당 수익을 계산해 드려요.</p>
             </div>
+          ) : viewMode === "compact" ? (
+            /* ── 컴팩트 리스트 뷰 ── */
+            <div className="divide-y divide-toss-border">
+              {/* 헤더 */}
+              <div className="grid grid-cols-[1fr_56px_76px_28px] gap-1.5 pb-1.5 text-[10px] font-semibold text-toss-sub uppercase tracking-wide">
+                <span>종목</span>
+                <span className="text-right">수익률</span>
+                <span className="text-right">세후 배당</span>
+                <span />
+              </div>
+              {events.filter(e => filterMarket === "ALL" || e.market === filterMarket).map((e, i) => {
+                const color     = STOCK_COLORS[i % STOCK_COLORS.length];
+                const yieldRate = apiData[e.ticker]?.dividendYield ?? null;
+                return (
+                  <div key={e.holdingId} className="grid grid-cols-[1fr_56px_76px_28px] gap-1.5 items-center py-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      {/* 차트 매핑 컬러 도트 */}
+                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }} />
+                      <div className="min-w-0">
+                        <p className="text-[13px] font-bold text-toss-text truncate">{e.name}</p>
+                        <p className="text-[10px] text-toss-sub">{e.quantity.toLocaleString()}주</p>
+                      </div>
+                    </div>
+                    <p className={`text-[12px] font-bold text-right ${
+                      yieldRate == null ? "text-toss-sub"
+                      : yieldRate >= 0.07 ? "text-red-500"
+                      : yieldRate >= 0.04 ? "text-toss-blue" : "text-toss-text"}`}>
+                      {yieldRate != null ? `${(yieldRate * 100).toFixed(1)}%` : "—"}
+                    </p>
+                    <p className="text-[12px] font-bold text-right text-toss-text">
+                      {e.market === "KR"
+                        ? `${Math.round(e.netAmount).toLocaleString("ko-KR")}원`
+                        : `$${e.netAmount.toFixed(2)}`}
+                    </p>
+                    <button onClick={() => handleRemove(e.holdingId)}
+                      className="p-0.5 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 text-toss-sub hover:text-red-400 transition-colors">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
+            /* ── 카드 뷰 (기본) ── */
             <div className="divide-y divide-toss-border">
               {events.filter(e => filterMarket === "ALL" || e.market === filterMarket).map((e, i) => {
                 const color     = STOCK_COLORS[i % STOCK_COLORS.length];
@@ -538,11 +638,13 @@ export default function DashboardPage() {
                 const ddayVal   = getDday(e.paymentDate);
                 const yieldRate = apiData[e.ticker]?.dividendYield ?? null;
                 return (
-                  <div key={e.holdingId} className="flex items-center justify-between py-3.5">
+                  <div key={e.holdingId} className="flex items-center justify-between py-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <StockLogo ticker={e.ticker} name={e.name} market={e.market} size={40} />
+                      <StockLogo ticker={e.ticker} name={e.name} market={e.market} size={38} />
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
+                          {/* 차트 매핑 컬러 도트 */}
+                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }} />
                           <p className="text-[14px] font-bold text-toss-text truncate">{e.name}</p>
                           {isLive && (
                             <span className="text-[10px] font-bold text-green-600 bg-green-50 dark:bg-green-900/20
@@ -574,7 +676,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center gap-3 flex-shrink-0">
                       <div className="text-right">
-                        <p className="text-[14px] font-bold" style={{ color }}>
+                        <p className="text-[14px] font-bold text-toss-text">
                           {e.market === "KR"
                             ? `${Math.round(e.netAmount).toLocaleString("ko-KR")}원`
                             : `$${e.netAmount.toFixed(2)}`}
@@ -639,11 +741,29 @@ function getDday(dateStr: string): number {
 }
 
 /* ── sub components ── */
-function SummaryCard({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+function SummaryCard({ label, value, highlight, hero, tooltip }: {
+  label: string; value: string; highlight?: boolean; hero?: boolean; tooltip?: string;
+}) {
   return (
-    <div className="bg-toss-card rounded-2xl shadow-card p-4 space-y-1.5">
-      <p className="text-[12px] text-toss-sub font-medium">{label}</p>
-      <p className={`text-[16px] font-extrabold leading-tight ${highlight ? "text-toss-blue" : "text-toss-text"}`}>{value}</p>
+    <div className={`relative bg-toss-card rounded-2xl shadow-card group cursor-default
+      ${hero ? "col-span-2 p-5 flex flex-col justify-between min-h-[90px] border border-toss-blue/20 bg-gradient-to-br from-blue-50/60 to-white dark:from-blue-900/10 dark:to-toss-card"
+             : "p-4 space-y-1.5"}`}>
+      <p className={`font-medium leading-tight ${hero ? "text-[13px] text-toss-blue" : "text-[12px] text-toss-sub"}`}>
+        {label}
+      </p>
+      <p className={`font-extrabold leading-tight ${
+        hero ? "text-[26px] text-toss-blue mt-1" :
+        highlight ? "text-[16px] text-toss-blue" : "text-[16px] text-toss-text"}`}>
+        {value}
+      </p>
+      {tooltip && (
+        <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50
+                        w-56 px-3 py-2.5 rounded-xl bg-[#191F28] text-white text-[11px] leading-relaxed text-center
+                        opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-pre-line shadow-lg">
+          {tooltip}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#191F28]" />
+        </div>
+      )}
     </div>
   );
 }
@@ -693,16 +813,23 @@ function PeerInsight({
     { subject: "종목 분산",   me: myScores.stocks, peer: 60 },
   ];
 
-  // 부족한 항목 → 팁 생성
+  // 부족한 항목 → 팁 생성 (데이터 기반 동적 액션 아이템)
   const tips: { icon: string; label: string; text: string }[] = [];
-  if (myScores.yield < 50)
-    tips.push({ icon: "📈", label: "배당수익률", text: `현재 수익률(${yieldPct.toFixed(1)}%)이 또래 평균(${PEER_MOCK.yield}%)보다 낮아요. 고배당 ETF(SCHD, JEPI 등)를 일부 편입하면 수익률을 높일 수 있어요.` });
-  if (myScores.annual < 50)
-    tips.push({ icon: "💰", label: "연간 배당금", text: `연간 배당금이 또래 평균(${(PEER_MOCK.annual / 10000).toFixed(0)}만 원)에 미치지 않아요. 꾸준한 적립식 매수로 배당 규모를 키워 나가 보세요.` });
+  if (myScores.yield < 50) {
+    const diff = PEER_MOCK.yield - yieldPct;
+    const actionText = diff >= 2
+      ? `또래 대비 배당수익률이 ${diff.toFixed(1)}%p 낮습니다. 리얼티인컴(O), SCHD, JEPI 같은 고배당 ETF 비중 확대를 고려해 보세요. 현재 포트폴리오에 월배당 ETF를 10~20% 편입하면 즉각적인 현금흐름 개선 효과가 있습니다.`
+      : `현재 수익률(${yieldPct.toFixed(1)}%)이 또래 평균(${PEER_MOCK.yield}%)보다 낮아요. SCHD·JEPI 등 고배당 ETF를 일부 편입하거나, 보유 종목의 배당 재투자(DRIP)를 활성화하면 수익률을 높일 수 있어요.`;
+    tips.push({ icon: "📈", label: "배당수익률", text: actionText });
+  }
+  if (myScores.annual < 50) {
+    const shortfall = PEER_MOCK.annual - annualNet;
+    tips.push({ icon: "💰", label: "연간 배당금", text: `또래 평균(${(PEER_MOCK.annual / 10000).toFixed(0)}만원)까지 약 ${(shortfall / 10000).toFixed(0)}만원이 부족해요. 배당수익률 4% 기준으로 약 ${Math.round(shortfall / 0.04 / 10000)}만원 추가 투자 시 목표에 도달할 수 있습니다. 꾸준한 적립식 매수를 권장합니다.` });
+  }
   if (myScores.stocks < 50)
-    tips.push({ icon: "🗂️", label: "종목 분산", text: `보유 종목(${stockCount}개)이 또래 평균(${PEER_MOCK.stocks}개)보다 적어요. 섹터를 다양화하면 배당 안정성이 높아져요.` });
+    tips.push({ icon: "🗂️", label: "종목 분산", text: `보유 종목(${stockCount}개)이 또래 평균(${PEER_MOCK.stocks}개)보다 적어요. 금융·에너지·통신·리츠 등 섹터별로 1종목씩 추가하면 배당 안정성과 지급 빈도가 높아집니다.` });
   if (tips.length === 0)
-    tips.push({ icon: "🎉", label: "잘 하고 있어요!", text: "배당수익률·연간 배당금·종목 분산 모두 또래 평균을 웃돌고 있어요. 지금 페이스를 유지하세요!" });
+    tips.push({ icon: "🎉", label: "잘 하고 있어요!", text: "배당수익률·연간 배당금·종목 분산 모두 또래 평균을 웃돌고 있어요. 이 페이스를 유지하며 배당 재투자(DRIP)로 복리 효과를 극대화해 보세요!" });
 
   return (
     <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-5">

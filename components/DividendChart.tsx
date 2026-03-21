@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell, ReferenceLine,
@@ -20,10 +20,14 @@ interface StackedData {
   [ticker: string]: number | string;
 }
 
+export type ChartPeriod = "N12M" | "THIS_YEAR" | "LAST_YEAR";
+
 interface Props {
   data: MonthlyDividend[];
   stackedData?: StackedData[];
   tickers?: string[];
+  period?: ChartPeriod;
+  onPeriodChange?: (p: ChartPeriod) => void;
 }
 
 function fmt(v: number) {
@@ -72,10 +76,33 @@ function CumTooltip({ active, payload, label }: any) {
   );
 }
 
-export default function DividendChart({ data, stackedData, tickers }: Props) {
+export default function DividendChart({ data, stackedData, tickers, period = "N12M", onPeriodChange }: Props) {
   const [view, setView] = useState<"monthly" | "cumulative">("monthly");
 
-  if (!stackedData || !tickers || tickers.length === 0) {
+  // 기간별 데이터 재정렬
+  const displayedStackedData = useMemo(() => {
+    if (!stackedData) return stackedData;
+    const currentMonthIdx = new Date().getMonth(); // 0-indexed
+    if (period === "N12M") {
+      // 현재 월부터 향후 12개월 순환
+      return [
+        ...stackedData.slice(currentMonthIdx),
+        ...stackedData.slice(0, currentMonthIdx),
+      ];
+    }
+    if (period === "LAST_YEAR") {
+      // 1년 전부터 현재 월까지 (currentMonthIdx+1 시작, 현재월로 끝)
+      const startIdx = (currentMonthIdx + 1) % 12;
+      return [
+        ...stackedData.slice(startIdx),
+        ...stackedData.slice(0, startIdx),
+      ];
+    }
+    // THIS_YEAR: 1월부터 12월 그대로
+    return stackedData;
+  }, [stackedData, period]);
+
+  if (!displayedStackedData || !tickers || tickers.length === 0) {
     // 단일 차트 fallback
     return (
       <ResponsiveContainer width="100%" height={220}>
@@ -94,7 +121,7 @@ export default function DividendChart({ data, stackedData, tickers }: Props) {
   }
 
   // 누적 데이터 계산
-  const cumulativeData = stackedData.reduce<{ month: string; total: number; [k: string]: number | string }[]>(
+  const cumulativeData = displayedStackedData.reduce<{ month: string; total: number; [k: string]: number | string }[]>(
     (acc, row) => {
       const prev = acc[acc.length - 1];
       const cumRow: any = { month: row.month };
@@ -111,13 +138,14 @@ export default function DividendChart({ data, stackedData, tickers }: Props) {
     []
   );
 
-  const maxMonth = stackedData.reduce((a, b) => (a.total > b.total ? a : b), stackedData[0]);
-  const annualTotal = stackedData.reduce((s, r) => s + r.total, 0);
+  const maxMonth = displayedStackedData.reduce((a, b) => (a.total > b.total ? a : b), displayedStackedData[0]);
+  const annualTotal = displayedStackedData.reduce((s, r) => s + r.total, 0);
+  const currentYear = new Date().getFullYear();
 
   return (
     <div className="space-y-3">
-      {/* 탭 + 연간 합계 */}
-      <div className="flex items-center justify-between">
+      {/* 뷰 탭 + 기간 필터 */}
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex bg-toss-bg rounded-xl p-0.5">
           {(["monthly", "cumulative"] as const).map((v) => (
             <button
@@ -132,9 +160,32 @@ export default function DividendChart({ data, stackedData, tickers }: Props) {
             </button>
           ))}
         </div>
-        {annualTotal > 0 && (
+
+        {/* 기간 필터 */}
+        {onPeriodChange && (
+          <div className="flex bg-toss-bg rounded-xl p-0.5">
+            {([
+              ["N12M",      "향후 12개월"],
+              ["THIS_YEAR", `${currentYear}년 기준`],
+              ["LAST_YEAR", "최근 1년"],
+            ] as [ChartPeriod, string][]).map(([p, label]) => (
+              <button
+                key={p}
+                onClick={() => onPeriodChange(p)}
+                className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all whitespace-nowrap
+                  ${period === p
+                    ? "bg-toss-blue text-white shadow-sm"
+                    : "text-toss-sub hover:text-toss-label"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {annualTotal > 0 && !onPeriodChange && (
           <p className="text-[13px] text-toss-sub">
-            연간 합계 <span className="text-toss-blue font-bold">{Math.round(annualTotal).toLocaleString("ko-KR")}원</span>
+            합계 <span className="text-toss-blue font-bold">{Math.round(annualTotal).toLocaleString("ko-KR")}원</span>
           </p>
         )}
       </div>
@@ -142,7 +193,7 @@ export default function DividendChart({ data, stackedData, tickers }: Props) {
       {/* 월별 배당 — 스택 바 */}
       {view === "monthly" && (
         <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={stackedData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+          <BarChart data={displayedStackedData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--toss-border)" vertical={false} />
             <XAxis dataKey="month" tick={{ fontSize: 12, fill: "var(--toss-sub)" }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 11, fill: "var(--toss-sub)" }} axisLine={false} tickLine={false}

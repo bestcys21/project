@@ -22,11 +22,13 @@ export default function WikiAccordion({ articles }: { articles: ArticleSection[]
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {articles.map((section) => (
-        <div key={section.category} className="space-y-2">
+        <div key={section.category} className="space-y-3">
           {/* 섹션 헤더 */}
-          <h2 className="text-[21px] font-extrabold text-toss-text mb-3">{section.category}</h2>
+          <h2 className="text-[26px] font-extrabold text-toss-text mb-4 flex items-center gap-2">
+            {section.category}
+          </h2>
 
           {/* 아코디언 목록 */}
           <div className="rounded-2xl overflow-hidden border border-toss-border bg-toss-card shadow-card divide-y divide-toss-border">
@@ -39,19 +41,19 @@ export default function WikiAccordion({ articles }: { articles: ArticleSection[]
                   {/* 질문 (토글 버튼) */}
                   <button
                     onClick={() => toggle(key)}
-                    className="w-full flex items-center justify-between px-5 py-4 text-left gap-3 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                    className="w-full flex items-center justify-between px-6 py-5 text-left gap-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                   >
                     <span
-                      className="text-[15px] font-semibold leading-snug flex-1"
+                      className="text-[18px] font-semibold leading-snug flex-1"
                       style={{ color: isOpen ? section.color : undefined }}
                     >
-                      <span className="mr-1.5 opacity-60 text-[14px]">Q.</span>
+                      <span className="mr-2 opacity-50 text-[15px] font-bold">Q.</span>
                       {item.q}
                     </span>
 
                     {/* 화살표 아이콘 */}
                     <svg
-                      className="w-4 h-4 flex-shrink-0 transition-transform duration-200 text-toss-sub"
+                      className="w-5 h-5 flex-shrink-0 transition-transform duration-200 text-toss-sub"
                       style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", color: isOpen ? section.color : undefined }}
                       viewBox="0 0 24 24"
                       fill="none"
@@ -67,11 +69,11 @@ export default function WikiAccordion({ articles }: { articles: ArticleSection[]
                   {/* 답변 (아코디언 패널) */}
                   <div
                     className="overflow-hidden transition-all duration-200 ease-in-out"
-                    style={{ maxHeight: isOpen ? "500px" : "0px" }}
+                    style={{ maxHeight: isOpen ? "600px" : "0px" }}
                   >
                     <div
-                      className="px-5 pt-1 pb-4 text-[14px] text-toss-label leading-relaxed border-l-[3px] ml-5 mr-5 mb-3 rounded-r-lg pl-4"
-                      style={{ borderColor: section.color, backgroundColor: section.bgColor }}
+                      className="mx-6 mb-5 mt-1 rounded-xl border-l-4 pl-5 pr-5 py-4 text-[16px] text-toss-label"
+                      style={{ borderColor: section.color, backgroundColor: section.bgColor, lineHeight: "1.75" }}
                     >
                       {item.a}
                     </div>
