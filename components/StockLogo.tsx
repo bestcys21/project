@@ -42,7 +42,7 @@ export default function StockLogo({ ticker, name, market, size = 36 }: Props) {
         height={size}
         onError={() => setErr(true)}
         style={{ width: size, height: size, borderRadius: radius }}
-        className="object-contain bg-white border border-toss-border flex-shrink-0"
+        className="object-contain bg-toss-card border border-toss-border flex-shrink-0"
       />
     );
   }

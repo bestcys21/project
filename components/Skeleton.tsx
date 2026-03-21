@@ -2,14 +2,14 @@
 
 function Shimmer({ className }: { className?: string }) {
   return (
-    <div className={`animate-pulse bg-gradient-to-r from-toss-bg via-gray-200 to-toss-bg bg-[length:200%_100%] rounded-xl ${className}`}
+    <div className={`animate-pulse bg-gradient-to-r from-toss-bg via-toss-border to-toss-bg bg-[length:200%_100%] rounded-xl ${className}`}
       style={{ animation: "shimmer 1.4s infinite linear" }} />
   );
 }
 
 export function CardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl shadow-card p-6 space-y-4">
+    <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-4">
       <Shimmer className="h-4 w-24" />
       <Shimmer className="h-8 w-40" />
       <Shimmer className="h-4 w-full" />
@@ -20,7 +20,7 @@ export function CardSkeleton() {
 
 export function SummaryCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl shadow-card p-4 space-y-2">
+    <div className="bg-toss-card rounded-2xl shadow-card p-4 space-y-2">
       <Shimmer className="h-3 w-16" />
       <Shimmer className="h-6 w-24" />
     </div>
@@ -32,7 +32,7 @@ export function ChartSkeleton() {
     <div className="space-y-3">
       <div className="flex items-end gap-2 h-[200px] px-2">
         {[60, 90, 40, 120, 80, 110, 50, 95, 70, 130, 85, 100].map((h, i) => (
-          <div key={i} className="flex-1 animate-pulse bg-gradient-to-r from-toss-bg via-gray-200 to-toss-bg rounded-t-lg"
+          <div key={i} className="flex-1 animate-pulse bg-gradient-to-r from-toss-bg via-toss-border to-toss-bg rounded-t-lg"
             style={{ height: `${h}px`, animationDelay: `${i * 0.05}s`, backgroundSize: "200% 100%", animation: "shimmer 1.4s infinite linear" }} />
         ))}
       </div>

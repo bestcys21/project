@@ -54,6 +54,14 @@
   }
 }
 
+/* 사이드바 그라디언트 — 다크/라이트 자동 전환 */
+.sidebar-bg {
+  background: linear-gradient(180deg, #ffffff 0%, #f8faff 60%, #f2f6ff 100%);
+}
+.dark .sidebar-bg {
+  background: linear-gradient(180deg, #1C2028 0%, #1a1e28 60%, #161b25 100%);
+}
+
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }

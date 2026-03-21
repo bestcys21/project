@@ -37,7 +37,7 @@ function BarTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   const total = payload.reduce((s: number, p: any) => s + (p.value || 0), 0);
   return (
-    <div className="bg-white rounded-xl shadow-card px-4 py-3 border border-toss-border text-[13px] min-w-[150px]">
+    <div className="bg-toss-card rounded-xl shadow-card px-4 py-3 border border-toss-border text-[13px] min-w-[150px]">
       <p className="font-bold text-toss-text mb-2">{label}</p>
       {payload.map((p: any) =>
         p.value > 0 ? (
@@ -60,7 +60,7 @@ function BarTooltip({ active, payload, label }: any) {
 function CumTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white rounded-xl shadow-card px-4 py-3 border border-toss-border text-[13px] min-w-[150px]">
+    <div className="bg-toss-card rounded-xl shadow-card px-4 py-3 border border-toss-border text-[13px] min-w-[150px]">
       <p className="font-bold text-toss-text mb-2">{label} 누적</p>
       {payload.map((p: any) => (
         <div key={p.dataKey} className="flex justify-between gap-4">
@@ -80,11 +80,11 @@ export default function DividendChart({ data, stackedData, tickers }: Props) {
     return (
       <ResponsiveContainer width="100%" height={220}>
         <BarChart data={data} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#E5E8EB" vertical={false} />
-          <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#8B95A1" }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fontSize: 11, fill: "#8B95A1" }} axisLine={false} tickLine={false}
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--toss-border)" vertical={false} />
+          <XAxis dataKey="month" tick={{ fontSize: 12, fill: "var(--toss-sub)" }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fontSize: 11, fill: "var(--toss-sub)" }} axisLine={false} tickLine={false}
             tickFormatter={fmt} width={42} />
-          <Tooltip content={<BarTooltip />} cursor={{ fill: "#F2F4F6" }} />
+          <Tooltip content={<BarTooltip />} cursor={{ fill: "var(--toss-bg)" }} />
           <Bar dataKey="amount" radius={[6, 6, 0, 0]} maxBarSize={40}>
             {data.map((_, i) => <Cell key={i} fill={STOCK_COLORS[i % STOCK_COLORS.length]} />)}
           </Bar>
@@ -125,7 +125,7 @@ export default function DividendChart({ data, stackedData, tickers }: Props) {
               onClick={() => setView(v)}
               className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold transition-all
                 ${view === v
-                  ? "bg-white text-toss-text shadow-sm"
+                  ? "bg-toss-card text-toss-text shadow-sm"
                   : "text-toss-sub hover:text-toss-label"}`}
             >
               {v === "monthly" ? "월별 배당" : "누적 배당"}
@@ -143,12 +143,12 @@ export default function DividendChart({ data, stackedData, tickers }: Props) {
       {view === "monthly" && (
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={stackedData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E5E8EB" vertical={false} />
-            <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#8B95A1" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: "#8B95A1" }} axisLine={false} tickLine={false}
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--toss-border)" vertical={false} />
+            <XAxis dataKey="month" tick={{ fontSize: 12, fill: "var(--toss-sub)" }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 11, fill: "var(--toss-sub)" }} axisLine={false} tickLine={false}
               tickFormatter={fmt} width={42} />
-            <Tooltip content={<BarTooltip />} cursor={{ fill: "#F2F4F6" }} />
-            <ReferenceLine x={maxMonth.month} stroke="#3182F6" strokeDasharray="4 2" strokeWidth={1.5} />
+            <Tooltip content={<BarTooltip />} cursor={{ fill: "var(--toss-bg)" }} />
+            <ReferenceLine x={maxMonth.month} stroke="var(--toss-blue)" strokeDasharray="4 2" strokeWidth={1.5} />
             {tickers.map((ticker, i) => (
               <Bar key={ticker} dataKey={ticker} stackId="a"
                 fill={STOCK_COLORS[i % STOCK_COLORS.length]}
@@ -169,11 +169,11 @@ export default function DividendChart({ data, stackedData, tickers }: Props) {
                 <stop offset="95%" stopColor="#3182F6" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E5E8EB" vertical={false} />
-            <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#8B95A1" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: "#8B95A1" }} axisLine={false} tickLine={false}
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--toss-border)" vertical={false} />
+            <XAxis dataKey="month" tick={{ fontSize: 12, fill: "var(--toss-sub)" }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 11, fill: "var(--toss-sub)" }} axisLine={false} tickLine={false}
               tickFormatter={fmt} width={42} />
-            <Tooltip content={<CumTooltip />} cursor={{ stroke: "#3182F6", strokeWidth: 1, strokeDasharray: "4 2" }} />
+            <Tooltip content={<CumTooltip />} cursor={{ stroke: "var(--toss-blue)", strokeWidth: 1, strokeDasharray: "4 2" }} />
             {tickers.length > 1
               ? tickers.map((ticker, i) => (
                   <Area key={ticker} type="monotone" dataKey={ticker}

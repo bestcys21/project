@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { hasFmpKey, getFmpRankItems } from "@/lib/fmp-api";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -250,8 +251,19 @@ async function batchFetch<T>(
 
 export async function GET(req: NextRequest) {
   const market = req.nextUrl.searchParams.get("market") ?? "US";
-  const list   = market === "KR" ? KR_TICKERS : US_TICKERS;
-  const yf     = getClient();
+
+  // ── US 주식: FMP 키가 있으면 FMP 사용 (배당 정확도 우수) ─────────────────
+  if (market === "US" && hasFmpKey()) {
+    const fmpItems = await getFmpRankItems(US_TICKERS, 10, 200);
+    const data = fmpItems
+      .sort((a, b) => (b.dividendYield ?? 0) - (a.dividendYield ?? 0))
+      .slice(0, 50);
+    return NextResponse.json({ market, data });
+  }
+
+  // ── Yahoo Finance 처리 (KR 또는 FMP 키 없는 US) ──────────────────────────
+  const list = market === "KR" ? KR_TICKERS : US_TICKERS;
+  const yf   = getClient();
 
   const results = await batchFetch(
     list,
@@ -259,13 +271,11 @@ export async function GET(req: NextRequest) {
       const quote = await yf.quote(ticker);
       const price = quote?.regularMarketPrice ?? null;
 
-      // DPS: 연간 주당배당금 (원화 or 달러)
       const dps: number | null =
         (quote as any)?.trailingAnnualDividendRate ??
         (quote as any)?.dividendRate ??
         null;
 
-      // Yield: DPS/가격으로 직접 계산 (Yahoo Finance가 이미 % 단위로 줄 때 오류 방지)
       let dividendYield: number | null = null;
       if (dps != null && price != null && price > 0) {
         dividendYield = dps / price;
@@ -275,15 +285,14 @@ export async function GET(req: NextRequest) {
           (quote as any)?.dividendYield ??
           null;
         if (raw != null) {
-          // 1 이상이면 이미 % 단위로 반환된 것 → 100으로 나눔
           dividendYield = raw > 1 ? raw / 100 : raw;
         }
       }
 
       return { ticker, name: koreanName, dividendYield, dps, price, market };
     },
-    10,  // 배치 크기
-    200  // 배치 간 딜레이 ms
+    10,
+    200
   );
 
   const data = results

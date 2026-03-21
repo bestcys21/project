@@ -153,7 +153,7 @@ export default function CalculatorForm() {
       const grossAmount = eligible ? dps * +qty : 0;
 
       setResult({
-        stock:        query.trim() || data.name ?? ticker,  // 검색어(한국어 종목명) 우선 사용
+        stock:        query.trim() || (data.name ?? ticker),  // 검색어(한국어 종목명) 우선 사용
         quantity:     +qty,
         purchaseDate: date,
         market,

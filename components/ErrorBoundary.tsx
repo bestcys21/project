@@ -24,7 +24,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     if (this.props.fallback) return this.props.fallback;
 
     return (
-      <div className="bg-white rounded-2xl shadow-card p-8 flex flex-col items-center text-center space-y-3">
+      <div className="bg-toss-card rounded-2xl shadow-card p-8 flex flex-col items-center text-center space-y-3">
         <span className="text-4xl">😵</span>
         <p className="text-[15px] font-bold text-toss-text">잠깐, 문제가 생겼어요</p>
         <p className="text-[13px] text-toss-sub leading-relaxed">{this.state.message}</p>

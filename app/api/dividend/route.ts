@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDartDividend } from "@/lib/dart-api";
+import {
+  hasFmpKey,
+  getFmpFullQuote,
+  getFmpDividendHistory,
+  estimateFrequency,
+} from "@/lib/fmp-api";
 
 // SSL 우회 (사내망/개발 환경)
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-function getClient() {
+function getYfClient() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const YF = require("yahoo-finance2").default;
   return new YF({ suppressNotices: ["yahooSurvey"] });
@@ -22,55 +28,125 @@ function fmt(d: unknown): string | null {
   } catch { return null; }
 }
 
-async function fetchQuote(yf: any, ticker: string): Promise<any> {
-  const quote = await yf.quote(ticker);
-  if (!quote?.regularMarketPrice) throw new Error("No price data");
-  return quote;
+function isPast(dateStr: string | null, daysAgo = 7): boolean {
+  if (!dateStr) return false;
+  const m = dateStr.match(/(\d{4})\.(\d{2})\.(\d{2})/);
+  if (!m) return false;
+  const threshold = new Date();
+  threshold.setDate(threshold.getDate() - daysAgo);
+  return new Date(+m[1], +m[2] - 1, +m[3]) < threshold;
 }
 
-export async function GET(req: NextRequest) {
-  const rawTicker = req.nextUrl.searchParams.get("ticker");
-  if (!rawTicker) {
-    return NextResponse.json({ error: "ticker 파라미터가 필요합니다." }, { status: 400 });
+// ── US 주식: FMP 기반 처리 ───────────────────────────────────────────────────
+async function handleUSWithFmp(rawTicker: string) {
+  const fmp = await getFmpFullQuote(rawTicker.toUpperCase());
+  if (!fmp) {
+    return NextResponse.json(
+      { error: "종목을 찾을 수 없습니다. 티커를 다시 확인해 주세요." },
+      { status: 404 }
+    );
   }
 
-  const yf = getClient();
+  // 배당 이력으로 지급 패턴 파악
+  const history = await getFmpDividendHistory(rawTicker.toUpperCase());
+  const dividendFrequency = estimateFrequency(history);
 
-  // 한국 주식(.KS 전용으로 왔을 때 .KQ 자동 fallback)
+  // 지급 월 목록
+  const twoYearsAgo = new Date();
+  twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+  const recentHist = history.filter((h) => new Date(h.date) >= twoYearsAgo);
+
+  const payMonthSet   = new Set<number>();
+  const payDayByMonth: Record<number, number> = {};
+  const payDaySums: Record<number, { sum: number; count: number }> = {};
+
+  recentHist.forEach((h) => {
+    const payTarget = h.paymentDate ?? h.date;
+    const d  = new Date(payTarget);
+    const mo = d.getMonth() + 1;
+    const dy = d.getDate();
+    payMonthSet.add(mo);
+    if (!payDaySums[mo]) payDaySums[mo] = { sum: 0, count: 0 };
+    payDaySums[mo].sum   += dy;
+    payDaySums[mo].count += 1;
+  });
+  Object.entries(payDaySums).forEach(([mo, { sum, count }]) => {
+    payDayByMonth[parseInt(mo)] = Math.round(sum / count);
+  });
+
+  let payMonths = [...payMonthSet].sort((a, b) => a - b);
+  if (payMonths.length === 0) {
+    payMonths = [3, 6, 9, 12];
+  }
+
+  // 향후 12개월 예상 지급일
+  const today = new Date();
+  const estimatedPayDates: string[] = [];
+  for (let offset = 0; offset <= 12; offset++) {
+    const d  = new Date(today.getFullYear(), today.getMonth() + offset, 1);
+    const mo = d.getMonth() + 1;
+    const yr = d.getFullYear();
+    if (payMonths.includes(mo)) {
+      const day     = payDayByMonth[mo] ?? 15;
+      const dateStr = `${yr}.${String(mo).padStart(2, "0")}.${String(day).padStart(2, "0")}`;
+      estimatedPayDates.push(dateStr);
+    }
+  }
+
+  return NextResponse.json({
+    ticker:            rawTicker.toUpperCase(),
+    name:              fmp.name,
+    price:             fmp.price,
+    dps:               fmp.dps,
+    dividendYield:     fmp.dividendYield,
+    exDate:            isPast(fmp.exDate) ? null : fmp.exDate,
+    paymentDate:       isPast(fmp.payDate) ? null : fmp.payDate,
+    currency:          fmp.currency,
+    payMonths,
+    dividendFrequency,
+    estimatedPayDates,
+  }, {
+    headers: {
+      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+    },
+  });
+}
+
+// ── 한국/Yahoo Finance 기반 처리 ─────────────────────────────────────────────
+async function handleWithYahoo(rawTicker: string) {
+  const yf = getYfClient();
+
   const isKorean = rawTicker.endsWith(".KS") || rawTicker.endsWith(".KQ");
   const tickerCandidates: string[] = isKorean
     ? rawTicker.endsWith(".KS")
-      ? [rawTicker, rawTicker.replace(".KS", ".KQ")]  // .KS 먼저, 실패 시 .KQ
-      : [rawTicker, rawTicker.replace(".KQ", ".KS")]  // .KQ 먼저, 실패 시 .KS
+      ? [rawTicker, rawTicker.replace(".KS", ".KQ")]
+      : [rawTicker, rawTicker.replace(".KQ", ".KS")]
     : [rawTicker];
 
   let quote: any;
   let ticker = rawTicker;
+
   for (const candidate of tickerCandidates) {
     try {
-      const q = await fetchQuote(yf, candidate);
-      quote = q;
-      ticker = candidate;  // 성공한 티커로 확정
-      break;
+      const q = await yf.quote(candidate);
+      if (q?.regularMarketPrice) { quote = q; ticker = candidate; break; }
     } catch { /* try next */ }
   }
 
   if (!quote) {
-    // 마지막 에러 응답
     return NextResponse.json(
       { error: "종목을 찾을 수 없습니다. 종목명 또는 티커를 다시 확인해 주세요." },
       { status: 404 }
     );
   }
 
-  // quote()에서 배당 정보 추출 (항상 사용 가능)
-  const price         = quote.regularMarketPrice          ?? null;
+  const price         = quote.regularMarketPrice ?? null;
   let   dps: number | null = (quote as any).trailingAnnualDividendRate ?? null;
   let   divYield      = (quote as any).trailingAnnualDividendYield      ?? null;
   let   exDateRaw     = (quote as any).exDividendDate                    ?? null;
   let   payDateRaw    = (quote as any).dividendDate                      ?? null;
 
-  // 2단계: quoteSummary() — 더 정확한 배당 데이터 (실패해도 무시)
+  // quoteSummary — 더 정확한 배당 데이터
   try {
     const summary = await yf.quoteSummary(ticker, {
       modules: ["summaryDetail", "calendarEvents"],
@@ -83,49 +159,28 @@ export async function GET(req: NextRequest) {
     if (det?.exDividendDate != null) exDateRaw  = det.exDividendDate;
     if (cal?.dividendDate   != null) payDateRaw = cal.dividendDate;
     else if (det?.dividendDate != null) payDateRaw = det.dividendDate;
-  } catch { /* 무시 — quote() 데이터로 진행 */ }
+  } catch { /* 무시 */ }
 
-  // 3단계: 한국 주식 → Open DART 공시 데이터로 DPS 검증/보완
-  // Yahoo Finance의 한국 배당 데이터가 부정확한 경우 DART 공식 공시값으로 대체
+  // 한국 주식 → Open DART 공시 데이터로 DPS 검증/보완
   const isKoreanStock = ticker.endsWith(".KS") || ticker.endsWith(".KQ");
   if (isKoreanStock && process.env.DART_API_KEY) {
     try {
       const stockCode = ticker.replace(".KS", "").replace(".KQ", "");
       const dartData  = await getDartDividend(stockCode);
       if (dartData) {
-        // DART DPS가 있고 Yahoo 값보다 신뢰도가 높으면 대체
-        if (dartData.dps != null && dartData.dps > 0) {
-          dps = dartData.dps;
-        }
-        // DART 배당수익률로 검증 (Yahoo 값이 없을 때 사용)
-        if (divYield == null && dartData.dividendYield != null) {
-          divYield = dartData.dividendYield;
-        }
-        // price 기준으로 수익률 재계산 (더 정확)
-        if (dps != null && price != null && price > 0) {
-          divYield = dps / price;
-        }
+        if (dartData.dps != null && dartData.dps > 0) dps = dartData.dps;
+        if (divYield == null && dartData.dividendYield != null) divYield = dartData.dividendYield;
+        if (dps != null && price != null && price > 0) divYield = dps / price;
       }
     } catch { /* DART 실패 시 Yahoo 데이터로 진행 */ }
   }
 
-  // 과거 배당락일(7일 이상 지난 경우)은 미정 처리 — 2014년 등 과거 날짜 반환 방지
-  const fmtExDate = fmt(exDateRaw);
+  const fmtExDate  = fmt(exDateRaw);
   const fmtPayDate = fmt(payDateRaw);
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-  function isPast(dateStr: string | null): boolean {
-    if (!dateStr) return false;
-    const m = dateStr.match(/(\d{4})\.(\d{2})\.(\d{2})/);
-    if (!m) return false;
-    return new Date(+m[1], +m[2] - 1, +m[3]) < sevenDaysAgo;
-  }
-
-  // 3단계: 배당 지급 이력으로 실제 지급 월 + 빈도 + 월별 대표 지급일 파악
+  // 배당 지급 이력으로 패턴 파악
   let payMonths: number[] = [];
   let dividendFrequency: "annual" | "semi-annual" | "quarterly" | "monthly" = "annual";
-  // 월별 대표 지급일 (1~12 → 일(day))
   const payDayByMonth: Record<number, number> = {};
 
   try {
@@ -134,7 +189,7 @@ export async function GET(req: NextRequest) {
     const hist = await yf.historical(ticker, {
       period1: twoYearsAgo.toISOString().split("T")[0],
       period2: new Date().toISOString().split("T")[0],
-      events: "dividends",
+      events:  "dividends",
     });
     const divRows = ((hist as any[]) ?? []).filter(
       (h: any) => h.dividends != null && h.dividends > 0
@@ -147,14 +202,13 @@ export async function GET(req: NextRequest) {
         avgPerYear >= 3  ? "quarterly" :
         avgPerYear >= 1.5 ? "semi-annual" : "annual";
 
-      // 월별 평균 지급일 계산
       const daySums: Record<number, { sum: number; count: number }> = {};
       divRows.forEach((h: any) => {
-        const d = new Date(h.date);
+        const d  = new Date(h.date);
         const mo = d.getMonth() + 1;
-        const day = d.getDate();
+        const dy = d.getDate();
         if (!daySums[mo]) daySums[mo] = { sum: 0, count: 0 };
-        daySums[mo].sum   += day;
+        daySums[mo].sum   += dy;
         daySums[mo].count += 1;
       });
       Object.entries(daySums).forEach(([mo, { sum, count }]) => {
@@ -163,9 +217,8 @@ export async function GET(req: NextRequest) {
     }
   } catch { /* 이력 없으면 기본값 */ }
 
-  // 이력 없으면 시장/지급일 기반 추정
   if (payMonths.length === 0) {
-    const isKR = ticker.endsWith(".KS") || ticker.endsWith(".KQ");
+    const isKR = isKoreanStock;
     if (!isPast(fmtPayDate) && fmtPayDate) {
       const m = fmtPayDate.match(/\d{4}\.(\d{2})\.(\d{2})/);
       if (m) { payMonths = [parseInt(m[1])]; payDayByMonth[parseInt(m[1])] = parseInt(m[2]); }
@@ -176,15 +229,14 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // 4단계: 향후 12개월 예상 지급일 생성
   const today = new Date();
   const estimatedPayDates: string[] = [];
   for (let offset = 0; offset <= 12; offset++) {
-    const d = new Date(today.getFullYear(), today.getMonth() + offset, 1);
+    const d  = new Date(today.getFullYear(), today.getMonth() + offset, 1);
     const mo = d.getMonth() + 1;
     const yr = d.getFullYear();
     if (payMonths.includes(mo)) {
-      const day = payDayByMonth[mo] ?? 15;
+      const day     = payDayByMonth[mo] ?? 15;
       const dateStr = `${yr}.${String(mo).padStart(2, "0")}.${String(day).padStart(2, "0")}`;
       estimatedPayDates.push(dateStr);
     }
@@ -201,10 +253,28 @@ export async function GET(req: NextRequest) {
     currency:          quote.currency ?? "USD",
     payMonths,
     dividendFrequency,
-    estimatedPayDates,  // 향후 12개월 예상 지급일 배열
+    estimatedPayDates,
   }, {
     headers: {
       "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
     },
   });
+}
+
+// ── 라우트 핸들러 ─────────────────────────────────────────────────────────────
+export async function GET(req: NextRequest) {
+  const rawTicker = req.nextUrl.searchParams.get("ticker");
+  if (!rawTicker) {
+    return NextResponse.json({ error: "ticker 파라미터가 필요합니다." }, { status: 400 });
+  }
+
+  const isKorean = rawTicker.endsWith(".KS") || rawTicker.endsWith(".KQ");
+
+  // US 주식 + FMP 키 있으면 FMP 사용
+  if (!isKorean && hasFmpKey()) {
+    return handleUSWithFmp(rawTicker);
+  }
+
+  // 한국 주식 또는 FMP 키 없는 경우 Yahoo Finance 사용
+  return handleWithYahoo(rawTicker);
 }

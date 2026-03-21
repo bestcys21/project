@@ -14,8 +14,8 @@ export default function ResultCard({ result }: Props) {
         <span className="text-[13px] font-semibold text-toss-label">계산 결과</span>
         <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${
           market === "KR"
-            ? "bg-blue-50 text-blue-700"
-            : "bg-green-50 text-green-700"
+            ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
+            : "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300"
         }`}>
           {market === "KR" ? "KRX" : "NYSE/NASDAQ"}
         </span>
@@ -36,7 +36,7 @@ export default function ResultCard({ result }: Props) {
 
       {/* 배당락일 이후 매수 경고 */}
       {!eligible && (
-        <div className="flex items-start gap-2 px-3.5 py-3 rounded-xl bg-orange-50 border border-orange-200">
+        <div className="flex items-start gap-2 px-3.5 py-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
           <span className="text-orange-400 flex-shrink-0 text-lg">⚠️</span>
           <div>
             <p className="text-[13px] font-bold text-orange-600">이번 배당은 받을 수 없어요</p>
@@ -58,7 +58,7 @@ export default function ResultCard({ result }: Props) {
         <hr className="border-toss-border" />
         <Row label="세전 배당금"   value={eligible ? formatAmount(grossAmount, market) : "-"} />
         <div className={`flex justify-between items-center -mx-1 px-3 py-2.5 rounded-xl ${
-          eligible ? "bg-blue-50" : "bg-toss-bg"
+          eligible ? "bg-blue-50 dark:bg-blue-900/20" : "bg-toss-bg"
         }`}>
           <span className={`text-[15px] font-bold ${eligible ? "text-toss-blue" : "text-toss-sub"}`}>
             세후 실수령액
