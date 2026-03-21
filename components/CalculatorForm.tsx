@@ -134,11 +134,31 @@ export default function CalculatorForm() {
     }
 
     if (market === "KR") {
-      // Local search — no API call
-      const results = searchMaster(masterDB, val).map(toStockItem);
-      setSuggestions(results);
+      // 1) 로컬 마스터 DB 즉시 검색
+      const localResults = searchMaster(masterDB, val).map(toStockItem);
+      setSuggestions(localResults);
       setShowDrop(true);
-      setSearching(false);
+
+      // 2) Yahoo Finance API 병합 (마스터 DB에 없는 종목 fallback)
+      if (searchRef.current) clearTimeout(searchRef.current);
+      setSearching(true);
+      searchRef.current = setTimeout(async () => {
+        try {
+          const res  = await fetch(`/api/search?q=${encodeURIComponent(val.trim())}&market=KR`);
+          const data = await res.json();
+          const api: StockItem[] = (data.results ?? []).map((r: any) => ({
+            ticker: r.ticker, name: r.name, market: "KR" as Market, exchange: r.exchange, type: r.type ?? "stock",
+          }));
+          setSuggestions((prev) => {
+            const seen = new Set(prev.map((s) => s.ticker));
+            const merged = [...prev, ...api.filter((a) => !seen.has(a.ticker))];
+            return merged.slice(0, 20);
+          });
+          setShowDrop(true);
+        } catch { /* ignore */ } finally {
+          setSearching(false);
+        }
+      }, 400);
     } else {
       // US: Yahoo Finance via API (debounced)
       setSuggestions([]);
@@ -257,7 +277,10 @@ export default function CalculatorForm() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+
+      {/* ── 좌측: 입력 폼 ── */}
+      <div className="space-y-5">
       <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-5">
 
         {/* 시장 선택 — 최상위 개념 */}
@@ -432,13 +455,30 @@ export default function CalculatorForm() {
           {loading ? <><Spinner />계산 중...</> : "내 배당금 계산하기"}
         </button>
       </div>
+      </div>{/* end 좌측 폼 col */}
 
-      {chartTicker && (
-        <StockPriceChart ticker={chartTicker} stockName={query.trim() || undefined}
-          currency={chartCurrency} dividendYield={dividendYield} />
-      )}
+      {/* ── 우측: 결과 카드 + 차트 (sticky) ── */}
+      <div className="mt-5 lg:mt-0 lg:sticky lg:top-24 space-y-4">
+        {result && <ResultCard result={result} ticker={ticker || undefined} exchange={exchange} />}
+        {chartTicker && (
+          <StockPriceChart ticker={chartTicker} stockName={query.trim() || undefined}
+            currency={chartCurrency} dividendYield={dividendYield} />
+        )}
+        {!result && !chartTicker && (
+          <div className="hidden lg:flex bg-toss-card rounded-2xl shadow-card
+                          items-center justify-center min-h-[320px] text-center
+                          border border-dashed border-toss-border">
+            <div className="space-y-3 px-8">
+              <p className="text-5xl">📊</p>
+              <p className="text-[16px] font-bold text-toss-text">계산 결과가 여기에 표시돼요</p>
+              <p className="text-[13px] text-toss-sub leading-relaxed">
+                종목을 선택하고 수량·매수일 입력 후<br />계산하기 버튼을 눌러보세요
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
 
-      {result && <ResultCard result={result} ticker={ticker || undefined} exchange={exchange} />}
     </div>
   );
 }

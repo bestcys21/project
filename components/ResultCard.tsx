@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { DividendResult, formatAmount, formatDate } from "@/lib/calculator";
 import { addHolding } from "@/lib/storage";
+import StockLogo from "./StockLogo";
 
 interface Props {
   result: DividendResult;
@@ -49,9 +50,7 @@ export default function ResultCard({ result, ticker, exchange }: Props) {
 
       {/* 종목 */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-toss-bg rounded-xl flex items-center justify-center text-xl">
-          {eligible ? "📈" : "📉"}
-        </div>
+        <StockLogo ticker={ticker ?? stock} name={stock} market={market} size={44} />
         <div>
           <p className="text-[17px] font-extrabold text-toss-text">{stock}</p>
           <p className="text-xs text-toss-sub mt-0.5">
@@ -128,9 +127,17 @@ export default function ResultCard({ result, ticker, exchange }: Props) {
       {/* 포트폴리오 추가 CTA */}
       <div className="pt-1">
         {added ? (
-          <div className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-            <span className="text-green-500 text-lg">✓</span>
-            <span className="text-[14px] font-bold text-green-600">내 배당에 추가됐어요!</span>
+          <div className="space-y-2">
+            <div className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+              <span className="text-green-500 text-lg">✓</span>
+              <span className="text-[14px] font-bold text-green-600">내 배당에 추가됐어요!</span>
+            </div>
+            <a href="/dashboard"
+              className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-2xl
+                         border border-toss-blue text-toss-blue text-[14px] font-bold
+                         hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+              내 배당 보러가기 →
+            </a>
           </div>
         ) : (
           <button

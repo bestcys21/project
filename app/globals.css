@@ -74,3 +74,43 @@
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* ── 텍스트 계층 시스템 (Typography Scale) ── */
+@layer components {
+  /* 페이지 타이틀 */
+  .heading-xl {
+    @apply text-[32px] md:text-[40px] font-extrabold text-toss-text leading-tight tracking-tight;
+  }
+  /* 섹션 헤더 */
+  .heading-lg {
+    @apply text-[22px] md:text-[26px] font-extrabold text-toss-text leading-tight;
+  }
+  /* 카드 헤더 */
+  .heading-md {
+    @apply text-[18px] font-bold text-toss-text leading-snug;
+  }
+  /* 서브 헤더 */
+  .heading-sm {
+    @apply text-[15px] font-bold text-toss-text;
+  }
+  /* 본문 */
+  .text-body {
+    @apply text-[15px] text-toss-text leading-relaxed;
+  }
+  /* 작은 본문 */
+  .text-body-sm {
+    @apply text-[14px] text-toss-text leading-relaxed;
+  }
+  /* 캡션 */
+  .text-caption {
+    @apply text-[12px] text-toss-sub leading-relaxed;
+  }
+  /* 라벨 */
+  .text-label-md {
+    @apply text-[13px] font-semibold text-toss-label;
+  }
+  /* 오버라인 (섹션 구분용) */
+  .text-overline {
+    @apply text-[11px] font-bold text-toss-sub uppercase tracking-wider;
+  }
+}

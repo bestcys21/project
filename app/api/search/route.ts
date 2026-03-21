@@ -14,10 +14,34 @@ export async function GET(req: NextRequest) {
 
   if (!q) return NextResponse.json({ results: [] });
 
-  // Korean stocks are now handled client-side via ticker_master.json
-  // This endpoint only serves US stock searches
+  // Korean stocks: local DB first (client-side), API used as fallback for stocks not in master DB
   if (market === "KR") {
-    return NextResponse.json({ results: [] });
+    try {
+      const yf = getClient();
+      const res = await yf.search(q, { quotesCount: 20, newsCount: 0 });
+      const quotes: any[] = res.quotes ?? [];
+      const results = quotes
+        .filter((item) => {
+          const sym: string = item.symbol ?? "";
+          return sym.endsWith(".KS") || sym.endsWith(".KQ");
+        })
+        .map((item) => {
+          const sym: string = item.symbol ?? "";
+          const exchange = sym.endsWith(".KQ") ? "KQ" : "KS";
+          const ticker = sym.replace(/\.(KS|KQ)$/, "");
+          return {
+            ticker,
+            name: item.longname ?? item.shortname ?? ticker,
+            market: "KR",
+            exchange,
+            type: "stock" as const,
+          };
+        })
+        .slice(0, 15);
+      return NextResponse.json({ results });
+    } catch {
+      return NextResponse.json({ results: [] });
+    }
   }
 
   try {

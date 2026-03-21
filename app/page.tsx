@@ -18,8 +18,8 @@ export default function Home() {
             종목, 수량, 매수일만 입력하면 세후 배당금을 즉시 알려드려요.
           </p>
 
-          {/* 계산기 폼 — 중앙 정렬, 최대 너비 제한 */}
-          <div className="max-w-xl mx-auto">
+          {/* 계산기 폼 — PC: 스플릿 2단, 모바일: 1단 */}
+          <div className="w-full">
             <CalculatorForm />
           </div>
 

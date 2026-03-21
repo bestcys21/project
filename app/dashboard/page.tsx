@@ -347,10 +347,10 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* PC: 2열 레이아웃 */}
-      <div className="lg:grid lg:grid-cols-[1fr_400px] lg:gap-6 lg:items-start space-y-5 lg:space-y-0">
-        {/* 왼쪽: 목표 배당금 + 차트 */}
-        <div className="space-y-5">
+      {/* PC: 12컬럼 비대칭 그리드 (8:4) */}
+      <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:items-start space-y-5 lg:space-y-0">
+        {/* 왼쪽 col-span-8: 목표 배당금 + 차트 */}
+        <div className="lg:col-span-8 space-y-5">
 
       {/* 목표 배당금 */}
       {!initLoading && (
@@ -486,9 +486,9 @@ export default function DashboardPage() {
 
         </div>{/* end lg 왼쪽 */}
 
-        {/* 오른쪽: 보유 종목 */}
+        {/* 오른쪽 col-span-4: 보유 종목 (sticky) */}
       <ErrorBoundary>
-        <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-4">
+        <div className="lg:col-span-4 lg:sticky lg:top-24 bg-toss-card rounded-2xl shadow-card p-6 space-y-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-[14px] font-bold text-toss-text">
@@ -640,7 +640,7 @@ export default function DashboardPage() {
 
           {/* 종목 리스트 */}
           {initLoading ? (
-            <div>{Array.from({ length: 3 }).map((_, i) => <HoldingRowSkeleton key={i} />)}</div>
+            <div className="overflow-y-auto max-h-[700px]">{Array.from({ length: 3 }).map((_, i) => <HoldingRowSkeleton key={i} />)}</div>
           ) : holdings.length === 0 ? (
             <PopularStocksWidget onSelect={(item) => {
               setFormMarket(item.market as Market);
@@ -649,7 +649,7 @@ export default function DashboardPage() {
             }} />
           ) : viewMode === "compact" ? (
             /* ── 컴팩트 리스트 뷰 ── */
-            <div className="divide-y divide-toss-border">
+            <div className="divide-y divide-toss-border overflow-y-auto max-h-[700px]">
               {/* 헤더 */}
               <div className="grid grid-cols-[1fr_56px_76px_28px] gap-1.5 pb-1.5 text-[10px] font-semibold text-toss-sub uppercase tracking-wide">
                 <span>종목</span>
@@ -693,7 +693,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             /* ── 카드 뷰 (기본) ── */
-            <div className="divide-y divide-toss-border">
+            <div className="divide-y divide-toss-border overflow-y-auto max-h-[700px]">
               {events.filter(e => filterMarket === "ALL" || e.market === filterMarket).map((e, i) => {
                 const color     = STOCK_COLORS[i % STOCK_COLORS.length];
                 const isLive    = !!apiData[e.ticker];
