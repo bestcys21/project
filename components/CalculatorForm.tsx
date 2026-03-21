@@ -294,7 +294,7 @@ export default function CalculatorForm() {
                             ? "border-toss-blue bg-toss-blue text-white shadow-sm"
                             : "border-toss-border text-toss-label bg-toss-card hover:border-toss-blue hover:text-toss-blue"}`}
             >
-              {m === "KR" ? "🇰🇷 한국주식" : "🇺🇸 미국주식"}
+              {m === "KR" ? "한국주식" : "미국주식"}
             </button>
           ))}
         </div>
@@ -415,8 +415,9 @@ export default function CalculatorForm() {
             <label className="block text-[13px] font-semibold text-toss-label">보유 수량</label>
             <div className="relative">
               <input type="number" min={1} value={qty} onChange={(e) => setQty(e.target.value)}
-                placeholder="0" className="toss-input pr-10" />
-              <span className="absolute inset-y-0 right-4 flex items-center text-[13px]
+                placeholder="0"
+                className="toss-input pr-10 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+              <span className="absolute inset-y-0 right-3 flex items-center text-[13px]
                                text-toss-sub font-medium pointer-events-none">주</span>
             </div>
           </div>
