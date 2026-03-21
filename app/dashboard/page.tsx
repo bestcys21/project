@@ -9,6 +9,7 @@ import StockLogo from "@/components/StockLogo";
 import DividendChart, { STOCK_COLORS, ChartPeriod } from "@/components/DividendChart";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { SummaryCardSkeleton, ChartSkeleton, HoldingRowSkeleton } from "@/components/Skeleton";
+import Toast from "@/components/Toast";
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip as ReTooltip,
 } from "recharts";
@@ -103,7 +104,7 @@ function StockSearchInput({
         onChange={(e) => handleChange(e.target.value)}
         onFocus={() => suggestions.length > 0 && setShowDrop(true)}
         onKeyDown={handleKeyDown}
-        placeholder={market === "KR" ? "종목명 또는 종목코드 (예: DL이앤씨, 375500)" : "Search stock (e.g. Apple, JEPI)"}
+        placeholder={market === "KR" ? "종목명, 코드, 초성으로 검색" : "종목명 또는 티커로 검색 (예: Apple, JEPI)"}
         className="toss-input"
         autoComplete="off"
       />
@@ -168,6 +169,9 @@ export default function DashboardPage() {
   // 보유 종목 뷰 모드
   const [viewMode, setViewMode] = useState<"card" | "compact">("card");
 
+  // 토스트
+  const [showToast, setShowToast] = useState(false);
+
   useEffect(() => {
     const h = getHoldings();
     setHoldings(h);
@@ -229,6 +233,7 @@ export default function DashboardPage() {
     const updated = getHoldings();
     setHoldings(updated);
     fetchApiData(updated);
+    setShowToast(true);
     setShowForm(false);
     setSelected(null);
     setQuantity("");
@@ -271,8 +276,9 @@ export default function DashboardPage() {
   const annualNet = chartPeriod === "THIS_YEAR"
     ? stackedData.slice(currentMonthIdx).reduce((s, m) => s + m.total, 0)
     : stackedData.reduce((s, m) => s + m.total, 0); // N12M & LAST_YEAR = full year
-  const nextEvent   = getNextEvent(events);
-  const dday        = nextEvent ? getDday(nextEvent.paymentDate) : null;
+  const nextPayment = getNextSmartPayment(events, apiData);
+  const nextEvent   = nextPayment?.event ?? null;
+  const dday        = nextPayment ? getDdayFromDate(nextPayment.date) : null;
   const avgYield    = calcAvgYield(holdings, apiData, events);
   const goalProgress = goalAmount && goalAmount > 0
     ? Math.min((annualNet / goalAmount) * 100, 100) : null;
@@ -342,7 +348,7 @@ export default function DashboardPage() {
             value={dday !== null ? (dday === 0 ? "오늘! 🎉" : `D-${dday}`) : "-"}
             highlight={dday !== null && dday <= 7}
             large={dday !== null && dday > 7}
-            tooltip={nextEvent ? `${nextEvent.name} 배당 예정일: ${nextEvent.paymentDate}` : "예정 배당 없음"}
+            tooltip={nextPayment ? `${nextPayment.event.name} 배당 예정: ${nextPayment.date.getFullYear()}.${String(nextPayment.date.getMonth() + 1).padStart(2, "0")}월경` : "예정 배당 없음"}
           />
         </div>
       )}
@@ -366,16 +372,14 @@ export default function DashboardPage() {
           </div>
 
           {editingGoal && (
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <input type="number" placeholder="연간 목표 금액 (원)"
-                  value={goalInput} onChange={(e) => setGoalInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleGoalSave()}
-                  className="toss-input pr-10 text-[13px]" />
-                <span className="absolute inset-y-0 right-4 flex items-center text-[14px] text-toss-sub font-medium pointer-events-none select-none">원</span>
-              </div>
+            <div className="flex items-center gap-2">
+              <input type="number" placeholder="목표 금액 입력"
+                value={goalInput} onChange={(e) => setGoalInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleGoalSave()}
+                className="toss-input flex-1 min-w-0 text-[13px]" />
+              <span className="text-[14px] text-toss-sub font-medium flex-shrink-0 select-none">원</span>
               <button onClick={handleGoalSave}
-                className="px-4 py-2 bg-toss-blue text-white font-bold text-[13px] rounded-xl hover:bg-toss-blueDark transition-colors">
+                className="flex-shrink-0 px-4 py-2 bg-toss-blue text-white font-bold text-[13px] rounded-xl hover:bg-toss-blueDark transition-colors">
                 저장
               </button>
             </div>
@@ -638,6 +642,18 @@ export default function DashboardPage() {
             </div>
           )}
 
+          {/* 저장 안내 배너 */}
+          {!initLoading && holdings.length > 0 && (
+            <div className="bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/10 rounded-xl px-3.5 py-2.5">
+              <p className="text-[12px] text-toss-text font-medium leading-snug [word-break:keep-all]">
+                💡 현재 기기(브라우저)에 안전하게 자동 저장됩니다.
+              </p>
+              <p className="text-[11px] text-toss-sub mt-0.5 [word-break:keep-all]">
+                캐시 삭제 시 데이터가 초기화될 수 있습니다.
+              </p>
+            </div>
+          )}
+
           {/* 종목 리스트 */}
           {initLoading ? (
             <div className="overflow-y-auto max-h-[700px]">{Array.from({ length: 3 }).map((_, i) => <HoldingRowSkeleton key={i} />)}</div>
@@ -855,6 +871,13 @@ export default function DashboardPage() {
           </div>
         );
       })()}
+
+      <Toast
+        visible={showToast}
+        message="종목이 추가되었습니다."
+        sub="현재 기기에 임시 보관됨"
+        onClose={() => setShowToast(false)}
+      />
     </div>
   );
 }
@@ -866,6 +889,55 @@ function calcAvgYield(holdings: Holding[], apiData: Record<string, ApiEntry>, ev
   const totalNet = withYield.reduce((s, e) => s + e.netAmount, 0);
   if (totalNet === 0) return null;
   return withYield.reduce((s, e) => s + (apiData[e.ticker]!.dividendYield! * e.netAmount), 0) / totalNet;
+}
+
+/**
+ * payMonths 기반으로 다음 배당 지급일을 계산.
+ * API paymentDate는 과거 기준 날짜인 경우가 많으므로 payMonths를 우선 사용.
+ */
+function getNextSmartPayment(
+  events: DividendEvent[],
+  apiData: Record<string, ApiEntry>
+): { event: DividendEvent; date: Date } | null {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const thisYear  = today.getFullYear();
+  const thisMonth = today.getMonth() + 1; // 1-indexed
+
+  let best: { event: DividendEvent; date: Date } | null = null;
+
+  for (const e of events) {
+    const payMonths = apiData[e.ticker]?.payMonths;
+
+    if (payMonths && payMonths.length > 0) {
+      // 이번 달 이후 가장 빠른 지급 월 탐색
+      let nextMonth = payMonths.find(m => m >= thisMonth) ?? null;
+      let nextYear  = thisYear;
+      if (!nextMonth) {
+        // 올해 지급 월이 모두 지났으면 내년 첫 번째 달
+        nextMonth = payMonths[0];
+        nextYear  = thisYear + 1;
+      }
+      // 지급일 미상 → 해당 월 15일로 근사
+      const candidate = new Date(nextYear, nextMonth - 1, 15);
+      if (!best || candidate < best.date) {
+        best = { event: e, date: candidate };
+      }
+    } else {
+      // payMonths 없으면 API paymentDate 사용 (fallback)
+      const d = parseDate(e.paymentDate);
+      if (d && d >= today && (!best || d < best.date)) {
+        best = { event: e, date: d };
+      }
+    }
+  }
+  return best;
+}
+
+function getDdayFromDate(date: Date): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.ceil((date.getTime() - today.getTime()) / 86400000);
 }
 
 function getNextEvent(events: DividendEvent[]): DividendEvent | null {
@@ -919,16 +991,19 @@ function SummaryCard({ label, value, highlight, hero, large, tooltip }: {
 
 function EmptyChart({ onSample }: { onSample?: () => void }) {
   return (
-    <div className="h-[200px] flex flex-col items-center justify-center text-toss-sub space-y-3">
-      <span className="text-4xl">📊</span>
-      <p className="text-[14px]">종목을 추가하면 배당 차트가 표시돼요.</p>
+    <div className="flex flex-col items-center justify-center text-toss-sub space-y-4 py-10">
+      <span className="text-5xl">📊</span>
+      <div className="text-center space-y-1">
+        <p className="text-[16px] font-extrabold text-toss-text">아직 구성된 배당 포트폴리오가 없습니다.</p>
+        <p className="text-[13px] text-toss-sub">오른쪽에서 종목을 추가하면 월별 배당 차트가 표시돼요</p>
+      </div>
       {onSample && (
         <button
           onClick={onSample}
-          className="px-4 py-2 text-[12px] font-bold text-toss-blue bg-blue-50 dark:bg-blue-900/20
+          className="px-5 py-2.5 text-[13px] font-bold text-toss-blue bg-blue-50 dark:bg-blue-900/20
                      rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
         >
-          샘플 포트폴리오 적용해 보기
+          샘플 포트폴리오 한 번에 적용해 보기
         </button>
       )}
     </div>
@@ -937,15 +1012,19 @@ function EmptyChart({ onSample }: { onSample?: () => void }) {
 
 /* ── 인기 배당주 추천 위젯 (Empty State 대체) ── */
 const POPULAR_STOCKS: StockItem[] = [
-  { ticker: "005930", name: "삼성전자",  market: "KR", exchange: "KS" },
-  { ticker: "SCHD",   name: "SCHD (미국 고배당 ETF)",  market: "US" },
-  { ticker: "O",      name: "리얼티인컴 (월배당)",      market: "US" },
+  { ticker: "005930", name: "삼성전자",         market: "KR", exchange: "KS" },
+  { ticker: "088980", name: "맥쿼리인프라",     market: "KR", exchange: "KS" },
+  { ticker: "SCHD",   name: "SCHD (미국 고배당 ETF)", market: "US" },
+  { ticker: "O",      name: "리얼티인컴 (월배당)",    market: "US" },
 ];
 
 function PopularStocksWidget({ onSelect }: { onSelect: (item: StockItem) => void }) {
   return (
     <div className="space-y-3 py-2">
-      <p className="text-[12px] text-toss-sub text-center">많은 분들이 이 종목으로 시작해요 👇</p>
+      <div className="text-center space-y-0.5">
+        <p className="text-[13px] font-bold text-toss-text">🔥 인기 배당주로 시작하기</p>
+        <p className="text-[11px] text-toss-sub">많은 분들이 이 종목으로 시작해요</p>
+      </div>
       <div className="space-y-2">
         {POPULAR_STOCKS.map((stock) => (
           <div

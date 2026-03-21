@@ -62,6 +62,7 @@ const POPULAR_US: Record<"인기" | "고배당" | "ETF", Array<{ ticker: string;
   ],
 };
 import StockPriceChart from "./StockPriceChart";
+import Toast from "./Toast";
 
 const TAX_RATE: Record<Market, number> = { KR: 0.154, US: 0.15 };
 
@@ -98,6 +99,7 @@ export default function CalculatorForm() {
   const [chartCurrency, setChartCurrency] = useState("KRW");
   const [dividendYield, setDividendYield] = useState<number | null>(null);
   const [popularTab,    setPopularTab]    = useState<"인기" | "고배당" | "ETF">("인기");
+  const [showToast,     setShowToast]     = useState(false);
 
   const wrapRef   = useRef<HTMLDivElement>(null);
   const searchRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -276,6 +278,13 @@ export default function CalculatorForm() {
     }
   }
 
+  function handleAddAnother() {
+    setQuery(""); setTicker(""); setExchange(undefined);
+    setQty(""); setResult(null); setError("");
+    setChartTicker(""); setDividendYield(null);
+    setSuggestions([]); setShowDrop(false);
+  }
+
   return (
     <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
 
@@ -310,9 +319,7 @@ export default function CalculatorForm() {
               onChange={(e) => handleQueryChange(e.target.value)}
               onFocus={() => suggestions.length > 0 && setShowDrop(true)}
               onKeyDown={handleKeyDown}
-              placeholder={market === "KR"
-                ? "종목명·코드·초성 (예: 삼성전자, 005930, ㅅㅅㅈㅈ)"
-                : "종목명 또는 코드 (예: Apple, AAPL, JEPI)"}
+              placeholder="종목명, 코드, 초성으로 검색"
               className="toss-input"
               autoComplete="off"
             />
@@ -460,7 +467,15 @@ export default function CalculatorForm() {
 
       {/* ── 우측: 결과 카드 + 차트 (sticky) ── */}
       <div className="mt-5 lg:mt-0 lg:sticky lg:top-24 space-y-4">
-        {result && <ResultCard result={result} ticker={ticker || undefined} exchange={exchange} />}
+        {result && (
+          <ResultCard
+            result={result}
+            ticker={ticker || undefined}
+            exchange={exchange}
+            onAdded={() => setShowToast(true)}
+            onAddAnother={handleAddAnother}
+          />
+        )}
         {chartTicker && (
           <StockPriceChart ticker={chartTicker} stockName={query.trim() || undefined}
             currency={chartCurrency} dividendYield={dividendYield} />
@@ -480,6 +495,12 @@ export default function CalculatorForm() {
         )}
       </div>
 
+    <Toast
+      visible={showToast}
+      message="종목이 추가되었습니다."
+      sub="현재 기기에 임시 보관됨"
+      onClose={() => setShowToast(false)}
+    />
     </div>
   );
 }

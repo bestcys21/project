@@ -9,9 +9,11 @@ interface Props {
   result: DividendResult;
   ticker?: string;
   exchange?: "KS" | "KQ";
+  onAdded?: () => void;
+  onAddAnother?: () => void;
 }
 
-export default function ResultCard({ result, ticker, exchange }: Props) {
+export default function ResultCard({ result, ticker, exchange, onAdded, onAddAnother }: Props) {
   const { stock, quantity, purchaseDate, market, dps, exDate, paymentDate,
           grossAmount, netAmount, taxRate, eligible } = result;
 
@@ -32,6 +34,7 @@ export default function ResultCard({ result, ticker, exchange }: Props) {
       purchaseDate,
     });
     setAdded(true);
+    onAdded?.();
   }
 
   return (
@@ -127,16 +130,57 @@ export default function ResultCard({ result, ticker, exchange }: Props) {
       {/* 포트폴리오 추가 CTA */}
       <div className="pt-1">
         {added ? (
-          <div className="space-y-2">
-            <div className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-              <span className="text-green-500 text-lg">✓</span>
-              <span className="text-[14px] font-bold text-green-600">내 배당에 추가됐어요!</span>
+          <div className="space-y-2.5">
+            {/* 저장 확인 */}
+            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+              <span className="text-green-500 flex-shrink-0">✓</span>
+              <span className="text-[13px] font-bold text-green-600">포트폴리오에 추가되었습니다</span>
             </div>
+
+            {/* 현재 월 배당금 표시 */}
+            {eligible && monthlyNet > 0 && (
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl px-4 py-3 text-center">
+                <p className="text-[11px] text-toss-sub mb-0.5">현재 예상 배당금</p>
+                <p className="text-[22px] font-extrabold text-toss-blue leading-tight">
+                  {market === "KR"
+                    ? `월 ${Math.round(monthlyNet).toLocaleString()}원`
+                    : `월 $${monthlyNet.toFixed(2)}`}
+                </p>
+              </div>
+            )}
+
+            {/* 부족함 느끼게 하는 메시지 */}
+            <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl px-3.5 py-2.5 text-center">
+              <p className="text-[12px] text-amber-700 dark:text-amber-400 font-medium leading-relaxed">
+                💡 다른 종목도 추가해볼까요?
+              </p>
+              <p className="text-[11px] text-amber-600 dark:text-amber-500 mt-0.5">
+                여러 종목으로 분산할수록 배당이 더 안정적이에요
+              </p>
+            </div>
+
+            {/* 종목 더 추가하기 — PRIMARY CTA */}
+            {onAddAnother && (
+              <button
+                onClick={onAddAnother}
+                className="w-full flex items-center justify-center gap-2
+                           bg-toss-blue hover:bg-toss-blueDark active:scale-[0.98]
+                           text-white font-bold text-[15px] py-3.5 rounded-2xl
+                           transition-all duration-150"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                종목 더 추가하기
+              </button>
+            )}
+
+            {/* 내 배당 보러가기 — secondary */}
             <a href="/dashboard"
               className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-2xl
-                         border border-toss-blue text-toss-blue text-[14px] font-bold
-                         hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
-              내 배당 보러가기 →
+                         border border-toss-border text-toss-sub text-[13px] font-semibold
+                         hover:border-toss-blue hover:text-toss-blue transition-colors">
+              내 배당 현황 보러가기 →
             </a>
           </div>
         ) : (
