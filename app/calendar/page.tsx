@@ -164,6 +164,37 @@ export default function CalendarPage() {
       <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-6 lg:items-start space-y-5 lg:space-y-0">
         <div className="space-y-5">
 
+      {/* 이번 주 배당 강조 */}
+      {!loading && events.length > 0 && (() => {
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - today.getDay());
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+
+        const thisWeekEvents = events.filter(e => {
+          const m = e.paymentDate.match(/(\d{4})\.(\d{2})\.(\d{2})/);
+          if (!m) return false;
+          const d = new Date(+m[1], +m[2]-1, +m[3]);
+          return d >= weekStart && d <= weekEnd;
+        });
+
+        if (thisWeekEvents.length === 0) return null;
+
+        const weekTotal = thisWeekEvents.reduce((s, e) => s + e.netAmount, 0);
+        return (
+          <div className="bg-green-500 rounded-2xl p-4 flex items-center justify-between text-white fade-up">
+            <div>
+              <p className="text-[12px] font-medium opacity-80">🔔 이번 주 배당 지급 예정</p>
+              <p className="text-[22px] font-extrabold mt-0.5">
+                {Math.round(weekTotal).toLocaleString("ko-KR")}원
+              </p>
+              <p className="text-[11px] opacity-75 mt-0.5">{thisWeekEvents.length}건</p>
+            </div>
+            <span className="text-4xl opacity-80">📬</span>
+          </div>
+        );
+      })()}
+
       {/* 이번 달 요약 */}
       {!loading && events.length > 0 && (
         <div className="bg-toss-blue rounded-2xl p-5 flex items-center justify-between text-white fade-up">
@@ -276,10 +307,20 @@ export default function CalendarPage() {
 
       {/* 종목 없을 때 */}
       {!loading && events.length === 0 && (
-        <div className="bg-toss-card rounded-2xl shadow-card p-10 text-center space-y-3">
+        <div className="bg-toss-card rounded-2xl shadow-card p-10 text-center space-y-4">
           <p className="text-4xl">📅</p>
           <p className="text-[15px] font-bold text-toss-text">등록된 종목이 없어요</p>
           <p className="text-[13px] text-toss-sub">내 배당 탭에서 종목을 추가하면<br />캘린더에 일정이 자동으로 표시돼요.</p>
+          <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
+            <a href="/dashboard"
+              className="px-5 py-2.5 bg-toss-blue text-white text-[13px] font-bold rounded-xl hover:bg-toss-blueDark transition-colors">
+              내 배당에서 종목 추가 →
+            </a>
+            <a href="/ranking"
+              className="px-5 py-2.5 border border-toss-border text-toss-label text-[13px] font-bold rounded-xl hover:border-toss-blue hover:text-toss-blue transition-colors">
+              배당 랭킹 보기
+            </a>
+          </div>
         </div>
       )}
 

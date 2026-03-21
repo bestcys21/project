@@ -1,213 +1,306 @@
-import type { Metadata } from "next";
-import WikiAccordion from "@/components/WikiAccordion";
+"use client";
 
-export const metadata: Metadata = {
-  title: "배당 위키 — 배당노트",
-  description: "배당금이란 무엇인가? 배당락일, 세금, 배당 귀족주까지 쉽게 알아보세요.",
-};
+import { useState } from "react";
 
-const ARTICLES = [
+const SECTIONS = [
   {
-    category: "📖 초보자 가이드",
-    color: "#3182F6",
-    bgColor: "#EBF3FE",
-    items: [
-      {
-        q: "배당금이란 무엇인가요?",
-        a: "배당금은 기업이 영업 이익의 일부를 주주에게 나눠주는 현금입니다. 주식을 보유하고 있으면 별도의 행동 없이 지정된 날에 계좌로 자동 입금돼요.",
-      },
-      {
-        q: "배당락일(Ex-Date)과 지급일(Payment Date)의 차이는?",
-        a: "배당락일은 '이 날부터는 배당을 받을 자격이 없다'는 기준일입니다. 배당을 받으려면 반드시 배당락일 하루 전날까지 매수해야 해요. 지급일은 실제로 배당금이 계좌에 입금되는 날입니다.",
-      },
-      {
-        q: "기준일(Record Date)이란?",
-        a: "주주명부에 공식 등재되는 날입니다. 한국은 보통 배당락일 다음 날이 기준일이에요. 배당락일 전날 매수 → 기준일에 주주 등재 → 지급일에 배당 수령 순서로 진행됩니다.",
-      },
-      {
-        q: "국가별 배당소득세는 얼마인가요?",
-        a: "한국 주식은 배당소득세 15.4%(소득세 14% + 지방소득세 1.4%)가 원천징수됩니다. 미국 주식은 한미 조세조약에 따라 15%가 원천징수돼요. 배당노트는 이를 자동 계산해 세후 실수령액을 보여드립니다.",
-      },
-      {
-        q: "금융소득 종합과세란?",
-        a: "배당소득 + 이자소득이 연 2,000만 원을 초과하면 금융소득종합과세 대상이 됩니다. 초과분은 다른 소득과 합산해 누진세율(6~45%)이 적용될 수 있어요. 고배당 포트폴리오 구성 시 주의가 필요합니다.",
-      },
-      {
-        q: "ETF도 배당을 받을 수 있나요?",
-        a: "네. ETF는 편입 종목에서 받은 배당금을 분배금으로 지급합니다. 분배금 지급 주기는 월 1회(JEPI, QYLD 등), 분기 1회(SCHD, VYM 등), 연 1회로 다양해요.",
-      },
+    id: "beginner",
+    icon: "📖",
+    title: "초보자 가이드",
+    cta: { label: "배당 계산기로 시작하기 →", href: "/" },
+    relatedStocks: [
+      { name: "삼성전자", ticker: "005930", desc: "국내 대표 분기배당" },
+      { name: "SCHD", ticker: "SCHD", desc: "미국 배당 성장 ETF" },
     ],
+    content: (
+      <div className="space-y-4 text-[14px] text-toss-label leading-relaxed">
+        <Section title="배당이란?">
+          기업이 이익의 일부를 주주에게 나눠주는 것입니다. 주식을 보유하고 있으면 배당락일 전날까지 매수 시 배당을 받을 수 있습니다.
+        </Section>
+        <Section title="배당락일 (Ex-Dividend Date)">
+          배당을 받을 주주를 확정하는 기준일입니다. <strong>배당락일 전날까지 매수</strong>해야 배당을 받을 수 있으며, 배당락일 당일부터는 배당권리가 소멸됩니다.
+        </Section>
+        <Section title="기준일 (Record Date)">
+          주주명부에 등재된 주주를 확인하는 날입니다. 실제로는 배당락일 다음날이 기준일입니다 (한국 기준).
+        </Section>
+        <Section title="배당소득세">
+          <ul className="space-y-1 ml-4 list-disc">
+            <li><strong>한국주식:</strong> 배당소득세 14% + 지방소득세 1.4% = <strong className="text-toss-blue">15.4%</strong></li>
+            <li><strong>미국주식:</strong> 한미조세조약에 의해 <strong className="text-green-600">15%</strong> 원천징수</li>
+            <li>연간 금융소득 2,000만원 초과 시 종합과세 대상</li>
+          </ul>
+        </Section>
+        <Section title="ISA 계좌 활용">
+          ISA(개인종합자산관리계좌)를 활용하면 배당소득세 비과세 혜택을 받을 수 있습니다. 서민형 기준 400만원까지 비과세, 초과분은 9.9% 분리과세.
+        </Section>
+        <Section title="ETF 배당(분배금)">
+          ETF는 분기 또는 월마다 분배금을 지급합니다. TIGER, KODEX 등 국내 ETF는 매년 4월/1월 등 정기 분배가 일반적이며, 일부 커버드콜 ETF는 월배당을 지급합니다.
+        </Section>
+      </div>
+    ),
   },
   {
-    category: "📊 배당 핵심 지표",
-    color: "#10B981",
-    bgColor: "#ECFDF5",
-    items: [
-      {
-        q: "배당수익률(Dividend Yield)이란?",
-        a: "연간 배당금을 현재 주가로 나눈 비율입니다. 예를 들어 주가 10만원짜리 주식이 연 5,000원을 배당한다면 배당수익률은 5%예요. 단순히 수익률이 높다고 좋은 건 아니며 기업의 지속성을 함께 봐야 합니다.",
-      },
-      {
-        q: "DPS(주당 배당금)란?",
-        a: "Dividend Per Share의 약자로, 주식 1주당 지급되는 배당금입니다. 보유 수량에 DPS를 곱하면 총 배당금이 나와요. 배당노트의 계산기가 바로 이 값을 기반으로 세후 수령액을 계산합니다.",
-      },
-      {
-        q: "배당성향(Payout Ratio)이란?",
-        a: "기업이 순이익 중 얼마를 배당으로 지급하는지 나타내는 비율입니다. 배당성향이 너무 높으면(80% 이상) 기업 성장에 재투자할 여력이 부족할 수 있고, 너무 낮으면 배당금이 적어요. 50~70%가 안정적인 수준으로 여겨집니다.",
-      },
-      {
-        q: "YOC(원가 대비 수익률)란?",
-        a: "Yield on Cost의 약자입니다. 현재 주가가 아닌 내가 산 원가를 기준으로 배당수익률을 계산한 값이에요. 오래전 싸게 산 배당 성장주는 YOC가 매우 높아질 수 있습니다. 장기 투자의 진짜 성과를 확인하는 지표예요.",
-      },
-      {
-        q: "배당 성장률이란?",
-        a: "매년 배당금이 얼마나 증가했는지 나타내는 비율입니다. 배당 성장률이 꾸준히 높은 기업은 주가 상승과 함께 배당도 늘어나 복리 효과가 극대화됩니다. 미국의 배당 귀족주들은 평균 7~10%의 배당 성장률을 보여왔어요.",
-      },
-      {
-        q: "배당 주기별 차이는?",
-        a: "한국 주식은 대부분 연 1회(12월 결산 → 4월 지급) 배당합니다. 삼성전자처럼 분기배당(3,6,9,12월)도 늘어나는 추세예요. 미국 주식은 분기(3개월) 배당이 일반적이고, JEPI·QYLD 같은 커버드콜 ETF는 매월 배당해요.",
-      },
+    id: "metrics",
+    icon: "📊",
+    title: "배당 핵심 지표",
+    cta: { label: "배당 랭킹에서 고배당 종목 보기 →", href: "/ranking" },
+    relatedStocks: [
+      { name: "KT&G", ticker: "033780", desc: "고배당 대표주" },
+      { name: "JEPI", ticker: "JEPI", desc: "월배당 커버드콜 ETF" },
     ],
+    content: (
+      <div className="space-y-4 text-[14px] text-toss-label leading-relaxed">
+        <Section title="배당수익률 (Dividend Yield)">
+          <code className="bg-toss-bg px-2 py-0.5 rounded text-[13px]">배당수익률 = 연간 DPS ÷ 현재 주가 × 100</code><br />
+          예: 주가 50,000원 / 연 배당 2,500원 → 수익률 5%. <strong>단, 주가 하락으로 인한 고수익률은 '배당 트랩'일 수 있으니 주의</strong>하세요.
+        </Section>
+        <Section title="주당배당금 (DPS)">
+          1주당 지급되는 배당금입니다. 보유 주수 × DPS = 총 배당금.
+        </Section>
+        <Section title="배당성향 (Payout Ratio)">
+          <code className="bg-toss-bg px-2 py-0.5 rounded text-[13px]">배당성향 = DPS ÷ EPS × 100</code><br />
+          순이익 중 배당으로 지급하는 비율. 70% 이상이면 지속 가능성을 점검해야 합니다.
+        </Section>
+        <Section title="YOC (Yield on Cost)">
+          <code className="bg-toss-bg px-2 py-0.5 rounded text-[13px]">YOC = 연간 DPS ÷ 내 매수가 × 100</code><br />
+          현재 주가가 아닌 내 취득원가 기준 수익률. 장기 보유 시 YOC가 커질 수 있습니다.
+        </Section>
+        <Section title="배당 성장률 (DGR)">
+          매년 배당금이 얼마나 증가하는지를 나타냅니다. 미국의 '배당귀족(Dividend Aristocrat)'은 25년 이상 연속 배당 성장 기업입니다.
+        </Section>
+        <Section title="배당 지급 주기">
+          <ul className="space-y-1 ml-4 list-disc">
+            <li><strong>월배당:</strong> JEPI, JEPQ, Realty Income(O) 등</li>
+            <li><strong>분기배당:</strong> 삼성전자(2024~), 대부분의 미국주식</li>
+            <li><strong>반기배당:</strong> 일부 한국 금융주</li>
+            <li><strong>연배당:</strong> 대부분의 한국 전통 종목</li>
+          </ul>
+        </Section>
+      </div>
+    ),
   },
   {
-    category: "🏆 투자 전략",
-    color: "#8B5CF6",
-    bgColor: "#F5F3FF",
-    items: [
-      {
-        q: "배당 성장주 vs 고배당주, 어떤 게 더 나을까요?",
-        a: "고배당주는 지금 당장 높은 수익률을 주지만 성장성이 낮을 수 있습니다. 배당 성장주는 현재 수익률은 낮지만 매년 배당이 늘어 장기적으로 YOC가 훨씬 높아져요. 보통 은퇴 후엔 고배당주, 자산 축적 기간엔 배당 성장주를 병행하는 전략이 인기입니다.",
-      },
-      {
-        q: "배당 귀족주(Dividend Aristocrats)란?",
-        a: "미국 S&P 500 편입 기업 중 25년 이상 연속으로 배당을 늘려온 기업입니다. 코카콜라, 존슨앤드존슨, P&G 등이 대표적이에요. 국내에서도 10년 이상 배당을 늘려온 기업을 '배당 성장주'로 주목합니다.",
-      },
-      {
-        q: "배당 재투자(DRIP)가 왜 강력한가요?",
-        a: "받은 배당금으로 같은 주식을 다시 매수하면 주식 수가 늘고 다음 배당이 더 커지는 복리 효과가 발생합니다. 매월 배당을 재투자한다면 10년 후 원금 대비 수익률(YOC)이 크게 올라갈 수 있어요.",
-      },
-      {
-        q: "월 배당 포트폴리오 만들기",
-        a: "미국 ETF 중 JEPI(JP모건), QYLD(나스닥 커버드콜), RYLD, XYLD 등은 매월 배당금을 지급해요. 이를 조합하면 매달 일정 현금을 수령하는 포트폴리오 구성이 가능합니다. 배당노트의 캘린더 기능으로 지급 일정을 한눈에 확인하세요.",
-      },
-      {
-        q: "커버드콜 ETF의 장단점은?",
-        a: "JEPI, QYLD 같은 커버드콜 ETF는 보유 주식의 콜옵션을 매도해 프리미엄 수입을 얻고 이를 월배당으로 지급합니다. 배당수익률이 10~15%에 달하지만, 주가 상승 폭이 제한되고 원금 손실 가능성도 있어요.",
-      },
-      {
-        q: "한국 리츠(REITs) 투자 포인트는?",
-        a: "리츠는 부동산에 투자하는 펀드로, 임대 수익을 주주에게 배당합니다. 맥쿼리인프라, 롯데리츠, SK리츠 등이 국내 상장 리츠예요. 고정 임대 수입 기반이라 비교적 안정적인 배당을 기대할 수 있습니다.",
-      },
+    id: "strategy",
+    icon: "🏆",
+    title: "투자 전략",
+    cta: { label: "내 포트폴리오 구성하기 →", href: "/dashboard" },
+    relatedStocks: [
+      { name: "TIGER 미국배당+7%", ticker: "476550", desc: "국내 인기 월배당 ETF" },
+      { name: "맥쿼리인프라", ticker: "088980", desc: "국내 고배당 리츠" },
     ],
+    content: (
+      <div className="space-y-4 text-[14px] text-toss-label leading-relaxed">
+        <Section title="성장주 vs 고배당주">
+          성장주는 배당이 적지만 주가 상승 기대가 크고, 고배당주는 안정적 현금흐름을 제공합니다. <strong>장기 투자자는 두 전략을 혼합</strong>하는 것이 일반적입니다.
+        </Section>
+        <Section title="배당귀족 전략">
+          미국 S&P500 기업 중 25년 이상 연속 배당 성장 기업들(JNJ, KO, PG 등). 안정성이 높지만 수익률은 상대적으로 낮습니다.
+        </Section>
+        <Section title="DRIP (배당 재투자)">
+          배당금을 자동으로 해당 주식에 재투자하는 전략. 복리 효과로 장기 수익률을 극대화할 수 있습니다.
+        </Section>
+        <Section title="월배당 포트폴리오">
+          매달 배당을 받는 포트폴리오 구성 전략입니다.<br />
+          예시: JEPI (1,4,7,10월) + JEPQ (2,5,8,11월) + O/STAG (매월) 조합.
+        </Section>
+        <Section title="커버드콜 ETF">
+          콜옵션을 매도해 프리미엄 수익으로 배당을 지급하는 ETF. JEPI(S&P500), JEPQ(나스닥), TIGER 미국배당+7% 등. <strong>주가 상승 참여가 제한</strong>되는 특성이 있습니다.
+        </Section>
+        <Section title="리츠(REITs) 투자">
+          부동산 임대수익을 배당으로 지급하는 상품. 국내: 맥쿼리인프라, SK리츠, 신한알파리츠. 미국: O, STAG, SPG 등. 이익의 90% 이상을 배당으로 지급합니다.
+        </Section>
+      </div>
+    ),
   },
   {
-    category: "💡 자주 묻는 질문",
-    color: "#F59E0B",
-    bgColor: "#FFFBEB",
-    items: [
-      {
-        q: "배당락일 당일 매수하면 배당을 받나요?",
-        a: "아니요. 배당락일 당일 매수하면 해당 회차 배당을 받을 수 없습니다. 반드시 배당락일 하루 전 영업일 장 마감 전까지 매수를 완료해야 해요.",
-      },
-      {
-        q: "배당락일에 주가가 떨어지는 이유는?",
-        a: "배당락일에는 배당받을 권리가 사라지므로 이론적으로 주가가 배당금만큼 하락합니다. 이를 '배당락'이라 해요. 다만 실제 시장에서는 수급과 심리에 따라 다르게 움직이기도 합니다.",
-      },
-      {
-        q: "미국 주식 배당금은 언제 원화로 환전되나요?",
-        a: "미국 주식 배당금은 달러($)로 입금됩니다. 증권사마다 다르지만 외화 계좌에 달러로 받거나, 자동 환전 서비스를 이용할 수 있어요. 환율에 따라 원화 수령액이 달라질 수 있으니 참고하세요.",
-      },
-      {
-        q: "배당소득과 ISA 계좌의 관계는?",
-        a: "ISA(개인종합자산관리계좌) 내에서 발생한 배당소득은 200만 원(서민형 400만 원)까지 비과세 혜택을 받을 수 있어요. 초과분도 9.9% 분리과세가 적용됩니다. 배당 투자자에게 유리한 절세 수단입니다.",
-      },
-      {
-        q: "배당 투자 시 피해야 할 함정은?",
-        a: "고배당수익률이 무조건 좋은 건 아닙니다. 주가가 폭락해 배당수익률이 높아 보이는 경우(배당 트랩)를 조심하세요. 실적 악화로 배당이 삭감되면 주가도 하락합니다. 배당성향, 실적 성장, 부채비율을 함께 확인하세요.",
-      },
-      {
-        q: "배당을 오래 받으려면 어떤 기준으로 종목을 고르나요?",
-        a: "① 10년 이상 배당 지급 이력 ② 배당성향 70% 이하 ③ 꾸준한 매출·영업이익 성장 ④ 낮은 부채비율을 기준으로 삼으세요. 배당노트의 랭킹 페이지에서 배당수익률 상위 종목을 확인해 보세요.",
-      },
-    ],
+    id: "faq",
+    icon: "💡",
+    title: "자주 묻는 질문",
+    cta: { label: "배당 캘린더에서 일정 확인 →", href: "/calendar" },
+    relatedStocks: null,
+    content: (
+      <div className="space-y-4 text-[14px] text-toss-label leading-relaxed">
+        <Section title="배당락일 당일 매수하면?">
+          배당락일 <strong>당일 매수는 이번 배당을 받을 수 없습니다</strong>. 반드시 배당락일 전날(D-1)까지 매수해야 합니다. 배당락일 이후 주가는 배당금만큼 하락하는 경향이 있습니다 (배당락 효과).
+        </Section>
+        <Section title="배당락일에 주가가 떨어지는 이유?">
+          배당락일에는 배당 권리가 소멸되므로 이론상 주가가 배당금만큼 하락합니다. 실제로는 시장 상황에 따라 다르게 움직일 수 있습니다.
+        </Section>
+        <Section title="미국 배당을 원화로 받나요?">
+          미국 주식 배당은 달러(USD)로 지급되며, 증권사가 원화로 환전해 입금하거나 달러 그대로 보유할 수 있습니다.
+        </Section>
+        <Section title="ISA 계좌에서 배당세 절약 방법?">
+          ISA 계좌 내 배당은 비과세 혜택(서민형 400만원, 일반형 200만원)을 받을 수 있습니다. 초과분은 9.9% 분리과세로 15.4%보다 유리합니다.
+        </Section>
+        <Section title="배당 트랩이란?">
+          비정상적으로 높은 배당수익률의 원인이 주가 급락인 경우를 말합니다. 기업 실적 악화나 일회성 배당일 수 있어 신중한 분석이 필요합니다.
+        </Section>
+      </div>
+    ),
   },
   {
-    category: "🇰🇷 한국 배당주 가이드",
-    color: "#EF4444",
-    bgColor: "#FEF2F2",
-    items: [
-      {
-        q: "한국 주식 배당금은 언제 들어오나요?",
-        a: "12월 결산 법인의 경우 보통 3~4월에 배당금이 지급됩니다. 삼성전자는 분기 배당(3·6·9·12월)을 실시하고, 금융주·리츠는 다른 지급 일정을 갖기도 해요. 배당노트 캘린더에서 종목별 지급일을 확인하세요.",
-      },
-      {
-        q: "국내 고배당주 선별 기준은?",
-        a: "① 최근 5년간 배당 지속 여부 ② 배당수익률 3% 이상 ③ 배당성향 50~70% ④ ROE 10% 이상을 기준으로 삼으면 안정적인 배당주를 추릴 수 있어요. 금융·에너지·통신 업종이 대표적입니다.",
-      },
-      {
-        q: "삼성전자 배당 특이사항은?",
-        a: "삼성전자는 분기 배당을 실시합니다. 3월·6월·9월 분기 배당 후 12월 결산 배당까지 연 4회 지급해요. 특별배당이 함께 발표되는 경우 지급액이 크게 늘기도 합니다. DPS는 Yahoo Finance에서 실시간 조회됩니다.",
-      },
-      {
-        q: "리츠(REITs) 배당 특징은?",
-        a: "국내 상장 리츠는 임대 수익을 재원으로 배당합니다. 맥쿼리인프라·롯데리츠·SK리츠 등이 대표적이며 반기 배당(6월·12월)이 일반적이에요. 배당수익률이 4~7% 수준으로 안정적이나 금리 상승 시 주가 하락 위험이 있습니다.",
-      },
-      {
-        q: "한국 배당주에서 분기 배당이 늘고 있나요?",
-        a: "네. 삼성전자를 시작으로 SK텔레콤, 포스코홀딩스, 현대차 등이 분기 배당을 도입했습니다. 정부의 기업 밸류업 프로그램 영향으로 분기 배당 기업이 더 늘어날 전망이에요. 배당 주기는 배당노트에서 종목별로 확인할 수 있습니다.",
-      },
-      {
-        q: "ISA + 한국 배당주 조합이 유리한 이유",
-        a: "ISA 계좌에서 한국 배당주를 보유하면 배당소득세 15.4% 대신 9.9% 분리과세 혹은 연 200만 원까지 비과세 혜택을 받을 수 있어요. 장기 배당 투자자에게 가장 효율적인 절세 방법 중 하나입니다.",
-      },
+    id: "korea",
+    icon: "🇰🇷",
+    title: "한국 배당주 가이드",
+    cta: { label: "한국 배당 랭킹 보기 →", href: "/ranking" },
+    relatedStocks: [
+      { name: "KB금융", ticker: "105560", desc: "은행 고배당" },
+      { name: "SK텔레콤", ticker: "017670", desc: "통신주 안정 배당" },
     ],
+    content: (
+      <div className="space-y-4 text-[14px] text-toss-label leading-relaxed">
+        <Section title="한국 배당 지급 시기">
+          대부분 <strong>12월 결산법인은 4월경</strong>에 배당금을 지급합니다. 삼성전자는 2024년부터 분기 배당으로 전환했습니다. 배당락일은 보통 12월 말 기준.
+        </Section>
+        <Section title="고배당주 선별 기준">
+          <ul className="space-y-1 ml-4 list-disc">
+            <li>최근 5년 연속 배당 지급 여부</li>
+            <li>배당성향 50% 이하 (지속 가능성)</li>
+            <li>배당수익률 3~7% 구간 (트랩 주의)</li>
+            <li>영업이익 성장 추세 확인</li>
+          </ul>
+        </Section>
+        <Section title="삼성전자 분기배당">
+          삼성전자는 2024년부터 분기 배당을 도입해 1·4·7·10월에 분기별 DPS를 지급합니다. 기말 배당은 별도 주주총회 결의를 거쳐 결정됩니다.
+        </Section>
+        <Section title="리츠(REITs) 특징">
+          부동산 임대수익을 배당으로 지급. 국내 상장 리츠는 KRX에서 주식처럼 거래 가능하며, 분기 또는 반기 배당이 일반적입니다.
+        </Section>
+      </div>
+    ),
   },
   {
-    category: "🇺🇸 미국 배당주 가이드",
-    color: "#3B82F6",
-    bgColor: "#EFF6FF",
-    items: [
-      {
-        q: "미국 배당주 투자 시 세금은?",
-        a: "한미 조세조약에 따라 배당금의 15%가 원천징수됩니다. 추가 국내 과세 없이 세후 85%를 수령해요. 단, 금융소득 종합과세 기준(2,000만 원)에는 포함되므로 고액 투자자는 주의가 필요합니다.",
-      },
-      {
-        q: "SCHD vs JEPI — 어떤 ETF가 나에게 맞을까?",
-        a: "SCHD는 배당 성장형 ETF로 꾸준한 분기 배당(수익률 약 3~4%)과 주가 상승을 함께 추구합니다. JEPI는 커버드콜 ETF로 월배당(수익률 약 7~10%)에 집중하지만 주가 상승은 제한적이에요. 자산 축적 목적엔 SCHD, 현금흐름 목적엔 JEPI가 인기입니다.",
-      },
-      {
-        q: "배당 귀족주(Dividend Aristocrats) 대표 종목",
-        a: "코카콜라(KO), 존슨앤드존슨(JNJ), P&G(PG), 에보트래버래토리(ABT), 리얼티인컴(O) 등이 대표적입니다. 이들은 25~50년 이상 연속 배당 증가 이력을 갖고 있어 장기 배당 투자의 핵심 후보예요.",
-      },
-      {
-        q: "월배당 포트폴리오 구성 방법",
-        a: "분기 배당 ETF 3개를 지급월이 겹치지 않게 조합하면 매월 배당을 받을 수 있어요. 예: 1·4·7·10월(QYLD) + 2·5·8·11월(RYLD) + 3·6·9·12월(XYLD). 여기에 월배당 JEPI를 더하면 더 안정적입니다.",
-      },
-      {
-        q: "리얼티인컴(O)이 인기 있는 이유?",
-        a: "리얼티인컴은 '월배당 기업(The Monthly Dividend Company)'이라는 별명을 가질 만큼 30년 이상 매월 배당을 지급했습니다. 편의점·약국·마트 등 경기 방어적 임차인 위주라 불황에도 배당이 안정적이에요.",
-      },
-      {
-        q: "미국 배당주 환율 리스크 관리법",
-        a: "달러로 배당을 받는 만큼 원달러 환율 변동에 영향을 받습니다. 환율이 낮을 때 달러를 보유하고 배당을 재투자하는 방식이 유리해요. 환헤지 ETF를 활용하거나 국내 상장 미국 ETF를 활용하면 환위험을 줄일 수 있습니다.",
-      },
+    id: "usa",
+    icon: "🇺🇸",
+    title: "미국 배당주 가이드",
+    cta: { label: "미국 배당 랭킹 보기 →", href: "/ranking" },
+    relatedStocks: [
+      { name: "SCHD", ticker: "SCHD", desc: "배당 성장 ETF" },
+      { name: "JEPI", ticker: "JEPI", desc: "월배당 커버드콜" },
     ],
+    content: (
+      <div className="space-y-4 text-[14px] text-toss-label leading-relaxed">
+        <Section title="세금 처리">
+          미국 배당은 원천징수 15%(한미조세조약)로 미국에서 공제 후 지급됩니다. 한국 거주자는 금융소득 종합과세 시 외국납부세액 공제 적용 가능.
+        </Section>
+        <Section title="SCHD vs JEPI">
+          <ul className="space-y-1 ml-4 list-disc">
+            <li><strong>SCHD:</strong> 배당 성장 중심, 수익률 3~4%, 주가 상승 참여 가능</li>
+            <li><strong>JEPI:</strong> 커버드콜 전략, 수익률 7~10%, 주가 상승 제한적, 월배당</li>
+          </ul>
+        </Section>
+        <Section title="배당귀족 대표 종목">
+          JNJ(존슨앤존슨), KO(코카콜라), PG(P&G), MMM(3M) 등 25년 이상 배당 성장 유지 기업. 안정성이 높아 방어적 포트폴리오에 적합.
+        </Section>
+        <Section title="월배당 포트폴리오 구성">
+          O(리얼티인컴), STAG(스태그인더스트리얼)은 매월 배당. JEPI, JEPQ도 월배당. 3개 이상 조합하면 사실상 매월 배당 수령 가능.
+        </Section>
+        <Section title="환율 리스크 관리">
+          원달러 환율에 따라 실수령 원화가 달라집니다. 환헤지(H) ETF를 활용하거나 달러 예수금으로 재투자하는 방법을 고려해보세요.
+        </Section>
+      </div>
+    ),
   },
 ];
 
-export default function WikiPage() {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="px-4 md:px-8 lg:px-10 py-8 max-w-6xl mx-auto space-y-10">
-      {/* 헤더 */}
-      <div className="space-y-1.5">
+    <div>
+      <p className="font-bold text-toss-text mb-1.5">{title}</p>
+      <div className="text-toss-label">{children}</div>
+    </div>
+  );
+}
+
+export default function WikiPage() {
+  const [open, setOpen] = useState<string | null>(null);
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 md:px-8 py-8 space-y-5">
+      <div className="space-y-1">
         <h1 className="text-3xl font-extrabold text-toss-text">배당 위키</h1>
-        <p className="text-base text-toss-sub">배당 투자에 필요한 모든 것을 쉽게 알아보세요.</p>
+        <p className="text-base text-toss-sub">배당 투자의 모든 것을 알아보세요.</p>
       </div>
 
-      <WikiAccordion articles={ARTICLES} />
+      {/* 초보자 시작 가이드 배너 */}
+      <div className="bg-gradient-to-r from-toss-blue to-blue-600 rounded-2xl p-5 text-white">
+        <p className="text-[16px] font-extrabold mb-1">💡 배당 투자 처음이세요?</p>
+        <p className="text-[13px] opacity-85 mb-3">아래 순서대로 따라하면 첫 배당을 받을 수 있어요.</p>
+        <div className="flex flex-wrap gap-2 text-[12px] font-bold">
+          {[
+            { step: "1", label: "초보자 가이드 읽기", href: "#" },
+            { step: "2", label: "종목 검색·계산", href: "/" },
+            { step: "3", label: "포트폴리오 추가", href: "/dashboard" },
+            { step: "4", label: "캘린더로 추적", href: "/calendar" },
+          ].map(({ step, label, href }) => (
+            <a key={step} href={href}
+              className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition-colors">
+              <span className="w-4 h-4 rounded-full bg-white text-toss-blue text-[10px] font-black flex items-center justify-center flex-shrink-0">{step}</span>
+              {label}
+            </a>
+          ))}
+        </div>
+      </div>
 
-      <p className="text-center text-[13px] text-toss-sub py-4 border-t border-toss-border">
-        본 내용은 투자 권유가 아닌 교육 목적의 정보입니다.
+      {/* 아코디언 섹션들 */}
+      <div className="space-y-3">
+        {SECTIONS.map((sec) => (
+          <div key={sec.id} className="bg-toss-card rounded-2xl shadow-card overflow-hidden">
+            <button
+              onClick={() => setOpen(open === sec.id ? null : sec.id)}
+              className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-toss-bg transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-xl">{sec.icon}</span>
+                <span className="text-[16px] font-extrabold text-toss-text">{sec.title}</span>
+              </div>
+              <svg
+                className={`w-5 h-5 text-toss-label transition-transform duration-200 ${open === sec.id ? "rotate-180" : ""}`}
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {open === sec.id && (
+              <div className="px-5 pb-5 space-y-4 border-t border-toss-border">
+                <div className="pt-4">{sec.content}</div>
+
+                {/* 관련 종목 추천 */}
+                {sec.relatedStocks && sec.relatedStocks.length > 0 && (
+                  <div className="pt-2 space-y-2">
+                    <p className="text-[12px] font-semibold text-toss-sub">관련 추천 종목</p>
+                    <div className="flex flex-wrap gap-2">
+                      {sec.relatedStocks.map((s) => (
+                        <a key={s.ticker} href={`/?ticker=${s.ticker}`}
+                          className="flex items-center gap-2 px-3 py-2 bg-toss-bg rounded-xl
+                                     border border-toss-border hover:border-toss-blue hover:bg-blue-50
+                                     dark:hover:bg-blue-900/20 transition-colors">
+                          <div>
+                            <p className="text-[13px] font-bold text-toss-text">{s.name}</p>
+                            <p className="text-[10px] text-toss-sub">{s.desc}</p>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* CTA 버튼 */}
+                <a href={sec.cta.href}
+                  className="flex items-center justify-center gap-1.5 w-full py-3 rounded-xl
+                             bg-toss-blue/10 text-toss-blue hover:bg-toss-blue hover:text-white
+                             text-[13px] font-bold transition-colors">
+                  {sec.cta.label}
+                </a>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <p className="text-[12px] text-toss-sub text-center pb-4">
+        * 본 내용은 투자 권유가 아닌 정보 제공 목적입니다. 투자 결정은 본인의 판단으로 하시기 바랍니다.
       </p>
     </div>
   );

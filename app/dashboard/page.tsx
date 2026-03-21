@@ -243,6 +243,20 @@ export default function DashboardPage() {
     else setApiData({});
   }
 
+  // 샘플 포트폴리오 (삼성전자 100주, SCHD 50주, 리얼티인컴 20주)
+  function handleSamplePortfolio() {
+    const today = new Date().toISOString().split("T")[0];
+    const samples = [
+      { ticker: "005930", name: "삼성전자",  market: "KR" as Market, quantity: 100, purchaseDate: today },
+      { ticker: "SCHD",   name: "SCHD",      market: "US" as Market, quantity: 50,  purchaseDate: today },
+      { ticker: "O",      name: "리얼티인컴", market: "US" as Market, quantity: 20,  purchaseDate: today },
+    ];
+    samples.forEach(s => addHolding(s));
+    const updated = getHoldings();
+    setHoldings(updated);
+    fetchApiData(updated);
+  }
+
   function handleGoalSave() {
     const v = parseFloat(goalInput.replace(/,/g, ""));
     if (!isNaN(v) && v > 0) { setGoalAmount(v); saveGoal(v); }
@@ -264,11 +278,35 @@ export default function DashboardPage() {
     ? Math.min((annualNet / goalAmount) * 100, 100) : null;
   const fullYearNet = stackedData.reduce((s, m) => s + m.total, 0);
 
+  // 이번 달 vs 지난달 비교
+  const thisMonthTotal = stackedData[currentMonthIdx]?.total ?? 0;
+  const prevMonthIdx   = currentMonthIdx === 0 ? 11 : currentMonthIdx - 1;
+  const prevMonthTotal = stackedData[prevMonthIdx]?.total ?? 0;
+  const monthDiff      = thisMonthTotal - prevMonthTotal;
+  const monthDiffPct   = prevMonthTotal > 0
+    ? Math.round((monthDiff / prevMonthTotal) * 100)
+    : null;
+
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-5">
-      <div className="space-y-1">
-        <h1 className="text-3xl font-extrabold text-toss-text">내 배당</h1>
-        <p className="text-base text-toss-sub">보유 종목 기반 연간 배당 수익을 한눈에 확인하세요.</p>
+      <div className="flex items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-3xl font-extrabold text-toss-text">내 배당</h1>
+          <p className="text-base text-toss-sub">보유 종목 기반 연간 배당 수익을 한눈에 확인하세요.</p>
+        </div>
+        {/* 글로벌 종목 추가 CTA */}
+        {!showForm && (
+          <button
+            onClick={openForm}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-toss-blue hover:bg-toss-blueDark
+                       active:scale-[0.97] text-white font-bold text-[14px] transition-all flex-shrink-0 shadow-md"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            종목 추가
+          </button>
+        )}
       </div>
 
       {/* 요약 카드 */}
@@ -303,6 +341,7 @@ export default function DashboardPage() {
             label="다음 배당 D-day"
             value={dday !== null ? (dday === 0 ? "오늘! 🎉" : `D-${dday}`) : "-"}
             highlight={dday !== null && dday <= 7}
+            large={dday !== null && dday > 7}
             tooltip={nextEvent ? `${nextEvent.name} 배당 예정일: ${nextEvent.paymentDate}` : "예정 배당 없음"}
           />
         </div>
@@ -416,9 +455,32 @@ export default function DashboardPage() {
             </div>
           )}
           {initLoading ? <ChartSkeleton />
-            : holdings.length === 0 ? <EmptyChart />
+            : holdings.length === 0 ? <EmptyChart onSample={handleSamplePortfolio} />
             : <DividendChart data={[]} stackedData={stackedData} tickers={tickers}
                 period={chartPeriod} onPeriodChange={setChartPeriod} />}
+
+          {/* 이번 달 vs 지난달 비교 */}
+          {!initLoading && holdings.length > 0 && (
+            <div className="mt-4 flex items-center justify-between px-1">
+              <div className="flex items-center gap-1.5 text-[12px] text-toss-sub">
+                <span>이번 달</span>
+                <span className="font-bold text-toss-text">
+                  {Math.round(thisMonthTotal).toLocaleString("ko-KR")}원
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[12px]">
+                {monthDiffPct !== null ? (
+                  <span className={`font-bold ${monthDiff >= 0 ? "text-toss-blue" : "text-red-500"}`}>
+                    {monthDiff >= 0 ? "▲" : "▼"} {Math.abs(monthDiffPct)}%
+                  </span>
+                ) : null}
+                <span className="text-toss-sub">vs 지난달</span>
+                <span className="font-semibold text-toss-label">
+                  {Math.round(prevMonthTotal).toLocaleString("ko-KR")}원
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </ErrorBoundary>
 
@@ -580,11 +642,11 @@ export default function DashboardPage() {
           {initLoading ? (
             <div>{Array.from({ length: 3 }).map((_, i) => <HoldingRowSkeleton key={i} />)}</div>
           ) : holdings.length === 0 ? (
-            <div className="text-center py-10 space-y-2">
-              <p className="text-4xl">📭</p>
-              <p className="text-[14px] font-semibold text-toss-text">등록된 종목이 없어요</p>
-              <p className="text-[13px] text-toss-sub">종목을 추가하면 배당 수익을 계산해 드려요.</p>
-            </div>
+            <PopularStocksWidget onSelect={(item) => {
+              setFormMarket(item.market as Market);
+              setSelected(item);
+              setShowForm(true);
+            }} />
           ) : viewMode === "compact" ? (
             /* ── 컴팩트 리스트 뷰 ── */
             <div className="divide-y divide-toss-border">
@@ -708,6 +770,91 @@ export default function DashboardPage() {
           stockCount={holdings.length}
         />
       )}
+
+      {/* ── 포트폴리오 인사이트 ── */}
+      {holdings.length > 0 && (() => {
+        const krCount   = holdings.filter(h => h.market === "KR").length;
+        const usCount   = holdings.filter(h => h.market === "US").length;
+        const total     = holdings.length;
+        const krPct     = Math.round((krCount / total) * 100);
+        const usPct     = 100 - krPct;
+
+        // 종목 집중도 체크 (단일 종목 > 30%)
+        const tickerCounts: Record<string, number> = {};
+        holdings.forEach(h => { tickerCounts[h.ticker] = (tickerCounts[h.ticker] ?? 0) + 1; });
+        const maxConc = Math.max(...Object.values(tickerCounts));
+        const concPct = Math.round((maxConc / total) * 100);
+
+        return (
+          <div className="bg-toss-card rounded-2xl shadow-card p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[16px] font-extrabold text-toss-text">포트폴리오 인사이트</h3>
+              <span className="text-xl">🔍</span>
+            </div>
+
+            {/* 국가 비중 */}
+            <div className="space-y-2">
+              <p className="text-[12px] font-semibold text-toss-sub">국가 비중</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-3 rounded-full bg-toss-bg overflow-hidden">
+                  <div className="h-full rounded-full bg-toss-blue transition-all duration-500"
+                    style={{ width: `${krPct}%` }} />
+                </div>
+                <div className="flex gap-3 text-[12px] font-bold flex-shrink-0">
+                  <span className="text-toss-blue">🇰🇷 {krPct}%</span>
+                  <span className="text-green-600">🇺🇸 {usPct}%</span>
+                </div>
+              </div>
+              {krPct > 80 && (
+                <p className="text-[11px] text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2.5 py-1.5 rounded-lg">
+                  💡 한국 비중이 높아요. 미국 ETF(JEPI, SCHD)로 분산을 고려해보세요.
+                </p>
+              )}
+            </div>
+
+            {/* 집중도 경고 */}
+            {concPct >= 30 && (
+              <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
+                <span className="text-orange-400 flex-shrink-0">⚠️</span>
+                <p className="text-[12px] text-orange-600">
+                  특정 종목 집중도가 {concPct}%예요. 배당 리스크 분산을 위해 여러 종목에 나눠 투자를 권장해요.
+                </p>
+              </div>
+            )}
+
+            {/* 추천 행동 */}
+            <div className="space-y-2">
+              <p className="text-[12px] font-semibold text-toss-sub">다음 액션 추천</p>
+              <div className="space-y-2">
+                {total < 5 && (
+                  <div className="flex items-center gap-2.5 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20">
+                    <span className="text-blue-500 text-base flex-shrink-0">📌</span>
+                    <p className="text-[12px] text-blue-700 dark:text-blue-300 flex-1">
+                      종목이 {total}개예요. 5개 이상으로 늘려 배당 안정성을 높여보세요.
+                    </p>
+                    <a href="/ranking"
+                      className="flex-shrink-0 text-[11px] font-bold text-toss-blue border border-toss-blue px-2 py-1 rounded-lg hover:bg-toss-blue hover:text-white transition-colors">
+                      랭킹 보기
+                    </a>
+                  </div>
+                )}
+                {usCount === 0 && (
+                  <div className="flex items-center gap-2.5 p-3 rounded-xl bg-green-50 dark:bg-green-900/20">
+                    <span className="text-green-500 text-base flex-shrink-0">🇺🇸</span>
+                    <p className="text-[12px] text-green-700 dark:text-green-300 flex-1">
+                      미국 ETF 추가로 월배당 포트폴리오를 만들어 보세요.
+                    </p>
+                    <a href="/ranking"
+                      className="flex-shrink-0 text-[11px] font-bold text-green-600 border border-green-400 px-2 py-1 rounded-lg hover:bg-green-500 hover:text-white transition-colors">
+                      ETF 보기
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -741,19 +888,21 @@ function getDday(dateStr: string): number {
 }
 
 /* ── sub components ── */
-function SummaryCard({ label, value, highlight, hero, tooltip }: {
-  label: string; value: string; highlight?: boolean; hero?: boolean; tooltip?: string;
+function SummaryCard({ label, value, highlight, hero, large, tooltip }: {
+  label: string; value: string; highlight?: boolean; hero?: boolean; large?: boolean; tooltip?: string;
 }) {
   return (
-    <div className={`relative bg-toss-card rounded-2xl shadow-card group cursor-default
-      ${hero ? "p-5 flex flex-col justify-between min-h-[90px] border border-toss-blue/20 bg-gradient-to-br from-blue-50/60 to-white dark:from-blue-900/10 dark:to-toss-card"
-             : "p-4 space-y-1.5"}`}>
-      <p className={`font-medium leading-tight ${hero ? "text-[13px] text-toss-blue" : "text-[12px] text-toss-sub"}`}>
+    <div className={`relative bg-toss-card rounded-xl shadow-card group cursor-default flex flex-col justify-between
+      ${hero
+        ? "p-4 border border-toss-blue/20 bg-gradient-to-br from-blue-50/60 to-white dark:from-blue-900/10 dark:to-toss-card"
+        : "p-3.5"}`}>
+      <p className={`font-medium leading-tight ${hero ? "text-[11px] text-toss-blue" : "text-[11px] text-toss-sub"}`}>
         {label}
       </p>
-      <p className={`font-extrabold leading-tight ${
-        hero ? "text-[26px] text-toss-blue mt-1" :
-        highlight ? "text-[16px] text-toss-blue" : "text-[16px] text-toss-text"}`}>
+      <p className={`font-extrabold leading-tight mt-1 ${
+        hero ? "text-[20px] text-toss-blue" :
+        highlight ? "text-[22px] text-toss-blue" :
+        large ? "text-[22px] text-toss-text" : "text-[15px] text-toss-text"}`}>
         {value}
       </p>
       {tooltip && (
@@ -768,11 +917,61 @@ function SummaryCard({ label, value, highlight, hero, tooltip }: {
   );
 }
 
-function EmptyChart() {
+function EmptyChart({ onSample }: { onSample?: () => void }) {
   return (
-    <div className="h-[200px] flex flex-col items-center justify-center text-toss-sub space-y-2">
+    <div className="h-[200px] flex flex-col items-center justify-center text-toss-sub space-y-3">
       <span className="text-4xl">📊</span>
       <p className="text-[14px]">종목을 추가하면 배당 차트가 표시돼요.</p>
+      {onSample && (
+        <button
+          onClick={onSample}
+          className="px-4 py-2 text-[12px] font-bold text-toss-blue bg-blue-50 dark:bg-blue-900/20
+                     rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+        >
+          샘플 포트폴리오 적용해 보기
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ── 인기 배당주 추천 위젯 (Empty State 대체) ── */
+const POPULAR_STOCKS: StockItem[] = [
+  { ticker: "005930", name: "삼성전자",  market: "KR", exchange: "KS" },
+  { ticker: "SCHD",   name: "SCHD (미국 고배당 ETF)",  market: "US" },
+  { ticker: "O",      name: "리얼티인컴 (월배당)",      market: "US" },
+];
+
+function PopularStocksWidget({ onSelect }: { onSelect: (item: StockItem) => void }) {
+  return (
+    <div className="space-y-3 py-2">
+      <p className="text-[12px] text-toss-sub text-center">많은 분들이 이 종목으로 시작해요 👇</p>
+      <div className="space-y-2">
+        {POPULAR_STOCKS.map((stock) => (
+          <div
+            key={stock.ticker}
+            className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-toss-bg hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <StockLogo ticker={stock.ticker} name={stock.name} market={stock.market} size={32} />
+              <div className="min-w-0">
+                <p className="text-[13px] font-bold text-toss-text truncate">{stock.name}</p>
+                <p className="text-[11px] text-toss-sub">{stock.ticker} · {stock.market === "KR" ? "한국" : "미국"}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => onSelect(stock)}
+              className="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-toss-blue text-white
+                         text-[12px] font-bold hover:bg-toss-blueDark transition-colors"
+            >
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              추가
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -229,6 +229,21 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ── 포트폴리오 유도 배너 ── */}
+      <div className="bg-toss-blue">
+        <div className="max-w-3xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-white text-center sm:text-left">
+            <p className="text-[18px] font-extrabold">내 배당 포트폴리오 만들기</p>
+            <p className="text-[13px] opacity-80 mt-1">종목을 추가하고 월별 배당 흐름을 한눈에 관리해요</p>
+          </div>
+          <a href="/dashboard"
+            className="flex-shrink-0 bg-white text-toss-blue font-bold text-[14px]
+                       px-6 py-3 rounded-2xl hover:bg-blue-50 transition-colors whitespace-nowrap">
+            내 배당 보러가기 →
+          </a>
+        </div>
+      </div>
+
     </div>
   );
 }

@@ -37,6 +37,18 @@ function isPast(dateStr: string | null, daysAgo = 7): boolean {
   return new Date(+m[1], +m[2] - 1, +m[3]) < threshold;
 }
 
+/** 과거 날짜를 배당 주기에 맞춰 다음 미래 날짜로 이동 */
+function projectToFuture(dateStr: string | null, freqMonths: number): string | null {
+  if (!dateStr) return null;
+  const m = dateStr.match(/(\d{4})\.(\d{2})\.(\d{2})/);
+  if (!m) return null;
+  const d = new Date(+m[1], +m[2] - 1, +m[3]);
+  const today = new Date();
+  if (d >= today) return dateStr; // 이미 미래
+  while (d < today) d.setMonth(d.getMonth() + freqMonths);
+  return fmt(d);
+}
+
 // ── US 주식: FMP 기반 처리 ───────────────────────────────────────────────────
 async function handleUSWithFmp(rawTicker: string) {
   const fmp = await getFmpFullQuote(rawTicker.toUpperCase());
@@ -182,6 +194,7 @@ async function handleWithYahoo(rawTicker: string) {
   let payMonths: number[] = [];
   let dividendFrequency: "annual" | "semi-annual" | "quarterly" | "monthly" = "annual";
   const payDayByMonth: Record<number, number> = {};
+  let lastKnownDivDate: Date | null = null;   // 이력에서 가장 최근 배당락일
 
   try {
     const twoYearsAgo = new Date();
@@ -214,6 +227,7 @@ async function handleWithYahoo(rawTicker: string) {
       Object.entries(daySums).forEach(([mo, { sum, count }]) => {
         payDayByMonth[parseInt(mo)] = Math.round(sum / count);
       });
+      lastKnownDivDate = new Date((divRows[divRows.length - 1] as any).date);
     }
   } catch { /* 이력 없으면 기본값 */ }
 
@@ -226,6 +240,34 @@ async function handleWithYahoo(rawTicker: string) {
     if (payMonths.length === 0) {
       payMonths = isKR ? [4] : [3, 6, 9, 12];
       dividendFrequency = isKR ? "annual" : "quarterly";
+    }
+  }
+
+  // 배당 주기(개월 수) 계산
+  const freqMonths =
+    dividendFrequency === "monthly"     ? 1  :
+    dividendFrequency === "quarterly"   ? 3  :
+    dividendFrequency === "semi-annual" ? 6  : 12;
+
+  // 과거 배당락일/지급일을 다음 사이클로 투영 (미정 대신 예상 날짜 표시)
+  let finalExDate  = projectToFuture(fmtExDate,  freqMonths);
+  let finalPayDate = projectToFuture(fmtPayDate, freqMonths);
+
+  // ex-date가 없으면 최근 배당 이력에서 추정
+  if (!finalExDate && lastKnownDivDate) {
+    const d = new Date(lastKnownDivDate);
+    while (d < new Date()) d.setMonth(d.getMonth() + freqMonths);
+    finalExDate = fmt(d);
+  }
+
+  // 지급일이 없고 ex-date가 있으면, 한국 주식은 ex-date로부터 약 3~4개월 후 추정
+  if (!finalPayDate && finalExDate && isKoreanStock) {
+    const m2 = finalExDate.match(/(\d{4})\.(\d{2})\.(\d{2})/);
+    if (m2) {
+      const d2 = new Date(+m2[1], +m2[2] - 1, +m2[3]);
+      const payOffset = dividendFrequency === "annual" ? 4 : dividendFrequency === "semi-annual" ? 2 : 1;
+      d2.setMonth(d2.getMonth() + payOffset);
+      finalPayDate = fmt(d2);
     }
   }
 
@@ -248,8 +290,8 @@ async function handleWithYahoo(rawTicker: string) {
     price,
     dps,
     dividendYield:     divYield,
-    exDate:            isPast(fmtExDate)  ? null : fmtExDate,
-    paymentDate:       isPast(fmtPayDate) ? null : fmtPayDate,
+    exDate:            finalExDate,
+    paymentDate:       finalPayDate,
     currency:          quote.currency ?? "USD",
     payMonths,
     dividendFrequency,
