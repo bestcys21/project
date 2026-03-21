@@ -3,12 +3,12 @@ import { hasFmpKey, getFmpRankItems } from "@/lib/fmp-api";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-// 캐시 없음 — 항상 최신 데이터 (Yahoo Finance 실시간)
-export const dynamic = "force-dynamic";
+// 1시간 캐시 — 랭킹 데이터는 실시간 불필요, Vercel timeout 방지
+export const revalidate = 3600;
 
 function getClient() {
   const YahooFinance = require("yahoo-finance2").default;
-  return new YahooFinance({ suppressNotices: ["yahooSurvey"] });
+  return new YahooFinance({ suppressNotices: ["yahooSurvey", "ripHistorical"] });
 }
 
 // ── 한국 KOSPI/KOSDAQ 주요 고배당 후보 (Yahoo Finance 필터 후 상위 50개 반환)

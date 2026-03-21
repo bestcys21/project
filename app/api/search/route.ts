@@ -5,7 +5,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 function getClient() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const YahooFinance = require("yahoo-finance2").default;
-  return new YahooFinance({ suppressNotices: ["yahooSurvey"] });
+  return new YahooFinance({ suppressNotices: ["yahooSurvey", "ripHistorical"] });
 }
 
 export async function GET(req: NextRequest) {

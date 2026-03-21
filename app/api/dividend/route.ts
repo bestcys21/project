@@ -13,7 +13,8 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 function getYfClient() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const YF = require("yahoo-finance2").default;
-  return new YF({ suppressNotices: ["yahooSurvey"] });
+  // ripHistorical: Yahoo가 historical() API 삭제 → chart()로 내부 매핑됨, 경고 억제
+  return new YF({ suppressNotices: ["yahooSurvey", "ripHistorical"] });
 }
 
 function fmt(d: unknown): string | null {
@@ -199,16 +200,27 @@ async function handleWithYahoo(rawTicker: string) {
   try {
     const twoYearsAgo = new Date();
     twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-    const hist = await yf.historical(ticker, {
-      period1: twoYearsAgo.toISOString().split("T")[0],
-      period2: new Date().toISOString().split("T")[0],
-      events:  "dividends",
+
+    // Yahoo Finance가 historical()을 삭제 → chart()로 직접 교체
+    const chartResult = await yf.chart(ticker, {
+      period1:  twoYearsAgo.toISOString().split("T")[0],
+      period2:  new Date().toISOString().split("T")[0],
+      interval: "1mo",
+      events:   "dividends",
     });
-    const divRows = ((hist as any[]) ?? []).filter(
-      (h: any) => h.dividends != null && h.dividends > 0
-    );
+
+    // chart()는 dividends를 { [timestamp]: { amount, date } } 형태로 반환
+    const dividendsObj = (chartResult as any)?.events?.dividends ?? {};
+    const divRows: Array<{ date: Date; amount: number }> = Object.values(dividendsObj)
+      .map((d: any) => ({
+        date:   d.date instanceof Date ? d.date : new Date((d.date as number) * 1000),
+        amount: d.amount as number,
+      }))
+      .filter((d) => d.amount > 0)
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
+
     if (divRows.length > 0) {
-      payMonths = [...new Set(divRows.map((h: any) => new Date(h.date).getMonth() + 1 as number))].sort((a, b) => a - b);
+      payMonths = [...new Set(divRows.map((h) => h.date.getMonth() + 1))].sort((a, b) => a - b);
       const avgPerYear = divRows.length / 2;
       dividendFrequency =
         avgPerYear >= 10 ? "monthly" :
@@ -216,10 +228,9 @@ async function handleWithYahoo(rawTicker: string) {
         avgPerYear >= 1.5 ? "semi-annual" : "annual";
 
       const daySums: Record<number, { sum: number; count: number }> = {};
-      divRows.forEach((h: any) => {
-        const d  = new Date(h.date);
-        const mo = d.getMonth() + 1;
-        const dy = d.getDate();
+      divRows.forEach((h) => {
+        const mo = h.date.getMonth() + 1;
+        const dy = h.date.getDate();
         if (!daySums[mo]) daySums[mo] = { sum: 0, count: 0 };
         daySums[mo].sum   += dy;
         daySums[mo].count += 1;
@@ -227,7 +238,7 @@ async function handleWithYahoo(rawTicker: string) {
       Object.entries(daySums).forEach(([mo, { sum, count }]) => {
         payDayByMonth[parseInt(mo)] = Math.round(sum / count);
       });
-      lastKnownDivDate = new Date((divRows[divRows.length - 1] as any).date);
+      lastKnownDivDate = divRows[divRows.length - 1].date;
     }
   } catch { /* 이력 없으면 기본값 */ }
 
