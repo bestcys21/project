@@ -81,9 +81,11 @@ export function calcStackedMonthly(
   const months  = Array.from({ length: 12 }, (_, i) => `${i + 1}월`);
 
   // 시장별 기본 지급월 (이력 없을 때 폴백)
+  // KR: 12월 기준일 → 4월 지급 (결산 배당 기본값)
+  // US: 3, 6, 9, 12월 지급 (분기 기본값)
   const defaultPayMonths: Record<Market, number[]> = {
-    KR: [12],        // 한국: 기본 연배당 12월
-    US: [3, 6, 9, 12], // 미국: 기본 분기
+    KR: [4],
+    US: [3, 6, 9, 12],
   };
 
   const stackedData = months.map((month, mi) => {

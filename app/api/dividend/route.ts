@@ -38,6 +38,20 @@ function isPast(dateStr: string | null, daysAgo = 7): boolean {
   return new Date(+m[1], +m[2] - 1, +m[3]) < threshold;
 }
 
+/**
+ * 한국 주식: ex-dividend month → 실제 지급월 변환
+ * Yahoo Finance chart()는 ex-date만 반환하므로 반드시 변환 필요
+ *   3월 기준일 → 5월 지급  (+2)
+ *   6월 기준일 → 8월 지급  (+2)
+ *   9월 기준일 → 11월 지급 (+2)
+ *  12월 기준일 → 4월 지급  (+4, 결산 배당)
+ */
+function exMonthToPayMonth(exMonth: number): number {
+  if (exMonth === 12) return 4;           // 결산 배당: 12월 기준 → 익년 4월 지급
+  const pay = exMonth + 2;
+  return pay > 12 ? pay - 12 : pay;      // +2개월 (분기/반기 공통)
+}
+
 /** 과거 날짜를 배당 주기에 맞춰 다음 미래 날짜로 이동 */
 function projectToFuture(dateStr: string | null, freqMonths: number): string | null {
   if (!dateStr) return null;
@@ -220,24 +234,27 @@ async function handleWithYahoo(rawTicker: string) {
       .sort((a, b) => a.date.getTime() - b.date.getTime());
 
     if (divRows.length > 0) {
-      payMonths = [...new Set(divRows.map((h) => h.date.getMonth() + 1))].sort((a, b) => a - b);
+      // ex-date 기준 월 목록
+      const exMonths = [...new Set(divRows.map((h) => h.date.getMonth() + 1))].sort((a, b) => a - b);
+
       const avgPerYear = divRows.length / 2;
       dividendFrequency =
         avgPerYear >= 10 ? "monthly" :
         avgPerYear >= 3  ? "quarterly" :
         avgPerYear >= 1.5 ? "semi-annual" : "annual";
 
-      const daySums: Record<number, { sum: number; count: number }> = {};
-      divRows.forEach((h) => {
-        const mo = h.date.getMonth() + 1;
-        const dy = h.date.getDate();
-        if (!daySums[mo]) daySums[mo] = { sum: 0, count: 0 };
-        daySums[mo].sum   += dy;
-        daySums[mo].count += 1;
-      });
-      Object.entries(daySums).forEach(([mo, { sum, count }]) => {
-        payDayByMonth[parseInt(mo)] = Math.round(sum / count);
-      });
+      // ★ 핵심 수정: 한국 주식은 ex-date → 지급월 변환 (Yahoo Finance는 ex-date만 제공)
+      //   미국 주식: FMP 루트에서 paymentDate 직접 사용하므로 여기선 Yahoo(=한국)만 해당
+      if (isKoreanStock) {
+        payMonths = [...new Set(exMonths.map(exMonthToPayMonth))].sort((a, b) => a - b);
+      } else {
+        // US Yahoo fallback: ex-date 그대로 사용 (FMP 없을 때)
+        payMonths = exMonths;
+      }
+
+      // payDayByMonth: 변환된 지급월 기준으로 기본 지급일 15일 설정 (Yahoo는 지급일 미제공)
+      payMonths.forEach((mo) => { payDayByMonth[mo] = 15; });
+
       lastKnownDivDate = divRows[divRows.length - 1].date;
     }
   } catch { /* 이력 없으면 기본값 */ }
@@ -249,6 +266,8 @@ async function handleWithYahoo(rawTicker: string) {
       if (m) { payMonths = [parseInt(m[1])]; payDayByMonth[parseInt(m[1])] = parseInt(m[2]); }
     }
     if (payMonths.length === 0) {
+      // 한국 연배당 기본: 12월 결산 → 4월 지급
+      // 미국 분기 기본: 3, 6, 9, 12월 지급
       payMonths = isKR ? [4] : [3, 6, 9, 12];
       dividendFrequency = isKR ? "annual" : "quarterly";
     }
