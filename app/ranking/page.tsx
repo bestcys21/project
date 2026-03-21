@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import StockLogo from "@/components/StockLogo";
 
@@ -41,21 +41,28 @@ export default function RankingPage() {
   const [data,    setData]    = useState<StockData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState("");
+  // 탭 전환 시 이전 요청 응답이 늦게 오는 race condition 방지
+  const reqIdRef = useRef(0);
 
   useEffect(() => {
     fetchRanking(market);
   }, [market]);
 
   async function fetchRanking(m: string) {
+    const reqId = ++reqIdRef.current;
     setLoading(true);
     setError("");
+    setData([]);
     try {
       const res  = await fetch(`/api/ranking?market=${m}`);
       const json = await res.json();
+      if (reqId !== reqIdRef.current) return; // 이미 다른 요청이 시작됨
       setData(json.data ?? []);
     } catch {
+      if (reqId !== reqIdRef.current) return;
       setError("데이터를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.");
     } finally {
+      if (reqId !== reqIdRef.current) return;
       setLoading(false);
     }
   }
