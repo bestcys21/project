@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AppShell from "@/components/AppShell";
-
-export const BASE_URL = "https://project-ruby-rho-88.vercel.app";
+import { BASE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),

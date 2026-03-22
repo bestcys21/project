@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BASE_URL } from "../layout";
+import { BASE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "배당 위키 - 배당 투자 기초 가이드",

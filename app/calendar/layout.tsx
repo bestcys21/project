@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BASE_URL } from "../layout";
+import { BASE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "배당 캘린더 - 배당락일·지급일 한눈에",

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import CalculatorForm from "@/components/CalculatorForm";
-import { BASE_URL } from "./layout";
+import { BASE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "배당금 계산기 - 세후 배당금 즉시 계산",
