@@ -172,8 +172,11 @@ export default function DashboardPage() {
   // 토스트
   const [showToast, setShowToast] = useState(false);
 
-  // 모달
+  // 인사이트 모달
   const [activeModal, setActiveModal] = useState<"health" | "peer" | "portfolio" | null>(null);
+
+  // 종목 제거 확인 모달
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
 
   useEffect(() => {
     const h = getHoldings();
@@ -184,6 +187,18 @@ export default function DashboardPage() {
     } else {
       setInitLoading(false);
     }
+  }, []);
+
+  // ESC 키로 모달 닫기
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setConfirmRemoveId(null);
+        setActiveModal(null);
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
   }, []);
 
   async function fetchApiData(h: Holding[]) {
@@ -336,10 +351,6 @@ export default function DashboardPage() {
       return { type: "danger" as const, icon: "⚠️",
         message: `${maxWeightEvent.name} 비중이 ${maxWeightPct.toFixed(0)}%입니다. 단일 종목 쏠림 위험이 있어요.`,
         action: "랭킹에서 분산 종목 찾기", href: "/ranking" };
-    if (gapMonths.length >= 2)
-      return { type: "opportunity" as const, icon: "💡",
-        message: `${gapMonths.join("·")} 배당 공백이 있어요. 월배당 ETF 1개로 해결됩니다.`,
-        action: "ETF 랭킹 보기", href: "/ranking" };
     if (monthDiff > 0 && prevMonthTotal > 0 && monthDiffPct !== null)
       return { type: "success" as const, icon: "🎉",
         message: `이번달 배당이 전월 대비 +${monthDiffPct}% 증가했어요!`,
@@ -617,7 +628,7 @@ export default function DashboardPage() {
                     <p className="text-[12px] font-bold text-right text-toss-text">
                       {e.market === "KR" ? `${Math.round(e.netAmount).toLocaleString("ko-KR")}원` : `$${e.netAmount.toFixed(2)}`}
                     </p>
-                    <button onClick={() => handleRemove(e.holdingId)}
+                    <button onClick={() => setConfirmRemoveId(e.holdingId)}
                       className="p-0.5 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 text-toss-sub hover:text-red-400 transition-colors">
                       <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -679,7 +690,7 @@ export default function DashboardPage() {
                           </p>
                         </div>
                       </div>
-                      <button onClick={() => handleRemove(e.holdingId)}
+                      <button onClick={() => setConfirmRemoveId(e.holdingId)}
                         className="flex-shrink-0 p-1.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-toss-sub hover:text-red-400 transition-colors">
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -844,9 +855,6 @@ export default function DashboardPage() {
                     <p className="text-[12px] text-toss-sub">
                       <span className="font-semibold text-toss-text">최고</span> {bestMonthData.month} · {Math.round(bestMonthData.total).toLocaleString("ko-KR")}원
                     </p>
-                  )}
-                  {gapMonths.length > 0 && (
-                    <p className="text-[12px] text-amber-600 font-semibold">⚠ 공백 {gapMonths.join("·")}</p>
                   )}
                   {gapMonths.length === 0 && (
                     <p className="text-[12px] text-green-600 font-semibold">✅ 매월 배당 수령</p>
@@ -1050,6 +1058,44 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* 종목 제거 확인 모달 */}
+      {confirmRemoveId && (() => {
+        const target = events.find(ev => ev.holdingId === confirmRemoveId);
+        return (
+          <div
+            className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
+            onClick={() => setConfirmRemoveId(null)}>
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-toss-card rounded-3xl w-full max-w-[320px] shadow-2xl p-6 space-y-5">
+              <div className="text-center space-y-2.5">
+                <p className="text-[18px] font-extrabold text-toss-text leading-snug">
+                  이 종목을 제거할까요?
+                </p>
+                {target && (
+                  <p className="text-[14px] font-bold text-toss-blue">{target.name}</p>
+                )}
+                <p className="text-[13px] text-toss-sub leading-relaxed [word-break:keep-all]">
+                  현재 포트폴리오에서만 제거되며,<br />배당 계산에서 제외됩니다.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  onClick={() => setConfirmRemoveId(null)}
+                  className="py-3.5 rounded-2xl text-[14px] font-bold text-toss-label bg-toss-bg hover:bg-toss-border transition-colors">
+                  취소
+                </button>
+                <button
+                  onClick={() => { handleRemove(confirmRemoveId); setConfirmRemoveId(null); }}
+                  className="py-3.5 rounded-2xl text-[14px] font-bold text-white bg-red-500 hover:bg-red-600 active:scale-[0.97] transition-all">
+                  제거하기
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       <Toast
         visible={showToast}
