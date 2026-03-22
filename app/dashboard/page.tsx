@@ -457,14 +457,28 @@ export default function DashboardPage() {
         <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-4">
           {/* 헤더 */}
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <p className="text-[14px] font-bold text-toss-text">
-              보유 종목
-              {filterMarket !== "ALL" && (
-                <span className="ml-2 text-[12px] font-semibold text-toss-blue">
-                  {filterMarket === "KR" ? "한국주식" : "미국주식"}
-                </span>
-              )}
-            </p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-[14px] font-bold text-toss-text">
+                보유 종목
+                {filterMarket !== "ALL" && (
+                  <span className="ml-2 text-[12px] font-semibold text-toss-blue">
+                    {filterMarket === "KR" ? "한국주식" : "미국주식"}
+                  </span>
+                )}
+              </p>
+              {/* 저장 안내 팝오버 */}
+              <div className="relative group">
+                <button className="w-4 h-4 rounded-full bg-toss-border text-toss-sub text-[10px] font-bold flex items-center justify-center hover:bg-toss-blue hover:text-white transition-colors select-none">
+                  ?
+                </button>
+                <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 z-30
+                                w-56 px-3 py-2.5 rounded-xl bg-[#191F28] text-white text-[11px] leading-relaxed text-center
+                                opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg whitespace-normal">
+                  현재 기기(브라우저)에 안전하게 자동 저장됩니다. 캐시 삭제 시 데이터가 초기화될 수 있습니다.
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#191F28]" />
+                </div>
+              </div>
+            </div>
             <div className="flex items-center gap-2">
               {holdings.length > 0 && !showForm && (
                 <div className="flex bg-toss-bg rounded-lg p-0.5">
@@ -580,15 +594,6 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* 저장 안내 */}
-          {!initLoading && holdings.length > 0 && (
-            <div className="bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/10 rounded-xl px-3.5 py-2.5">
-              <p className="text-[12px] text-toss-text font-medium leading-snug [word-break:keep-all]">
-                💡 현재 기기(브라우저)에 안전하게 자동 저장됩니다.
-              </p>
-              <p className="text-[11px] text-toss-sub mt-0.5 [word-break:keep-all]">캐시 삭제 시 데이터가 초기화될 수 있습니다.</p>
-            </div>
-          )}
 
           {/* 종목 카드/리스트 */}
           {initLoading ? (
