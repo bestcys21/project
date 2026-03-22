@@ -294,6 +294,56 @@ export default function DashboardPage() {
     ? Math.round((monthDiff / prevMonthTotal) * 100)
     : null;
 
+  // ── 인사이트 계산 ──
+  // 배당 공백 달 (stackedData 기준 합계 0인 달)
+  const gapMonths = stackedData.filter(d => d.total === 0).map(d => d.month as string);
+  // 가장 많은 달
+  const bestMonthData = stackedData.reduce((best, d) => d.total > best.total ? d : best, stackedData[0] ?? { month: "", total: 0 });
+  // 최대 비중 종목
+  const maxWeightEvent = totalNetForWeight > 0 && events.length > 0
+    ? events.reduce((m, e) => e.netAmount > m.netAmount ? e : m)
+    : null;
+  const maxWeightPct = totalNetForWeight > 0 && maxWeightEvent
+    ? (maxWeightEvent.netAmount / totalNetForWeight) * 100 : 0;
+
+  // 건강도 점수
+  const healthInfo = holdings.length > 0 ? (() => {
+    let score = 100;
+    const items: { ok: boolean | "warn"; label: string }[] = [];
+    if (holdings.length < 3)      { score -= 20; items.push({ ok: false,   label: `종목 수 ${holdings.length}개 — 부족` }); }
+    else if (holdings.length < 5) { score -= 5;  items.push({ ok: "warn",  label: `종목 ${holdings.length}개 — 보통` }); }
+    else                          {               items.push({ ok: true,    label: "종목 분산 양호" }); }
+    if (gapMonths.length >= 3)    { score -= 20; items.push({ ok: false,   label: `공백 ${gapMonths.length}개월` }); }
+    else if (gapMonths.length >= 1){ score -= 10; items.push({ ok: "warn", label: `공백 ${gapMonths.length}개월` }); }
+    else                          {               items.push({ ok: true,    label: "매월 배당 수령" }); }
+    if (maxWeightPct > 50)        { score -= 20; items.push({ ok: false,   label: `단일 비중 ${maxWeightPct.toFixed(0)}% 초과` }); }
+    else if (maxWeightPct > 30)   { score -= 10; items.push({ ok: "warn",  label: `비중 ${maxWeightPct.toFixed(0)}% 주의` }); }
+    else if (events.length > 0)   {               items.push({ ok: true,    label: "비중 분산 양호" }); }
+    if (avgYield != null) {
+      if (avgYield < 0.02)        { score -= 10; items.push({ ok: false,   label: "수익률 낮음" }); }
+      else if (avgYield >= 0.04)  {               items.push({ ok: true,    label: "수익률 우수" }); }
+      else                        {               items.push({ ok: "warn",  label: "수익률 보통" }); }
+    }
+    return { score: Math.max(score, 0), items };
+  })() : null;
+
+  // 인사이트 배너 (위험 > 기회 > 달성, 1개만 노출)
+  const insightBanner = holdings.length > 0 ? (() => {
+    if (maxWeightPct > 40 && maxWeightEvent)
+      return { type: "danger" as const, icon: "⚠️",
+        message: `${maxWeightEvent.name} 비중이 ${maxWeightPct.toFixed(0)}%입니다. 단일 종목 쏠림 위험이 있어요.`,
+        action: "랭킹에서 분산 종목 찾기", href: "/ranking" };
+    if (gapMonths.length >= 2)
+      return { type: "opportunity" as const, icon: "💡",
+        message: `${gapMonths.join("·")} 배당 공백이 있어요. 월배당 ETF 1개로 해결됩니다.`,
+        action: "ETF 랭킹 보기", href: "/ranking" };
+    if (monthDiff > 0 && prevMonthTotal > 0 && monthDiffPct !== null)
+      return { type: "success" as const, icon: "🎉",
+        message: `이번달 배당이 전월 대비 +${monthDiffPct}% 증가했어요!`,
+        action: null, href: null };
+    return null;
+  })() : null;
+
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-5">
       <div className="flex items-center justify-between gap-4">
@@ -334,11 +384,31 @@ export default function DashboardPage() {
             hero
             tooltip={`DPS × 수량 × (1-세율)\n연간 합계: ${Math.round(fullYearNet).toLocaleString("ko-KR")}원`}
           />
-          <SummaryCard
-            label="보유 종목"
-            value={`${holdings.length}개`}
-            tooltip={`총 ${holdings.length}개 종목 보유 중`}
-          />
+          {/* 건강도 점수 카드 */}
+          {healthInfo ? (
+            <div className="bg-toss-card rounded-2xl shadow-card p-4 flex flex-col justify-between min-h-[96px]">
+              <p className="text-[12px] font-semibold text-toss-sub">포트폴리오 건강도</p>
+              <div className="flex items-end justify-between mt-1">
+                <p className={`text-[26px] font-extrabold leading-tight ${
+                  healthInfo.score >= 80 ? "text-green-500" : healthInfo.score >= 60 ? "text-toss-blue" : "text-amber-500"}`}>
+                  {healthInfo.score}<span className="text-[14px] font-bold ml-0.5 text-toss-sub">/100</span>
+                </p>
+                <div className="text-right space-y-0.5">
+                  {healthInfo.items.slice(0, 2).map((item, i) => (
+                    <p key={i} className="text-[10px] font-medium text-toss-sub flex items-center gap-1 justify-end">
+                      <span>{item.ok === true ? "✅" : item.ok === "warn" ? "⚠️" : "❌"}</span>
+                      <span>{item.label}</span>
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-toss-card rounded-2xl shadow-card p-4 flex flex-col justify-center items-center min-h-[96px]">
+              <p className="text-[12px] font-semibold text-toss-sub">포트폴리오 건강도</p>
+              <p className="text-[22px] font-extrabold text-toss-label mt-1">-</p>
+            </div>
+          )}
           <SummaryCard
             label="평균 배당수익률"
             value={avgYield != null ? `${(avgYield * 100).toFixed(2)}%` : "-"}
@@ -351,6 +421,35 @@ export default function DashboardPage() {
             large={dday !== null && dday > 7}
             tooltip={nextPayment ? `${nextPayment.event.name} 배당 예정: ${nextPayment.date.getFullYear()}.${String(nextPayment.date.getMonth() + 1).padStart(2, "0")}월경` : "예정 배당 없음"}
           />
+        </div>
+      )}
+
+      {/* 인사이트 배너 */}
+      {insightBanner && (
+        <div className={`flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border
+          ${insightBanner.type === "danger"
+            ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+            : insightBanner.type === "opportunity"
+            ? "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800"
+            : "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"}`}>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="text-base flex-shrink-0">{insightBanner.icon}</span>
+            <p className={`text-[13px] font-semibold leading-snug [word-break:keep-all]
+              ${insightBanner.type === "danger" ? "text-red-700 dark:text-red-300"
+              : insightBanner.type === "opportunity" ? "text-amber-700 dark:text-amber-300"
+              : "text-green-700 dark:text-green-300"}`}>
+              {insightBanner.message}
+            </p>
+          </div>
+          {insightBanner.href && insightBanner.action && (
+            <a href={insightBanner.href}
+              className={`flex-shrink-0 text-[11px] font-bold px-3 py-1.5 rounded-xl border transition-colors
+                ${insightBanner.type === "danger"
+                  ? "text-red-600 border-red-300 hover:bg-red-100 dark:hover:bg-red-900/40"
+                  : "text-amber-600 border-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/40"}`}>
+              {insightBanner.action}
+            </a>
+          )}
         </div>
       )}
 
@@ -418,7 +517,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-[12px] text-toss-sub">
                     {(goalProgress ?? 0) >= 100 ? "🎉 목표 달성!"
-                      : `남은 금액 ${Math.round(Math.max(goalAmount - annualNet, 0)).toLocaleString("ko-KR")}원`}
+                      : `목표까지 ${Math.round(Math.max(goalAmount - annualNet, 0)).toLocaleString("ko-KR")}원 부족`}
                   </span>
                   <span className={`text-[15px] font-extrabold ${
                     (goalProgress ?? 0) >= 100 ? "text-green-500"
@@ -426,6 +525,11 @@ export default function DashboardPage() {
                     {(goalProgress ?? 0).toFixed(1)}%
                   </span>
                 </div>
+                {(goalProgress ?? 0) < 100 && goalAmount - annualNet > 0 && (
+                  <p className="text-[12px] text-toss-blue bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-xl font-medium [word-break:keep-all]">
+                    💡 매월 약 <span className="font-extrabold">{Math.round((goalAmount - annualNet) / 12).toLocaleString("ko-KR")}원</span>의 배당을 추가로 확보하면 목표를 달성할 수 있어요.
+                  </p>
+                )}
               </div>
             </div>
           ) : (
@@ -457,6 +561,24 @@ export default function DashboardPage() {
                   {t}
                 </span>
               ))}
+            </div>
+          )}
+          {/* 차트 컨텍스트 인사이트 */}
+          {!initLoading && holdings.length > 0 && (
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3">
+              {bestMonthData.total > 0 && (
+                <p className="text-[12px] text-toss-sub">
+                  <span className="font-semibold text-toss-text">최고</span> {bestMonthData.month} · {Math.round(bestMonthData.total).toLocaleString("ko-KR")}원
+                </p>
+              )}
+              {gapMonths.length > 0 && (
+                <p className="text-[12px] text-amber-600 font-semibold">
+                  ⚠ 공백 {gapMonths.join("·")}
+                </p>
+              )}
+              {gapMonths.length === 0 && (
+                <p className="text-[12px] text-green-600 font-semibold">✅ 매월 배당 수령</p>
+              )}
             </div>
           )}
           {initLoading ? <ChartSkeleton />
@@ -727,8 +849,18 @@ export default function DashboardPage() {
                   const dday = Math.ceil((payDate.getTime() - new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()) / 86400000);
                   nextPayInfo = { dday, month: nextMonth };
                 }
+                // 경고 조건
+                const weightPct = totalNetForWeight > 0 ? (e.netAmount / totalNetForWeight) * 100 : 0;
+                const isLowYield = yieldRate != null && yieldRate < 0.035;
+                const isHighWeight = weightPct > 30;
+                const warningMsg = isHighWeight
+                  ? `비중 ${weightPct.toFixed(0)}% — 권장 상한(30%) 초과`
+                  : isLowYield
+                  ? `수익률 ${(yieldRate! * 100).toFixed(1)}% — 예금금리(3.5%)보다 낮음`
+                  : null;
                 return (
-                  <div key={e.holdingId} className="flex items-center justify-between py-3">
+                  <div key={e.holdingId} className="py-3 space-y-1.5">
+                    <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 min-w-0">
                       {/* 로고 + 국기 뱃지 */}
                       <div className="relative flex-shrink-0">
@@ -788,6 +920,12 @@ export default function DashboardPage() {
                         </svg>
                       </button>
                     </div>
+                    </div>{/* end justify-between row */}
+                    {warningMsg && (
+                      <p className="text-[11px] font-medium text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2.5 py-1.5 rounded-lg [word-break:keep-all]">
+                        ⚠ {warningMsg}
+                      </p>
+                    )}
                   </div>
                 );
               })}
