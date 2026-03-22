@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hasFmpKey, getFmpRankItems } from "@/lib/fmp-api";
+import { getDartDividend } from "@/lib/dart-api";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -264,22 +265,37 @@ export async function GET(req: NextRequest) {
   // ── Yahoo Finance 처리 (KR 또는 FMP 키 없는 US) ──────────────────────────
   const list = market === "KR" ? KR_TICKERS : US_TICKERS;
   const yf   = getClient();
+  const isKR = market === "KR";
 
   const results = await batchFetch(
     list,
     async ({ ticker, name: koreanName }) => {
+      // Yahoo에서 가격 조회 (KR/US 공통)
       const quote = await yf.quote(ticker);
       const price = quote?.regularMarketPrice ?? null;
 
-      const dps: number | null =
+      // Yahoo DPS (기본값, KR에선 부정확한 경우 많음)
+      let dps: number | null =
         (quote as any)?.trailingAnnualDividendRate ??
         (quote as any)?.dividendRate ??
         null;
 
+      // KR 주식: DART 공시 DPS로 교체 (Yahoo보다 정확)
+      if (isKR && process.env.DART_API_KEY) {
+        try {
+          const stockCode = ticker.replace(/\.(KS|KQ)$/, "");
+          const dartData  = await getDartDividend(stockCode);
+          if (dartData?.dps != null && dartData.dps > 0) {
+            dps = dartData.dps;
+          }
+        } catch { /* DART 실패 시 Yahoo DPS 유지 */ }
+      }
+
       let dividendYield: number | null = null;
       if (dps != null && price != null && price > 0) {
         dividendYield = dps / price;
-      } else {
+      } else if (!isKR) {
+        // US 주식만 Yahoo yield 폴백 (KR은 Yahoo yield가 부정확)
         const raw =
           (quote as any)?.trailingAnnualDividendYield ??
           (quote as any)?.dividendYield ??
@@ -292,7 +308,7 @@ export async function GET(req: NextRequest) {
       return { ticker, name: koreanName, dividendYield, dps, price, market };
     },
     10,
-    200
+    300
   );
 
   const data = results
