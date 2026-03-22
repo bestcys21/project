@@ -172,6 +172,9 @@ export default function DashboardPage() {
   // 토스트
   const [showToast, setShowToast] = useState(false);
 
+  // 모달
+  const [activeModal, setActiveModal] = useState<"health" | "peer" | "portfolio" | null>(null);
+
   useEffect(() => {
     const h = getHoldings();
     setHoldings(h);
@@ -386,7 +389,9 @@ export default function DashboardPage() {
           />
           {/* 건강도 점수 카드 */}
           {healthInfo ? (
-            <div className="bg-toss-card rounded-2xl shadow-card p-4 flex flex-col justify-between min-h-[96px]">
+            <div
+              className="bg-toss-card rounded-2xl shadow-card p-4 flex flex-col justify-between min-h-[96px] cursor-pointer hover:ring-2 hover:ring-toss-blue/30 transition-all"
+              onClick={() => setActiveModal("health")}>
               <p className="text-[12px] font-semibold text-toss-sub">포트폴리오 건강도</p>
               <div className="flex items-end justify-between mt-1">
                 <p className={`text-[26px] font-extrabold leading-tight ${
@@ -424,259 +429,74 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* 인사이트 배너 */}
+      {/* ZONE B: 소프트 가이드 메시지 (1줄, 컬러 배경 없음) */}
       {insightBanner && (
-        <div className={`flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border
-          ${insightBanner.type === "danger"
-            ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
-            : insightBanner.type === "opportunity"
-            ? "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800"
-            : "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"}`}>
-          <div className="flex items-center gap-2.5 min-w-0">
-            <span className="text-base flex-shrink-0">{insightBanner.icon}</span>
-            <p className={`text-[13px] font-semibold leading-snug [word-break:keep-all]
-              ${insightBanner.type === "danger" ? "text-red-700 dark:text-red-300"
-              : insightBanner.type === "opportunity" ? "text-amber-700 dark:text-amber-300"
-              : "text-green-700 dark:text-green-300"}`}>
-              {insightBanner.message}
-            </p>
-          </div>
+        <p className="text-[13px] text-toss-sub [word-break:keep-all] px-1">
+          💬 {insightBanner.message}
           {insightBanner.href && insightBanner.action && (
-            <a href={insightBanner.href}
-              className={`flex-shrink-0 text-[11px] font-bold px-3 py-1.5 rounded-xl border transition-colors
-                ${insightBanner.type === "danger"
-                  ? "text-red-600 border-red-300 hover:bg-red-100 dark:hover:bg-red-900/40"
-                  : "text-amber-600 border-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/40"}`}>
+            <a href={insightBanner.href} className="ml-2 underline text-toss-blue font-semibold hover:no-underline">
               {insightBanner.action}
             </a>
           )}
-        </div>
+        </p>
       )}
 
-      {/* PC: 12컬럼 비대칭 그리드 (8:4) */}
-      <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:items-start space-y-5 lg:space-y-0">
-        {/* 왼쪽 col-span-8: 목표 배당금 + 차트 */}
-        <div className="lg:col-span-8 space-y-5">
-
-      {/* 목표 배당금 */}
-      {!initLoading && (
-        <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[14px] font-bold text-toss-text">연간 목표 배당금</p>
-            <button
-              onClick={() => { setEditingGoal(v => !v); setGoalInput(goalAmount ? Math.round(goalAmount).toString() : ""); }}
-              className="text-[12px] font-semibold text-toss-blue bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
-            >
-              {goalAmount ? "수정" : "목표 설정"}
-            </button>
-          </div>
-
-          {editingGoal && (
-            <div className="flex items-center gap-2">
-              <input type="number" placeholder="목표 금액 입력"
-                value={goalInput} onChange={(e) => setGoalInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleGoalSave()}
-                className="toss-input flex-1 min-w-0 text-[13px]" />
-              <span className="text-[14px] text-toss-sub font-medium flex-shrink-0 select-none">원</span>
-              <button onClick={handleGoalSave}
-                className="flex-shrink-0 px-4 py-2 bg-toss-blue text-white font-bold text-[13px] rounded-xl hover:bg-toss-blueDark transition-colors">
-                저장
-              </button>
-            </div>
-          )}
-
-          {goalAmount ? (
-            <div className="space-y-3">
-              {/* 달성/목표 금액 한 줄 표시 */}
-              <div className="flex items-end justify-between">
-                <div>
-                  <p className="text-[12px] text-toss-sub mb-0.5">현재 달성</p>
-                  <p className="text-[22px] font-extrabold text-toss-blue leading-tight">
-                    {Math.round(annualNet).toLocaleString("ko-KR")}
-                    <span className="text-[14px] font-bold ml-0.5">원</span>
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[12px] text-toss-sub mb-0.5">목표</p>
-                  <p className="text-[16px] font-bold text-toss-text">
-                    {Math.round(goalAmount).toLocaleString("ko-KR")}
-                    <span className="text-[12px] font-semibold ml-0.5">원</span>
-                  </p>
-                </div>
-              </div>
-              {/* 프로그레스 바 */}
-              <div className="space-y-1.5">
-                <div className="h-3 bg-toss-bg rounded-full overflow-hidden">
-                  <div className="h-full rounded-full transition-all duration-700"
-                    style={{
-                      width: `${goalProgress ?? 0}%`,
-                      background: (goalProgress ?? 0) >= 100 ? "#22c55e"
-                        : (goalProgress ?? 0) >= 60 ? "#3182F6" : "#f59e0b",
-                    }} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-toss-sub">
-                    {(goalProgress ?? 0) >= 100 ? "🎉 목표 달성!"
-                      : `목표까지 ${Math.round(Math.max(goalAmount - annualNet, 0)).toLocaleString("ko-KR")}원 부족`}
-                  </span>
-                  <span className={`text-[15px] font-extrabold ${
-                    (goalProgress ?? 0) >= 100 ? "text-green-500"
-                    : (goalProgress ?? 0) >= 60 ? "text-toss-blue" : "text-amber-500"}`}>
-                    {(goalProgress ?? 0).toFixed(1)}%
-                  </span>
-                </div>
-                {(goalProgress ?? 0) < 100 && goalAmount - annualNet > 0 && (
-                  <p className="text-[12px] text-toss-blue bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-xl font-medium [word-break:keep-all]">
-                    💡 매월 약 <span className="font-extrabold">{Math.round((goalAmount - annualNet) / 12).toLocaleString("ko-KR")}원</span>의 배당을 추가로 확보하면 목표를 달성할 수 있어요.
-                  </p>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-4 space-y-1">
-              <p className="text-3xl">🎯</p>
-              <p className="text-[13px] text-toss-sub">연간 목표 배당금을 설정하면 달성률을 확인할 수 있어요.</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* 월별 차트 */}
+      {/* ZONE C: 보유 종목 (전체 너비) */}
       <ErrorBoundary>
-        <div className="bg-toss-card rounded-2xl shadow-card p-6">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-[14px] font-bold text-toss-text">월별 예상 배당금</p>
-            {apiLoading && (
-              <span className="flex items-center gap-1.5 text-[12px] text-toss-sub">
-                <span className="w-2 h-2 rounded-full bg-toss-blue animate-pulse" />
-                업데이트 중
-              </span>
-            )}
-          </div>
-          {tickers.length > 0 && (
-            <div className="flex flex-wrap gap-3 mb-4">
-              {tickers.map((t, i) => (
-                <span key={t} className="flex items-center gap-1.5 text-[12px] text-toss-label">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: STOCK_COLORS[i % STOCK_COLORS.length] }} />
-                  {t}
+        <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-4">
+          {/* 헤더 */}
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <p className="text-[14px] font-bold text-toss-text">
+              보유 종목
+              {filterMarket !== "ALL" && (
+                <span className="ml-2 text-[12px] font-semibold text-toss-blue">
+                  {filterMarket === "KR" ? "한국주식" : "미국주식"}
                 </span>
+              )}
+            </p>
+            <div className="flex items-center gap-2">
+              {holdings.length > 0 && !showForm && (
+                <div className="flex bg-toss-bg rounded-lg p-0.5">
+                  <button onClick={() => setViewMode("card")} title="카드 뷰"
+                    className={`p-1.5 rounded-md transition-colors ${viewMode === "card" ? "bg-toss-card shadow-sm text-toss-text" : "text-toss-sub hover:text-toss-label"}`}>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+                      <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                  </button>
+                  <button onClick={() => setViewMode("compact")} title="컴팩트 뷰"
+                    className={`p-1.5 rounded-md transition-colors ${viewMode === "compact" ? "bg-toss-card shadow-sm text-toss-text" : "text-toss-sub hover:text-toss-label"}`}>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+              {!showForm && (
+                <button onClick={openForm}
+                  className="flex items-center gap-1.5 text-[13px] font-semibold text-toss-blue
+                             bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  종목 추가
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 필터 탭 */}
+          {events.length > 0 && (
+            <div className="flex gap-1.5">
+              {(["ALL", "KR", "US"] as const).map((f) => (
+                <button key={f} onClick={() => setFilterMarket(f)}
+                  className={`px-3 py-1 rounded-lg text-[12px] font-semibold transition-all
+                    ${filterMarket === f ? "bg-toss-blue text-white" : "bg-toss-bg text-toss-sub hover:text-toss-text"}`}>
+                  {f === "ALL" ? "전체" : f === "KR" ? "한국" : "미국"}
+                </button>
               ))}
             </div>
           )}
-          {/* 차트 컨텍스트 인사이트 */}
-          {!initLoading && holdings.length > 0 && (
-            <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3">
-              {bestMonthData.total > 0 && (
-                <p className="text-[12px] text-toss-sub">
-                  <span className="font-semibold text-toss-text">최고</span> {bestMonthData.month} · {Math.round(bestMonthData.total).toLocaleString("ko-KR")}원
-                </p>
-              )}
-              {gapMonths.length > 0 && (
-                <p className="text-[12px] text-amber-600 font-semibold">
-                  ⚠ 공백 {gapMonths.join("·")}
-                </p>
-              )}
-              {gapMonths.length === 0 && (
-                <p className="text-[12px] text-green-600 font-semibold">✅ 매월 배당 수령</p>
-              )}
-            </div>
-          )}
-          {initLoading ? <ChartSkeleton />
-            : holdings.length === 0 ? <EmptyChart onSample={handleSamplePortfolio} />
-            : <DividendChart data={[]} stackedData={stackedData} tickers={tickers}
-                period={chartPeriod} onPeriodChange={setChartPeriod} />}
-
-          {/* 이번 달 vs 지난달 비교 */}
-          {!initLoading && holdings.length > 0 && (
-            <div className="mt-4 flex items-center justify-between px-1">
-              <div className="flex items-center gap-1.5 text-[12px] text-toss-sub">
-                <span>이번 달</span>
-                <span className="font-bold text-toss-text">
-                  {Math.round(thisMonthTotal).toLocaleString("ko-KR")}원
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-[12px]">
-                {monthDiffPct !== null ? (
-                  <span className={`font-bold ${monthDiff >= 0 ? "text-toss-blue" : "text-red-500"}`}>
-                    {monthDiff >= 0 ? "▲" : "▼"} {Math.abs(monthDiffPct)}%
-                  </span>
-                ) : null}
-                <span className="text-toss-sub">vs 지난달</span>
-                <span className="font-semibold text-toss-label">
-                  {Math.round(prevMonthTotal).toLocaleString("ko-KR")}원
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-      </ErrorBoundary>
-
-        </div>{/* end lg 왼쪽 */}
-
-        {/* 오른쪽 col-span-4: 보유 종목 (sticky) */}
-      <ErrorBoundary>
-        <div className="lg:col-span-4 lg:sticky lg:top-24 bg-toss-card rounded-2xl shadow-card p-6 space-y-4">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <p className="text-[14px] font-bold text-toss-text">
-                보유 종목
-                {filterMarket !== "ALL" && (
-                  <span className="ml-2 text-[12px] font-semibold text-toss-blue">
-                    {filterMarket === "KR" ? "한국주식" : "미국주식"}
-                  </span>
-                )}
-              </p>
-              <div className="flex items-center gap-2">
-                {/* 뷰 모드 토글 */}
-                {holdings.length > 0 && !showForm && (
-                  <div className="flex bg-toss-bg rounded-lg p-0.5">
-                    <button
-                      onClick={() => setViewMode("card")}
-                      title="카드 뷰"
-                      className={`p-1.5 rounded-md transition-colors ${viewMode === "card" ? "bg-toss-card shadow-sm text-toss-text" : "text-toss-sub hover:text-toss-label"}`}>
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
-                        <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => setViewMode("compact")}
-                      title="컴팩트 뷰"
-                      className={`p-1.5 rounded-md transition-colors ${viewMode === "compact" ? "bg-toss-card shadow-sm text-toss-text" : "text-toss-sub hover:text-toss-label"}`}>
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                      </svg>
-                    </button>
-                  </div>
-                )}
-                {!showForm && (
-                  <button onClick={openForm}
-                    className="flex items-center gap-1.5 text-[13px] font-semibold text-toss-blue
-                               bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                    종목 추가
-                  </button>
-                )}
-              </div>
-            </div>
-            {/* 필터 탭 */}
-            {events.length > 0 && (
-              <div className="flex gap-1.5">
-                {(["ALL", "KR", "US"] as const).map((f) => (
-                  <button key={f}
-                    onClick={() => setFilterMarket(f)}
-                    className={`px-3 py-1 rounded-lg text-[12px] font-semibold transition-all
-                      ${filterMarket === f
-                        ? "bg-toss-blue text-white"
-                        : "bg-toss-bg text-toss-sub hover:text-toss-text"}`}>
-                    {f === "ALL" ? "전체" : f === "KR" ? "한국" : "미국"}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
 
           {/* 종목 추가 폼 */}
           {showForm && (
@@ -690,16 +510,12 @@ export default function DashboardPage() {
                   </svg>
                 </button>
               </div>
-
-              {/* 시장 선택 */}
               <div>
                 <label className="block text-[13px] font-semibold text-toss-label mb-1.5">시장</label>
                 <div className="flex gap-2">
                   {(["KR", "US"] as Market[]).map((m) => (
-                    <button key={m}
-                      onClick={() => { setFormMarket(m); setSelected(null); }}
-                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[13px] font-semibold
-                                  border transition-all
+                    <button key={m} onClick={() => { setFormMarket(m); setSelected(null); }}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[13px] font-semibold border transition-all
                                   ${formMarket === m
                                     ? "border-toss-blue bg-toss-blue text-white"
                                     : "border-toss-border text-toss-label bg-toss-card hover:border-toss-blue hover:text-toss-blue"}`}>
@@ -708,13 +524,10 @@ export default function DashboardPage() {
                   ))}
                 </div>
               </div>
-
-              {/* 종목 검색 */}
               <div>
                 <label className="block text-[13px] font-semibold text-toss-label mb-1.5">종목명</label>
                 {selected ? (
-                  <div className="flex items-center justify-between bg-toss-card border border-toss-blue
-                                  rounded-xl px-4 py-3">
+                  <div className="flex items-center justify-between bg-toss-card border border-toss-blue rounded-xl px-4 py-3">
                     <div className="flex items-center gap-2.5">
                       <StockLogo ticker={selected.ticker} name={selected.name} market={formMarket} size={36} />
                       <div>
@@ -723,63 +536,54 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <button onClick={() => setSelected(null)}
-                      className="text-[12px] text-toss-sub hover:text-toss-blue transition-colors font-medium">
-                      변경
-                    </button>
+                      className="text-[12px] text-toss-sub hover:text-toss-blue transition-colors font-medium">변경</button>
                   </div>
                 ) : (
                   <StockSearchInput market={formMarket} onSelect={(item) => setSelected(item)} />
                 )}
               </div>
-
-              {/* 수량 + 매수일 */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[13px] font-semibold text-toss-label mb-1.5">수량</label>
                   <div className="relative">
-                    <input type="number" min={1} placeholder="0"
-                      value={quantity} onChange={(e) => setQuantity(e.target.value)}
-                      className="toss-input pr-12" />
+                    <input type="number" min={1} placeholder="0" value={quantity}
+                      onChange={(e) => setQuantity(e.target.value)} className="toss-input pr-12" />
                     <span className="absolute inset-y-0 right-4 flex items-center text-[14px] text-toss-sub font-medium pointer-events-none select-none">주</span>
                   </div>
                 </div>
                 <div>
                   <label className="block text-[13px] font-semibold text-toss-label mb-1.5">매수일 (선택)</label>
-                  <input type="date" value={buyDate} onChange={(e) => setBuyDate(e.target.value)}
-                    className="toss-input" />
+                  <input type="date" value={buyDate} onChange={(e) => setBuyDate(e.target.value)} className="toss-input" />
                 </div>
               </div>
-
               {formError && (
                 <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800">
                   <span className="text-red-400 text-sm">⚠</span>
                   <p className="text-[13px] text-red-500 font-medium">{formError}</p>
                 </div>
               )}
-
               <button onClick={handleAdd}
-                className="w-full bg-toss-blue hover:bg-toss-blueDark text-white font-bold
-                           text-[14px] py-3.5 rounded-2xl transition-colors">
+                className="w-full bg-toss-blue hover:bg-toss-blueDark text-white font-bold text-[14px] py-3.5 rounded-2xl transition-colors">
                 추가하기
               </button>
             </div>
           )}
 
-          {/* 저장 안내 배너 */}
+          {/* 저장 안내 */}
           {!initLoading && holdings.length > 0 && (
             <div className="bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/10 rounded-xl px-3.5 py-2.5">
               <p className="text-[12px] text-toss-text font-medium leading-snug [word-break:keep-all]">
                 💡 현재 기기(브라우저)에 안전하게 자동 저장됩니다.
               </p>
-              <p className="text-[11px] text-toss-sub mt-0.5 [word-break:keep-all]">
-                캐시 삭제 시 데이터가 초기화될 수 있습니다.
-              </p>
+              <p className="text-[11px] text-toss-sub mt-0.5 [word-break:keep-all]">캐시 삭제 시 데이터가 초기화될 수 있습니다.</p>
             </div>
           )}
 
-          {/* 종목 리스트 */}
+          {/* 종목 카드/리스트 */}
           {initLoading ? (
-            <div className="overflow-y-auto max-h-[700px]">{Array.from({ length: 3 }).map((_, i) => <HoldingRowSkeleton key={i} />)}</div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {Array.from({ length: 3 }).map((_, i) => <HoldingRowSkeleton key={i} />)}
+            </div>
           ) : holdings.length === 0 ? (
             <PopularStocksWidget onSelect={(item) => {
               setFormMarket(item.market as Market);
@@ -788,21 +592,17 @@ export default function DashboardPage() {
             }} />
           ) : viewMode === "compact" ? (
             /* ── 컴팩트 리스트 뷰 ── */
-            <div className="divide-y divide-toss-border overflow-y-auto max-h-[700px]">
-              {/* 헤더 */}
+            <div className="divide-y divide-toss-border">
               <div className="grid grid-cols-[1fr_56px_76px_28px] gap-1.5 pb-1.5 text-[10px] font-semibold text-toss-sub uppercase tracking-wide">
-                <span>종목</span>
-                <span className="text-right">수익률</span>
-                <span className="text-right">세후 배당</span>
-                <span />
+                <span>종목</span><span className="text-right">수익률</span>
+                <span className="text-right">세후 배당</span><span />
               </div>
               {events.filter(e => filterMarket === "ALL" || e.market === filterMarket).map((e, i) => {
-                const color     = STOCK_COLORS[i % STOCK_COLORS.length];
+                const color = STOCK_COLORS[i % STOCK_COLORS.length];
                 const yieldRate = apiData[e.ticker]?.dividendYield ?? null;
                 return (
                   <div key={e.holdingId} className="grid grid-cols-[1fr_56px_76px_28px] gap-1.5 items-center py-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      {/* 차트 매핑 컬러 도트 */}
                       <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }} />
                       <div className="min-w-0">
                         <p className="text-[13px] font-bold text-toss-text truncate">{e.name}</p>
@@ -810,15 +610,12 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <p className={`text-[12px] font-bold text-right ${
-                      yieldRate == null ? "text-toss-sub"
-                      : yieldRate >= 0.07 ? "text-red-500"
+                      yieldRate == null ? "text-toss-sub" : yieldRate >= 0.07 ? "text-red-500"
                       : yieldRate >= 0.04 ? "text-toss-blue" : "text-toss-text"}`}>
                       {yieldRate != null ? `${(yieldRate * 100).toFixed(1)}%` : "—"}
                     </p>
                     <p className="text-[12px] font-bold text-right text-toss-text">
-                      {e.market === "KR"
-                        ? `${Math.round(e.netAmount).toLocaleString("ko-KR")}원`
-                        : `$${e.netAmount.toFixed(2)}`}
+                      {e.market === "KR" ? `${Math.round(e.netAmount).toLocaleString("ko-KR")}원` : `$${e.netAmount.toFixed(2)}`}
                     </p>
                     <button onClick={() => handleRemove(e.holdingId)}
                       className="p-0.5 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 text-toss-sub hover:text-red-400 transition-colors">
@@ -831,12 +628,11 @@ export default function DashboardPage() {
               })}
             </div>
           ) : (
-            /* ── 카드 뷰 (기본) ── */
-            <div className="divide-y divide-toss-border overflow-y-auto max-h-[700px]">
+            /* ── 카드 그리드 뷰 ── */
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {events.filter(e => filterMarket === "ALL" || e.market === filterMarket).map((e, i) => {
-                const color     = STOCK_COLORS[i % STOCK_COLORS.length];
+                const color = STOCK_COLORS[i % STOCK_COLORS.length];
                 const yieldRate = apiData[e.ticker]?.dividendYield ?? null;
-                // 다음 지급 정보 계산
                 const payMonths = apiData[e.ticker]?.payMonths;
                 let nextPayInfo: { dday: number; month: number } | null = null;
                 if (payMonths && payMonths.length > 0) {
@@ -849,82 +645,89 @@ export default function DashboardPage() {
                   const dday = Math.ceil((payDate.getTime() - new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()) / 86400000);
                   nextPayInfo = { dday, month: nextMonth };
                 }
-                // 경고 조건
                 const weightPct = totalNetForWeight > 0 ? (e.netAmount / totalNetForWeight) * 100 : 0;
-                const isLowYield = yieldRate != null && yieldRate < 0.035;
                 const isHighWeight = weightPct > 30;
-                const warningMsg = isHighWeight
-                  ? `비중 ${weightPct.toFixed(0)}% — 권장 상한(30%) 초과`
-                  : isLowYield
-                  ? `수익률 ${(yieldRate! * 100).toFixed(1)}% — 예금금리(3.5%)보다 낮음`
-                  : null;
+                const isLowYield = yieldRate != null && yieldRate < 0.035;
+                const softMsg = isHighWeight
+                  ? "한 종목에 많이 투자되어 있어요"
+                  : isLowYield ? "배당을 더 키울 수 있어요" : null;
                 return (
-                  <div key={e.holdingId} className="py-3 space-y-1.5">
-                    <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 min-w-0">
-                      {/* 로고 + 국기 뱃지 */}
-                      <div className="relative flex-shrink-0">
-                        <StockLogo ticker={e.ticker} name={e.name} market={e.market} size={38} />
-                        <span className="absolute -bottom-0.5 -right-0.5 text-[11px] leading-none select-none">
-                          {e.market === "KR" ? "🇰🇷" : "🇺🇸"}
-                        </span>
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          {/* 차트 매핑 컬러 도트 */}
-                          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }} />
-                          <p className="text-[14px] font-bold text-toss-text truncate">{e.name}</p>
-                          {yieldRate != null && (
-                            <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${
-                              yieldRate >= 0.07 ? "bg-red-50 dark:bg-red-900/20 text-red-500"
-                              : yieldRate >= 0.04 ? "bg-blue-50 dark:bg-blue-900/20 text-toss-blue"
-                              : "bg-toss-bg text-toss-label"}`}>
-                              {(yieldRate * 100).toFixed(2)}%
-                            </span>
-                          )}
+                  <div key={e.holdingId} className="bg-toss-bg dark:bg-white/[0.03] rounded-2xl p-4 space-y-3">
+                    {/* 상단: 로고 + 종목명 + 삭제 */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="relative flex-shrink-0">
+                          <StockLogo ticker={e.ticker} name={e.name} market={e.market} size={36} />
+                          <span className="absolute -bottom-0.5 -right-0.5 text-[10px] leading-none select-none">
+                            {e.market === "KR" ? "🇰🇷" : "🇺🇸"}
+                          </span>
                         </div>
-                        <p className="text-[13px] text-toss-sub mt-0.5">
-                          {e.quantity.toLocaleString()}주
-                          {apiData[e.ticker]?.dividendFrequency && (
-                            <span className="ml-1 text-[11px] bg-toss-bg px-1.5 py-0.5 rounded-full">
-                              {apiData[e.ticker]!.dividendFrequency === "monthly" ? "월배당" :
-                               apiData[e.ticker]!.dividendFrequency === "quarterly" ? "분기배당" :
-                               apiData[e.ticker]!.dividendFrequency === "semi-annual" ? "반기배당" : "연배당"}
-                            </span>
-                          )}
-                          {nextPayInfo && (
-                            nextPayInfo.dday <= 30
-                              ? <span className="ml-1.5 text-toss-blue font-semibold">· D-{nextPayInfo.dday}</span>
-                              : <span className="ml-1.5 text-toss-sub">· 다음 {nextPayInfo.month}월</span>
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <div className="text-right">
-                        <p className="text-[14px] font-bold text-toss-text">
-                          {e.market === "KR"
-                            ? `${Math.round(e.netAmount).toLocaleString("ko-KR")}원`
-                            : `$${e.netAmount.toFixed(2)}`}
-                        </p>
-                        {totalNetForWeight > 0 && (
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }} />
+                            <p className="text-[13px] font-bold text-toss-text truncate">{e.name}</p>
+                          </div>
                           <p className="text-[11px] text-toss-sub mt-0.5">
-                            비중 {((e.netAmount / totalNetForWeight) * 100).toFixed(1)}%
+                            {e.quantity.toLocaleString()}주
+                            {apiData[e.ticker]?.dividendFrequency && (
+                              <span className="ml-1">· {
+                                apiData[e.ticker]!.dividendFrequency === "monthly" ? "월배당" :
+                                apiData[e.ticker]!.dividendFrequency === "quarterly" ? "분기배당" :
+                                apiData[e.ticker]!.dividendFrequency === "semi-annual" ? "반기배당" : "연배당"
+                              }</span>
+                            )}
                           </p>
-                        )}
+                        </div>
                       </div>
                       <button onClick={() => handleRemove(e.holdingId)}
-                        className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-toss-sub hover:text-red-400 transition-colors">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        className="flex-shrink-0 p-1.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-toss-sub hover:text-red-400 transition-colors">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </button>
                     </div>
-                    </div>{/* end justify-between row */}
-                    {warningMsg && (
-                      <p className="text-[11px] font-medium text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2.5 py-1.5 rounded-lg [word-break:keep-all]">
-                        ⚠ {warningMsg}
-                      </p>
+                    {/* 중단: 배당금 + D-day + 수익률 */}
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <p className="text-[11px] text-toss-sub mb-0.5">세후 연배당</p>
+                        <p className="text-[18px] font-extrabold text-toss-text leading-tight">
+                          {e.market === "KR"
+                            ? `${Math.round(e.netAmount).toLocaleString("ko-KR")}원`
+                            : `$${e.netAmount.toFixed(2)}`}
+                        </p>
+                      </div>
+                      <div className="text-right space-y-1">
+                        {nextPayInfo && (
+                          <p className={`text-[12px] font-bold ${nextPayInfo.dday <= 30 ? "text-toss-blue" : "text-toss-sub"}`}>
+                            {nextPayInfo.dday <= 30 ? `D-${nextPayInfo.dday}` : `${nextPayInfo.month}월 예정`}
+                          </p>
+                        )}
+                        {yieldRate != null && (
+                          <span className={`inline-block text-[11px] font-bold px-1.5 py-0.5 rounded-full ${
+                            yieldRate >= 0.07 ? "bg-red-50 dark:bg-red-900/20 text-red-500"
+                            : yieldRate >= 0.04 ? "bg-blue-50 dark:bg-blue-900/20 text-toss-blue"
+                            : "bg-toss-border text-toss-label"}`}>
+                            {(yieldRate * 100).toFixed(2)}%
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {/* 하단: 비중 바 */}
+                    {totalNetForWeight > 0 && (
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-[10px] text-toss-sub">
+                          <span>포트폴리오 비중</span>
+                          <span className="font-semibold">{weightPct.toFixed(1)}%</span>
+                        </div>
+                        <div className="h-1.5 bg-toss-border rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-500"
+                            style={{ width: `${Math.min(weightPct, 100)}%`, background: color }} />
+                        </div>
+                      </div>
+                    )}
+                    {/* 소프트 가이드 */}
+                    {softMsg && (
+                      <p className="text-[11px] text-toss-sub [word-break:keep-all]">💬 {softMsg}</p>
                     )}
                   </div>
                 );
@@ -934,101 +737,319 @@ export default function DashboardPage() {
         </div>
       </ErrorBoundary>
 
-      </div>{/* end PC 2열 */}
-
-      {/* 또래 평균 비교 인사이트 */}
-      {!initLoading && holdings.length > 0 && (
-        <PeerInsight
-          annualNet={annualNet}
-          avgYield={avgYield}
-          stockCount={holdings.length}
-        />
-      )}
-
-      {/* ── 포트폴리오 인사이트 ── */}
-      {holdings.length > 0 && (() => {
-        const krCount   = holdings.filter(h => h.market === "KR").length;
-        const usCount   = holdings.filter(h => h.market === "US").length;
-        const total     = holdings.length;
-        const krPct     = Math.round((krCount / total) * 100);
-        const usPct     = 100 - krPct;
-
-        // 종목 집중도 체크 (단일 종목 > 30%)
-        const tickerCounts: Record<string, number> = {};
-        holdings.forEach(h => { tickerCounts[h.ticker] = (tickerCounts[h.ticker] ?? 0) + 1; });
-        const maxConc = Math.max(...Object.values(tickerCounts));
-        const concPct = Math.round((maxConc / total) * 100);
-
-        return (
-          <div className="bg-toss-card rounded-2xl shadow-card p-5 space-y-4">
+      {/* ZONE D: 목표 배당금 + 월별 차트 (2열) */}
+      {!initLoading && (
+        <div className="grid md:grid-cols-2 gap-5">
+          {/* 목표 배당금 */}
+          <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-[16px] font-extrabold text-toss-text">포트폴리오 인사이트</h3>
-              <span className="text-xl">🔍</span>
+              <p className="text-[14px] font-bold text-toss-text">연간 목표 배당금</p>
+              <button
+                onClick={() => { setEditingGoal(v => !v); setGoalInput(goalAmount ? Math.round(goalAmount).toString() : ""); }}
+                className="text-[12px] font-semibold text-toss-blue bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
+                {goalAmount ? "수정" : "목표 설정"}
+              </button>
             </div>
-
-            {/* 국가 비중 */}
-            <div className="space-y-2">
-              <p className="text-[12px] font-semibold text-toss-sub">국가 비중</p>
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-3 rounded-full bg-toss-bg overflow-hidden">
-                  <div className="h-full rounded-full bg-toss-blue transition-all duration-500"
-                    style={{ width: `${krPct}%` }} />
-                </div>
-                <div className="flex gap-3 text-[12px] font-bold flex-shrink-0">
-                  <span className="text-toss-blue">🇰🇷 {krPct}%</span>
-                  <span className="text-green-600">🇺🇸 {usPct}%</span>
-                </div>
-              </div>
-              {krPct > 80 && (
-                <p className="text-[11px] text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2.5 py-1.5 rounded-lg">
-                  💡 한국 비중이 높아요. 미국 ETF(JEPI, SCHD)로 분산을 고려해보세요.
-                </p>
-              )}
-            </div>
-
-            {/* 집중도 경고 */}
-            {concPct >= 30 && (
-              <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
-                <span className="text-orange-400 flex-shrink-0">⚠️</span>
-                <p className="text-[12px] text-orange-600">
-                  특정 종목 집중도가 {concPct}%예요. 배당 리스크 분산을 위해 여러 종목에 나눠 투자를 권장해요.
-                </p>
+            {editingGoal && (
+              <div className="flex items-center gap-2">
+                <input type="number" placeholder="목표 금액 입력" value={goalInput}
+                  onChange={(e) => setGoalInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleGoalSave()}
+                  className="toss-input flex-1 min-w-0 text-[13px]" />
+                <span className="text-[14px] text-toss-sub font-medium flex-shrink-0 select-none">원</span>
+                <button onClick={handleGoalSave}
+                  className="flex-shrink-0 px-4 py-2 bg-toss-blue text-white font-bold text-[13px] rounded-xl hover:bg-toss-blueDark transition-colors">
+                  저장
+                </button>
               </div>
             )}
+            {goalAmount ? (
+              <div className="space-y-3">
+                <div className="flex items-end justify-between">
+                  <div>
+                    <p className="text-[12px] text-toss-sub mb-0.5">현재 달성</p>
+                    <p className="text-[22px] font-extrabold text-toss-blue leading-tight">
+                      {Math.round(annualNet).toLocaleString("ko-KR")}
+                      <span className="text-[14px] font-bold ml-0.5">원</span>
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[12px] text-toss-sub mb-0.5">목표</p>
+                    <p className="text-[16px] font-bold text-toss-text">
+                      {Math.round(goalAmount).toLocaleString("ko-KR")}
+                      <span className="text-[12px] font-semibold ml-0.5">원</span>
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <div className="h-3 bg-toss-bg rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-700"
+                      style={{
+                        width: `${goalProgress ?? 0}%`,
+                        background: (goalProgress ?? 0) >= 100 ? "#22c55e"
+                          : (goalProgress ?? 0) >= 60 ? "#3182F6" : "#f59e0b",
+                      }} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[12px] text-toss-sub">
+                      {(goalProgress ?? 0) >= 100 ? "🎉 목표 달성!"
+                        : `목표까지 ${Math.round(Math.max(goalAmount - annualNet, 0)).toLocaleString("ko-KR")}원 부족`}
+                    </span>
+                    <span className={`text-[15px] font-extrabold ${
+                      (goalProgress ?? 0) >= 100 ? "text-green-500"
+                      : (goalProgress ?? 0) >= 60 ? "text-toss-blue" : "text-amber-500"}`}>
+                      {(goalProgress ?? 0).toFixed(1)}%
+                    </span>
+                  </div>
+                  {(goalProgress ?? 0) < 100 && goalAmount - annualNet > 0 && (
+                    <p className="text-[12px] text-toss-blue bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-xl font-medium [word-break:keep-all]">
+                      💡 매월 약 <span className="font-extrabold">{Math.round((goalAmount - annualNet) / 12).toLocaleString("ko-KR")}원</span>의 배당을 추가로 확보하면 목표를 달성할 수 있어요.
+                    </p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-4 space-y-1">
+                <p className="text-3xl">🎯</p>
+                <p className="text-[13px] text-toss-sub">연간 목표 배당금을 설정하면 달성률을 확인할 수 있어요.</p>
+              </div>
+            )}
+          </div>
 
-            {/* 추천 행동 */}
-            <div className="space-y-2">
-              <p className="text-[12px] font-semibold text-toss-sub">다음 액션 추천</p>
-              <div className="space-y-2">
-                {total < 5 && (
-                  <div className="flex items-center gap-2.5 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20">
-                    <span className="text-blue-500 text-base flex-shrink-0">📌</span>
-                    <p className="text-[12px] text-blue-700 dark:text-blue-300 flex-1">
-                      종목이 {total}개예요. 5개 이상으로 늘려 배당 안정성을 높여보세요.
-                    </p>
-                    <a href="/ranking"
-                      className="flex-shrink-0 text-[11px] font-bold text-toss-blue border border-toss-blue px-2 py-1 rounded-lg hover:bg-toss-blue hover:text-white transition-colors">
-                      랭킹 보기
-                    </a>
-                  </div>
-                )}
-                {usCount === 0 && (
-                  <div className="flex items-center gap-2.5 p-3 rounded-xl bg-green-50 dark:bg-green-900/20">
-                    <span className="text-green-500 text-base flex-shrink-0">🇺🇸</span>
-                    <p className="text-[12px] text-green-700 dark:text-green-300 flex-1">
-                      미국 ETF 추가로 월배당 포트폴리오를 만들어 보세요.
-                    </p>
-                    <a href="/ranking"
-                      className="flex-shrink-0 text-[11px] font-bold text-green-600 border border-green-400 px-2 py-1 rounded-lg hover:bg-green-500 hover:text-white transition-colors">
-                      ETF 보기
-                    </a>
-                  </div>
+          {/* 월별 차트 */}
+          <ErrorBoundary>
+            <div className="bg-toss-card rounded-2xl shadow-card p-6">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[14px] font-bold text-toss-text">월별 예상 배당금</p>
+                {apiLoading && (
+                  <span className="flex items-center gap-1.5 text-[12px] text-toss-sub">
+                    <span className="w-2 h-2 rounded-full bg-toss-blue animate-pulse" />
+                    업데이트 중
+                  </span>
                 )}
               </div>
+              {tickers.length > 0 && (
+                <div className="flex flex-wrap gap-3 mb-4">
+                  {tickers.map((t, i) => (
+                    <span key={t} className="flex items-center gap-1.5 text-[12px] text-toss-label">
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ background: STOCK_COLORS[i % STOCK_COLORS.length] }} />
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {holdings.length > 0 && (
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3">
+                  {bestMonthData.total > 0 && (
+                    <p className="text-[12px] text-toss-sub">
+                      <span className="font-semibold text-toss-text">최고</span> {bestMonthData.month} · {Math.round(bestMonthData.total).toLocaleString("ko-KR")}원
+                    </p>
+                  )}
+                  {gapMonths.length > 0 && (
+                    <p className="text-[12px] text-amber-600 font-semibold">⚠ 공백 {gapMonths.join("·")}</p>
+                  )}
+                  {gapMonths.length === 0 && (
+                    <p className="text-[12px] text-green-600 font-semibold">✅ 매월 배당 수령</p>
+                  )}
+                </div>
+              )}
+              {holdings.length === 0
+                ? <EmptyChart onSample={handleSamplePortfolio} />
+                : <DividendChart data={[]} stackedData={stackedData} tickers={tickers}
+                    period={chartPeriod} onPeriodChange={setChartPeriod} />}
+              {holdings.length > 0 && (
+                <div className="mt-4 flex items-center justify-between px-1">
+                  <div className="flex items-center gap-1.5 text-[12px] text-toss-sub">
+                    <span>이번 달</span>
+                    <span className="font-bold text-toss-text">{Math.round(thisMonthTotal).toLocaleString("ko-KR")}원</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[12px]">
+                    {monthDiffPct !== null && (
+                      <span className={`font-bold ${monthDiff >= 0 ? "text-toss-blue" : "text-red-500"}`}>
+                        {monthDiff >= 0 ? "▲" : "▼"} {Math.abs(monthDiffPct)}%
+                      </span>
+                    )}
+                    <span className="text-toss-sub">vs 지난달</span>
+                    <span className="font-semibold text-toss-label">{Math.round(prevMonthTotal).toLocaleString("ko-KR")}원</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </ErrorBoundary>
+        </div>
+      )}
+
+      {/* ZONE E: 인사이트 섹션 (압축 카드 → 모달 연결) */}
+      {!initLoading && holdings.length > 0 && (
+        <div className="grid sm:grid-cols-2 gap-3">
+          {/* 또래 비교 */}
+          <button
+            onClick={() => setActiveModal("peer")}
+            className="flex items-center justify-between bg-toss-card rounded-2xl shadow-card px-5 py-4 text-left hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors group">
+            <div className="flex items-center gap-3">
+              <span className="text-xl">🔍</span>
+              <div>
+                <p className="text-[13px] font-bold text-toss-text">또래 배당러 비교</p>
+                <p className="text-[11px] text-toss-sub mt-0.5">
+                  {holdings.length >= 5 ? "또래 평균 이상" : "또래 평균 미달 항목 있음"} · 탭해서 자세히
+                </p>
+              </div>
+            </div>
+            <svg className="w-4 h-4 text-toss-sub group-hover:text-toss-blue transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          {/* 포트폴리오 분석 */}
+          {(() => {
+            const krCount = holdings.filter(h => h.market === "KR").length;
+            const krPct = Math.round((krCount / holdings.length) * 100);
+            return (
+              <button
+                onClick={() => setActiveModal("portfolio")}
+                className="flex items-center justify-between bg-toss-card rounded-2xl shadow-card px-5 py-4 text-left hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors group">
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">📊</span>
+                  <div>
+                    <p className="text-[13px] font-bold text-toss-text">포트폴리오 분석</p>
+                    <p className="text-[11px] text-toss-sub mt-0.5">
+                      🇰🇷 {krPct}% · 🇺🇸 {100 - krPct}% · {holdings.length}종목 · 탭해서 자세히
+                    </p>
+                  </div>
+                </div>
+                <svg className="w-4 h-4 text-toss-sub group-hover:text-toss-blue transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            );
+          })()}
+        </div>
+      )}
+
+      {/* 모달 오버레이 */}
+      {activeModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-4"
+          onClick={() => setActiveModal(null)}>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-toss-card rounded-t-3xl sm:rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl">
+            {/* 모달 헤더 */}
+            <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-toss-border sticky top-0 bg-toss-card rounded-t-3xl sm:rounded-t-3xl z-10">
+              <p className="text-[16px] font-extrabold text-toss-text">
+                {activeModal === "health" ? "포트폴리오 건강도"
+                  : activeModal === "peer" ? "또래 배당러 비교"
+                  : "포트폴리오 분석"}
+              </p>
+              <button onClick={() => setActiveModal(null)}
+                className="p-2 rounded-xl hover:bg-toss-bg transition-colors text-toss-sub">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            {/* 모달 컨텐츠 */}
+            <div className="p-6">
+              {activeModal === "health" && healthInfo && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <p className={`text-[48px] font-extrabold leading-none ${
+                      healthInfo.score >= 80 ? "text-green-500" : healthInfo.score >= 60 ? "text-toss-blue" : "text-amber-500"}`}>
+                      {healthInfo.score}
+                    </p>
+                    <div>
+                      <p className="text-[14px] font-bold text-toss-text">건강도 점수</p>
+                      <p className="text-[12px] text-toss-sub">/100점 만점</p>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    {healthInfo.items.map((item, i) => (
+                      <div key={i} className="flex items-center gap-2.5 py-2.5 border-b border-toss-border last:border-0">
+                        <span className="text-base">{item.ok === true ? "✅" : item.ok === "warn" ? "⚠️" : "❌"}</span>
+                        <p className="text-[13px] text-toss-text font-medium">{item.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {activeModal === "peer" && (
+                <PeerInsight annualNet={annualNet} avgYield={avgYield} stockCount={holdings.length} />
+              )}
+              {activeModal === "portfolio" && (() => {
+                const krCount = holdings.filter(h => h.market === "KR").length;
+                const usCount = holdings.filter(h => h.market === "US").length;
+                const total = holdings.length;
+                const krPct = Math.round((krCount / total) * 100);
+                const usPct = 100 - krPct;
+                const tickerCounts: Record<string, number> = {};
+                holdings.forEach(h => { tickerCounts[h.ticker] = (tickerCounts[h.ticker] ?? 0) + 1; });
+                const maxConc = Math.max(...Object.values(tickerCounts));
+                const concPct = Math.round((maxConc / total) * 100);
+                return (
+                  <div className="space-y-5">
+                    <div className="space-y-2">
+                      <p className="text-[12px] font-semibold text-toss-sub">국가 비중</p>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 h-3 rounded-full bg-toss-bg overflow-hidden">
+                          <div className="h-full rounded-full bg-toss-blue transition-all duration-500" style={{ width: `${krPct}%` }} />
+                        </div>
+                        <div className="flex gap-3 text-[12px] font-bold flex-shrink-0">
+                          <span className="text-toss-blue">🇰🇷 {krPct}%</span>
+                          <span className="text-green-600">🇺🇸 {usPct}%</span>
+                        </div>
+                      </div>
+                      {krPct > 80 && (
+                        <p className="text-[12px] text-toss-sub [word-break:keep-all]">
+                          💬 한국 비중이 높아요. 미국 ETF(JEPI, SCHD)로 분산을 고려해보세요.
+                        </p>
+                      )}
+                    </div>
+                    {concPct >= 30 && (
+                      <p className="text-[12px] text-toss-sub [word-break:keep-all]">
+                        💬 특정 종목 집중도가 {concPct}%예요. 여러 종목에 나눠 투자를 권장해요.
+                      </p>
+                    )}
+                    <div className="space-y-2">
+                      <p className="text-[12px] font-semibold text-toss-sub">다음 액션 추천</p>
+                      <div className="space-y-2">
+                        {total < 5 && (
+                          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20">
+                            <span className="text-blue-500 text-base flex-shrink-0">📌</span>
+                            <p className="text-[12px] text-blue-700 dark:text-blue-300 flex-1">
+                              종목이 {total}개예요. 5개 이상으로 늘려 배당 안정성을 높여보세요.
+                            </p>
+                            <a href="/ranking"
+                              className="flex-shrink-0 text-[11px] font-bold text-toss-blue border border-toss-blue px-2 py-1 rounded-lg hover:bg-toss-blue hover:text-white transition-colors">
+                              랭킹 보기
+                            </a>
+                          </div>
+                        )}
+                        {usCount === 0 && (
+                          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-green-50 dark:bg-green-900/20">
+                            <span className="text-green-500 text-base flex-shrink-0">🇺🇸</span>
+                            <p className="text-[12px] text-green-700 dark:text-green-300 flex-1">
+                              미국 ETF 추가로 월배당 포트폴리오를 만들어 보세요.
+                            </p>
+                            <a href="/ranking"
+                              className="flex-shrink-0 text-[11px] font-bold text-green-600 border border-green-400 px-2 py-1 rounded-lg hover:bg-green-500 hover:text-white transition-colors">
+                              ETF 보기
+                            </a>
+                          </div>
+                        )}
+                        {total >= 5 && usCount > 0 && (
+                          <p className="text-[12px] text-toss-sub [word-break:keep-all]">
+                            💬 잘 구성된 포트폴리오예요. 배당 재투자로 복리 효과를 높여보세요.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
-        );
-      })()}
+        </div>
+      )}
 
       <Toast
         visible={showToast}
