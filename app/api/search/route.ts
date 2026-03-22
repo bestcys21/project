@@ -52,11 +52,11 @@ export async function GET(req: NextRequest) {
     const results = quotes
       .filter((item) => {
         const sym: string = item.symbol ?? "";
-        return !sym.includes("."); // US tickers only
+        return sym.length > 0 && !sym.includes("."); // US tickers only, exclude null/empty
       })
       .map((item) => ({
-        ticker:   item.symbol,
-        name:     item.longname ?? item.shortname ?? item.symbol,
+        ticker:   item.symbol as string,
+        name:     item.longname ?? item.shortname ?? item.symbol ?? "",
         market:   "US",
         exchange: null,
         type:     "stock" as const,
