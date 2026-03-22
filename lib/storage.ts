@@ -26,6 +26,10 @@ export function removeHolding(id: string): void {
   saveHoldings(getHoldings().filter((h) => h.id !== id));
 }
 
+export function updateHoldingQuantity(id: string, quantity: number): void {
+  saveHoldings(getHoldings().map((h) => h.id === id ? { ...h, quantity } : h));
+}
+
 const GOAL_KEY = "dividend_insight_goal";
 
 export function getGoal(): number | null {

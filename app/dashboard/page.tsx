@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { getHoldings, addHolding, removeHolding, getGoal, saveGoal } from "@/lib/storage";
+import { getHoldings, addHolding, removeHolding, updateHoldingQuantity, getGoal, saveGoal } from "@/lib/storage";
 import { calcStackedMonthly, holdingsToDividendEvents } from "@/lib/calculator";
 import { Holding, Market, DividendEvent } from "@/lib/types";
 import { searchStocks, StockItem } from "@/lib/stocks";
@@ -178,6 +178,10 @@ export default function DashboardPage() {
   // 종목 제거 확인 모달
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
 
+  // 수량 수정 모달
+  const [editQtyId, setEditQtyId] = useState<string | null>(null);
+  const [editQtyValue, setEditQtyValue] = useState("");
+
   useEffect(() => {
     const h = getHoldings();
     setHoldings(h);
@@ -195,6 +199,8 @@ export default function DashboardPage() {
       if (e.key === "Escape") {
         setConfirmRemoveId(null);
         setActiveModal(null);
+        setEditQtyId(null);
+        setEditQtyValue("");
       }
     }
     document.addEventListener("keydown", onKey);
@@ -256,6 +262,15 @@ export default function DashboardPage() {
     setSelected(null);
     setQuantity("");
     setBuyDate("");
+  }
+
+  function handleUpdateQty(id: string, newQty: number) {
+    updateHoldingQuantity(id, newQty);
+    const updated = getHoldings();
+    setHoldings(updated);
+    fetchApiData(updated);
+    setEditQtyId(null);
+    setEditQtyValue("");
   }
 
   function handleRemove(id: string) {
@@ -695,12 +710,27 @@ export default function DashboardPage() {
                           </p>
                         </div>
                       </div>
-                      <button onClick={() => setConfirmRemoveId(e.holdingId)}
-                        className="flex-shrink-0 p-1.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-toss-sub hover:text-red-400 transition-colors">
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        {/* 수정 버튼 */}
+                        <button
+                          onClick={() => { setEditQtyId(e.holdingId); setEditQtyValue(String(e.quantity)); }}
+                          className="p-1.5 rounded-xl hover:bg-toss-bg text-toss-sub hover:text-toss-label transition-colors"
+                          title="수량 수정">
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <circle cx="5" cy="12" r="1" fill="currentColor" stroke="none"/>
+                            <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>
+                            <circle cx="19" cy="12" r="1" fill="currentColor" stroke="none"/>
+                          </svg>
+                        </button>
+                        {/* 제거 버튼 */}
+                        <button onClick={() => setConfirmRemoveId(e.holdingId)}
+                          className="p-1.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-toss-sub hover:text-red-400 transition-colors"
+                          title="종목 제거">
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                     {/* 중단: 배당금 + D-day + 수익률 */}
                     <div className="flex items-end justify-between">
@@ -1063,6 +1093,75 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* 수량 수정 모달 */}
+      {editQtyId && (() => {
+        const target = events.find(ev => ev.holdingId === editQtyId);
+        const parsedQty = parseInt(editQtyValue, 10);
+        const isValid = !isNaN(parsedQty) && parsedQty > 0;
+        return (
+          <div
+            className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
+            onClick={() => { setEditQtyId(null); setEditQtyValue(""); }}>
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-toss-card rounded-3xl w-full max-w-[320px] shadow-2xl p-6 space-y-5">
+              {/* 헤더 */}
+              <div className="flex items-center justify-between">
+                <p className="text-[16px] font-extrabold text-toss-text">보유 수량 수정</p>
+                <button onClick={() => { setEditQtyId(null); setEditQtyValue(""); }}
+                  className="p-1.5 rounded-xl hover:bg-toss-bg transition-colors text-toss-sub">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              {/* 종목명 */}
+              {target && (
+                <div className="flex items-center gap-2.5 px-3 py-2.5 bg-toss-bg rounded-2xl">
+                  <StockLogo ticker={target.ticker} name={target.name} market={target.market} size={32} />
+                  <div>
+                    <p className="text-[13px] font-bold text-toss-text">{target.name}</p>
+                    <p className="text-[11px] text-toss-sub">{target.ticker}</p>
+                  </div>
+                </div>
+              )}
+              {/* 수량 입력 */}
+              <div className="space-y-2">
+                <label className="block text-[12px] font-semibold text-toss-sub">현재 보유 수량</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min={1}
+                    value={editQtyValue}
+                    onChange={(e) => setEditQtyValue(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter" && isValid) handleUpdateQty(editQtyId, parsedQty); }}
+                    className="toss-input pr-10 text-[16px] font-bold"
+                    autoFocus
+                  />
+                  <span className="absolute inset-y-0 right-4 flex items-center text-[13px] text-toss-sub font-medium pointer-events-none">주</span>
+                </div>
+                <p className="text-[11px] text-toss-sub">변경 후 배당이 자동으로 계산됩니다.</p>
+              </div>
+              {/* 버튼 */}
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  onClick={() => { setEditQtyId(null); setEditQtyValue(""); }}
+                  className="py-3.5 rounded-2xl text-[14px] font-bold text-toss-label bg-toss-bg hover:bg-toss-border transition-colors">
+                  취소
+                </button>
+                <button
+                  onClick={() => isValid && handleUpdateQty(editQtyId, parsedQty)}
+                  disabled={!isValid}
+                  className={`py-3.5 rounded-2xl text-[14px] font-bold text-white transition-all ${
+                    isValid ? "bg-toss-blue hover:bg-toss-blueDark active:scale-[0.97]" : "bg-toss-border cursor-not-allowed"}`}>
+                  저장
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 종목 제거 확인 모달 */}
       {confirmRemoveId && (() => {
