@@ -270,6 +270,7 @@ export default function DashboardPage() {
   }
 
   const events      = holdingsToDividendEvents(holdings, apiData);
+  const totalNetForWeight = events.reduce((s, ev) => s + ev.netAmount, 0);
   const { stackedData, tickers } = calcStackedMonthly(holdings, apiData);
   // N12M: 향후 12개월 합계 (전체), THIS_YEAR: 이번 연도 남은 월 합계
   const currentMonthIdx = new Date().getMonth(); // 0-indexed (March=2)
@@ -712,22 +713,35 @@ export default function DashboardPage() {
             <div className="divide-y divide-toss-border overflow-y-auto max-h-[700px]">
               {events.filter(e => filterMarket === "ALL" || e.market === filterMarket).map((e, i) => {
                 const color     = STOCK_COLORS[i % STOCK_COLORS.length];
-                const isLive    = !!apiData[e.ticker];
-                const ddayVal   = getDday(e.paymentDate);
                 const yieldRate = apiData[e.ticker]?.dividendYield ?? null;
+                // 다음 지급 정보 계산
+                const payMonths = apiData[e.ticker]?.payMonths;
+                let nextPayInfo: { dday: number; month: number } | null = null;
+                if (payMonths && payMonths.length > 0) {
+                  const now = new Date();
+                  const thisMonth = now.getMonth() + 1;
+                  const searchFrom = (payMonths.includes(thisMonth) && now.getDate() > 15) ? thisMonth + 1 : thisMonth;
+                  const nextMonth = payMonths.find(m => m >= searchFrom) ?? payMonths[0];
+                  const nextYear = nextMonth < searchFrom ? now.getFullYear() + 1 : now.getFullYear();
+                  const payDate = new Date(nextYear, nextMonth - 1, 15);
+                  const dday = Math.ceil((payDate.getTime() - new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()) / 86400000);
+                  nextPayInfo = { dday, month: nextMonth };
+                }
                 return (
                   <div key={e.holdingId} className="flex items-center justify-between py-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <StockLogo ticker={e.ticker} name={e.name} market={e.market} size={38} />
+                      {/* 로고 + 국기 뱃지 */}
+                      <div className="relative flex-shrink-0">
+                        <StockLogo ticker={e.ticker} name={e.name} market={e.market} size={38} />
+                        <span className="absolute -bottom-0.5 -right-0.5 text-[11px] leading-none select-none">
+                          {e.market === "KR" ? "🇰🇷" : "🇺🇸"}
+                        </span>
+                      </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {/* 차트 매핑 컬러 도트 */}
                           <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }} />
                           <p className="text-[14px] font-bold text-toss-text truncate">{e.name}</p>
-                          {isLive && (
-                            <span className="text-[10px] font-bold text-green-600 bg-green-50 dark:bg-green-900/20
-                                             px-1.5 py-0.5 rounded-full flex-shrink-0">실시간</span>
-                          )}
                           {yieldRate != null && (
                             <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${
                               yieldRate >= 0.07 ? "bg-red-50 dark:bg-red-900/20 text-red-500"
@@ -738,7 +752,7 @@ export default function DashboardPage() {
                           )}
                         </div>
                         <p className="text-[13px] text-toss-sub mt-0.5">
-                          {e.quantity.toLocaleString()}주 · {e.market}
+                          {e.quantity.toLocaleString()}주
                           {apiData[e.ticker]?.dividendFrequency && (
                             <span className="ml-1 text-[11px] bg-toss-bg px-1.5 py-0.5 rounded-full">
                               {apiData[e.ticker]!.dividendFrequency === "monthly" ? "월배당" :
@@ -746,8 +760,10 @@ export default function DashboardPage() {
                                apiData[e.ticker]!.dividendFrequency === "semi-annual" ? "반기배당" : "연배당"}
                             </span>
                           )}
-                          {ddayVal >= 0 && ddayVal <= 30 && (
-                            <span className="ml-1.5 text-toss-blue font-semibold">· D-{ddayVal}</span>
+                          {nextPayInfo && (
+                            nextPayInfo.dday <= 30
+                              ? <span className="ml-1.5 text-toss-blue font-semibold">· D-{nextPayInfo.dday}</span>
+                              : <span className="ml-1.5 text-toss-sub">· 다음 {nextPayInfo.month}월</span>
                           )}
                         </p>
                       </div>
@@ -759,7 +775,11 @@ export default function DashboardPage() {
                             ? `${Math.round(e.netAmount).toLocaleString("ko-KR")}원`
                             : `$${e.netAmount.toFixed(2)}`}
                         </p>
-                        <p className="text-[12px] text-toss-sub">세후 배당</p>
+                        {totalNetForWeight > 0 && (
+                          <p className="text-[11px] text-toss-sub mt-0.5">
+                            비중 {((e.netAmount / totalNetForWeight) * 100).toFixed(1)}%
+                          </p>
+                        )}
                       </div>
                       <button onClick={() => handleRemove(e.holdingId)}
                         className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-toss-sub hover:text-red-400 transition-colors">
