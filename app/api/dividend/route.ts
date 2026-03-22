@@ -6,6 +6,7 @@ import {
   getFmpDividendHistory,
   estimateFrequency,
 } from "@/lib/fmp-api";
+import { hasKisKey, getKisFullQuote } from "@/lib/kis-api";
 
 // SSL 우회 (사내망/개발 환경)
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -344,6 +345,35 @@ async function handleWithYahoo(rawTicker: string) {
   });
 }
 
+// ── 한국투자증권 KIS API 처리 ────────────────────────────────────────────────
+async function handleKRWithKis(rawTicker: string) {
+  const stockCode = rawTicker.replace(/\.(KS|KQ)$/, "");
+  const q = await getKisFullQuote(stockCode);
+
+  if (!q) {
+    // KIS 실패 → Yahoo 폴백
+    return handleWithYahoo(rawTicker);
+  }
+
+  return NextResponse.json({
+    ticker:            rawTicker,
+    name:              q.name,
+    price:             q.price,
+    dps:               q.dps,
+    dividendYield:     q.dividendYield,
+    exDate:            q.exDate,
+    paymentDate:       q.payDate,
+    currency:          "KRW",
+    payMonths:         q.payMonths,
+    dividendFrequency: q.dividendFrequency,
+    estimatedPayDates: q.estimatedPayDates,
+  }, {
+    headers: {
+      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+    },
+  });
+}
+
 // ── 라우트 핸들러 ─────────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
   const rawTicker = req.nextUrl.searchParams.get("ticker");
@@ -353,11 +383,16 @@ export async function GET(req: NextRequest) {
 
   const isKorean = rawTicker.endsWith(".KS") || rawTicker.endsWith(".KQ");
 
+  // 한국 주식 + KIS 키 있으면 KIS 우선 사용 (Yahoo보다 정확한 배당 데이터)
+  if (isKorean && hasKisKey()) {
+    return handleKRWithKis(rawTicker);
+  }
+
   // US 주식 + FMP 키 있으면 FMP 사용
   if (!isKorean && hasFmpKey()) {
     return handleUSWithFmp(rawTicker);
   }
 
-  // 한국 주식 또는 FMP 키 없는 경우 Yahoo Finance 사용
+  // 폴백: Yahoo Finance
   return handleWithYahoo(rawTicker);
 }

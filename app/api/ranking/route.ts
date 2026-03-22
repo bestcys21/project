@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hasFmpKey, getFmpRankItems } from "@/lib/fmp-api";
+import { hasKisKey, getKisRankItems } from "@/lib/kis-api";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -251,6 +252,15 @@ async function batchFetch<T>(
 
 export async function GET(req: NextRequest) {
   const market = req.nextUrl.searchParams.get("market") ?? "US";
+
+  // ── KR 주식: KIS 키가 있으면 KIS 사용 (실제 배당 이력 기반, 가장 정확) ────
+  if (market === "KR" && hasKisKey()) {
+    const kisItems = await getKisRankItems(KR_TICKERS, 5, 500);
+    const data = kisItems
+      .sort((a, b) => (b.dividendYield ?? 0) - (a.dividendYield ?? 0))
+      .slice(0, 50);
+    return NextResponse.json({ market, data });
+  }
 
   // ── US 주식: FMP 키가 있으면 FMP 사용 (배당 정확도 우수) ─────────────────
   if (market === "US" && hasFmpKey()) {
