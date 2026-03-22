@@ -118,21 +118,23 @@ export default function RankingPage() {
   const sorted = [...data].sort((a, b) => {
     if (sortKey === "yield") return b.dividendYield - a.dividendYield;
     if (sortKey === "stability") {
-      const stList = market === "KR" ? STABLE_TICKERS_KR : STABLE_TICKERS_US;
-      const aS = stList.includes(a.ticker.replace(/\.(KS|KQ)$/,"")) ? 1 : 0;
-      const bS = stList.includes(b.ticker.replace(/\.(KS|KQ)$/,"")) ? 1 : 0;
-      return bS - aS || b.dividendYield - a.dividendYield;
+      // 안정형: 배당수익률 2~8% 구간(지속 가능한 배당) 종목을 상단으로
+      const isStableA = a.dividendYield >= 0.02 && a.dividendYield < 0.08;
+      const isStableB = b.dividendYield >= 0.02 && b.dividendYield < 0.08;
+      if (isStableA !== isStableB) return isStableA ? -1 : 1;
+      return b.dividendYield - a.dividendYield;
     }
-    // growth
-    const grList = market === "KR" ? GROWTH_TICKERS_KR : GROWTH_TICKERS_US;
-    const aG = grList.includes(a.ticker.replace(/\.(KS|KQ)$/,"")) ? 1 : 0;
-    const bG = grList.includes(b.ticker.replace(/\.(KS|KQ)$/,"")) ? 1 : 0;
-    return bG - aG || b.dividendYield - a.dividendYield;
+    // growth: 저배당(0~4% 미만) 성장주 성향 종목 우선
+    const isGrowthA = a.dividendYield > 0 && a.dividendYield < 0.04;
+    const isGrowthB = b.dividendYield > 0 && b.dividendYield < 0.04;
+    if (isGrowthA !== isGrowthB) return isGrowthA ? -1 : 1;
+    return b.dividendYield - a.dividendYield;
   });
 
-  // 추천 섹션 데이터
-  const stablePicks  = data.filter(d => (market === "KR" ? STABLE_TICKERS_KR : STABLE_TICKERS_US).includes(d.ticker.replace(/\.(KS|KQ)$/,""))).slice(0,3);
-  const etfPicks     = data.filter(d => (market === "KR" ? ETF_TICKERS_KR : ETF_TICKERS_US).includes(d.ticker.replace(/\.(KS|KQ)$/,""))).slice(0,3);
+  // 추천 섹션 데이터 — 현재 정렬 탭 기준으로 하나만 표시
+  const stablePicks = data.filter(d => (market === "KR" ? STABLE_TICKERS_KR : STABLE_TICKERS_US).includes(d.ticker.replace(/\.(KS|KQ)$/,""))).slice(0,3);
+  const etfPicks    = data.filter(d => (market === "KR" ? ETF_TICKERS_KR    : ETF_TICKERS_US   ).includes(d.ticker.replace(/\.(KS|KQ)$/,""))).slice(0,3);
+  const growthPicks = data.filter(d => (market === "KR" ? GROWTH_TICKERS_KR : GROWTH_TICKERS_US).includes(d.ticker.replace(/\.(KS|KQ)$/,""))).slice(0,3);
 
   return (
     <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 space-y-5">
@@ -150,7 +152,7 @@ export default function RankingPage() {
                 ? "bg-toss-blue text-white"
                 : "bg-toss-card text-toss-label border border-toss-border hover:border-toss-blue hover:text-toss-blue"
               }`}>
-            {m === "KR" ? "🇰🇷 한국주식" : "🇺🇸 미국주식"}
+            {m === "KR" ? "한국주식" : "미국주식"}
           </button>
         ))}
       </div>
@@ -160,8 +162,8 @@ export default function RankingPage() {
         <span className="text-[12px] font-semibold text-toss-sub">정렬 기준</span>
         {([
           { key: "yield",     label: "📈 수익률 순",  desc: "배당수익률 높은 순" },
-          { key: "stability", label: "🛡️ 안정형 우선", desc: "지속적 배당 종목 상단" },
-          { key: "growth",    label: "🚀 성장형 우선", desc: "성장 + 배당 겸비 종목" },
+          { key: "stability", label: "🛡️ 안정형 우선", desc: "수익률 2~8% 지속 가능 배당 우선" },
+          { key: "growth",    label: "🚀 성장형 우선", desc: "저배당 성장주 우선 (수익률 0~4%)" },
         ] as { key: SortKey; label: string; desc: string }[]).map(({ key, label }) => (
           <button key={key} onClick={() => setSortKey(key)}
             className={`px-3.5 py-1.5 rounded-full text-[12px] font-bold transition-all border
@@ -173,65 +175,45 @@ export default function RankingPage() {
         ))}
       </div>
 
-      {/* 추천 섹션 */}
-      {!loading && data.length > 0 && (
-        <div className="grid md:grid-cols-2 gap-4">
-          {/* 안정형 추천 */}
-          {stablePicks.length > 0 && (
-            <div className="bg-toss-card rounded-2xl shadow-card p-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">🛡️</span>
-                <div>
-                  <p className="text-[14px] font-extrabold text-toss-text">안정형 배당 추천</p>
-                  <p className="text-[11px] text-toss-sub">배당 지속성이 높은 종목</p>
-                </div>
+      {/* 추천 섹션 — 정렬 탭에 따라 하나만 표시 */}
+      {!loading && data.length > 0 && (() => {
+        const picks =
+          sortKey === "stability" ? stablePicks :
+          sortKey === "growth"    ? growthPicks  :
+          etfPicks;
+        const meta =
+          sortKey === "stability" ? { icon: "🛡️", title: "안정형 배당 추천",    sub: "배당수익률 2~8%, 꾸준한 지급 이력 보유 종목", color: "text-toss-blue" } :
+          sortKey === "growth"    ? { icon: "🚀", title: "성장형 배당 추천",    sub: "배당을 주면서도 성장성이 높은 종목",           color: "text-green-600" } :
+          { icon: "📦", title: "ETF 중심 포트폴리오", sub: "분산 투자로 안정적인 현금흐름 확보",          color: "text-purple-600" };
+        if (picks.length === 0) return null;
+        return (
+          <div className="bg-toss-card rounded-2xl shadow-card p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">{meta.icon}</span>
+              <div>
+                <p className="text-[14px] font-extrabold text-toss-text">{meta.title}</p>
+                <p className="text-[11px] text-toss-sub">{meta.sub}</p>
               </div>
-              {stablePicks.map((s) => (
-                <div key={s.ticker} className="flex items-center gap-2 py-1.5 border-b border-toss-border last:border-0">
-                  <StockLogo ticker={s.ticker.replace(/\.(KS|KQ)$/,"")} name={s.name} market={market} size={32} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-bold text-toss-text truncate">{s.name}</p>
-                    <p className="text-[11px] text-toss-blue font-semibold">{(s.dividendYield*100).toFixed(2)}%</p>
-                  </div>
-                  <AddButton stock={s} market={market} />
-                </div>
-              ))}
             </div>
-          )}
-          {/* ETF 추천 */}
-          {etfPicks.length > 0 && (
-            <div className="bg-toss-card rounded-2xl shadow-card p-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">📦</span>
-                <div>
-                  <p className="text-[14px] font-extrabold text-toss-text">ETF 중심 포트폴리오</p>
-                  <p className="text-[11px] text-toss-sub">분산 투자로 리스크 최소화</p>
+            {picks.map((s) => (
+              <div key={s.ticker} className="flex items-center gap-2 py-1.5 border-b border-toss-border last:border-0">
+                <StockLogo ticker={s.ticker.replace(/\.(KS|KQ)$/,"")} name={s.name} market={market} size={32} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-bold text-toss-text truncate">{s.name}</p>
+                  <p className={`text-[11px] font-semibold ${meta.color}`}>{(s.dividendYield*100).toFixed(2)}%</p>
                 </div>
+                <AddButton stock={s} market={market} />
               </div>
-              {etfPicks.map((s) => (
-                <div key={s.ticker} className="flex items-center gap-2 py-1.5 border-b border-toss-border last:border-0">
-                  <StockLogo ticker={s.ticker.replace(/\.(KS|KQ)$/,"")} name={s.name} market={market} size={32} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-bold text-toss-text truncate">{s.name}</p>
-                    <p className="text-[11px] text-purple-600 font-semibold">{(s.dividendYield*100).toFixed(2)}%</p>
-                  </div>
-                  <AddButton stock={s} market={market} />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+            ))}
+          </div>
+        );
+      })()}
 
       {/* 데이터 소스 안내 */}
       <div className="flex items-start gap-2 px-3.5 py-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
         <span className="text-blue-400 flex-shrink-0 text-base">ℹ️</span>
         <p className="text-[12px] text-blue-700 dark:text-blue-300 leading-relaxed">
-          <strong>데이터 출처:</strong>{" "}
-          {market === "KR"
-            ? "Open DART(금융감독원 공시) + Yahoo Finance."
-            : "Financial Modeling Prep(FMP) API."}
-          {" "}배당수익률이 10% 이상인 종목은 주의 표시가 적용됩니다.
+          배당수익률은 최근 시세 기준 추정값으로 실제와 다를 수 있습니다. 투자 전 기업 공시를 꼭 확인하세요.
         </p>
       </div>
 

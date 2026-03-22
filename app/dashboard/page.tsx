@@ -910,8 +910,13 @@ function getNextSmartPayment(
     const payMonths = apiData[e.ticker]?.payMonths;
 
     if (payMonths && payMonths.length > 0) {
-      // 이번 달 이후 가장 빠른 지급 월 탐색
-      let nextMonth = payMonths.find(m => m >= thisMonth) ?? null;
+      // 이번 달 15일이 이미 지났으면 다음 달부터 탐색 (D--7 버그 방지)
+      const todayDate = today.getDate();
+      const searchFromMonth = (payMonths.includes(thisMonth) && todayDate > 15)
+        ? thisMonth + 1
+        : thisMonth;
+
+      let nextMonth = payMonths.find(m => m >= searchFromMonth) ?? null;
       let nextYear  = thisYear;
       if (!nextMonth) {
         // 올해 지급 월이 모두 지났으면 내년 첫 번째 달
@@ -1056,12 +1061,15 @@ function PopularStocksWidget({ onSelect }: { onSelect: (item: StockItem) => void
 }
 
 /* ── 또래 평균 비교 인사이트 ── */
-// 30대 배당 투자자 mock 평균 데이터
-const PEER_MOCK = {
-  yield:  3.8,   // 평균 배당수익률 %
-  annual: 840000, // 연간 배당금 (원)
-  stocks: 4,     // 평균 보유 종목 수
-};
+const PEER_DATA = {
+  "20대": { yield: 2.5,  annual:  240000, stocks: 2 },
+  "30대": { yield: 3.8,  annual:  840000, stocks: 4 },
+  "40대": { yield: 4.5,  annual: 2400000, stocks: 7 },
+  "50대+": { yield: 5.2, annual: 6000000, stocks: 10 },
+} as const;
+
+type AgeGroup = keyof typeof PEER_DATA;
+const AGE_GROUPS: AgeGroup[] = ["20대", "30대", "40대", "50대+"];
 
 function scorify(value: number, peer: number, max: number): number {
   // 0~100 점수로 정규화. peer가 기준(60점)
@@ -1078,6 +1086,17 @@ function PeerInsight({
   avgYield:   number | null;
   stockCount: number;
 }) {
+  const [ageGroup, setAgeGroup] = useState<AgeGroup>("30대");
+  useEffect(() => {
+    const saved = localStorage.getItem("peerAgeGroup") as AgeGroup;
+    if (saved && AGE_GROUPS.includes(saved)) setAgeGroup(saved);
+  }, []);
+  function handleAgeGroup(g: AgeGroup) {
+    setAgeGroup(g);
+    localStorage.setItem("peerAgeGroup", g);
+  }
+  const PEER_MOCK = PEER_DATA[ageGroup];
+
   const yieldPct  = avgYield != null ? avgYield * 100 : 0;
   const myScores  = {
     yield:  scorify(yieldPct,    PEER_MOCK.yield,   10),
@@ -1112,11 +1131,25 @@ function PeerInsight({
   return (
     <div className="bg-toss-card rounded-2xl shadow-card p-6 space-y-5">
       {/* 헤더 */}
-      <div className="flex items-center gap-2">
-        <span className="text-xl">🔍</span>
-        <div>
-          <p className="text-[14px] font-bold text-toss-text">또래 배당러 비교 인사이트</p>
-          <p className="text-[12px] text-toss-sub">30대 배당 투자자 평균 데이터와 나를 비교해요 (Mock)</p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          <span className="text-xl">🔍</span>
+          <div>
+            <p className="text-[14px] font-bold text-toss-text">또래 배당러 비교 인사이트</p>
+            <p className="text-[12px] text-toss-sub">{ageGroup} 배당 투자자 평균과 나를 비교해요 (Mock)</p>
+          </div>
+        </div>
+        {/* 나이대 선택 */}
+        <div className="flex gap-1.5 flex-wrap">
+          {AGE_GROUPS.map(g => (
+            <button key={g} onClick={() => handleAgeGroup(g)}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all border
+                ${ageGroup === g
+                  ? "bg-toss-blue text-white border-toss-blue"
+                  : "bg-toss-bg text-toss-sub border-toss-border hover:border-toss-blue hover:text-toss-blue"}`}>
+              {g}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -1188,7 +1221,7 @@ function PeerInsight({
             </div>
           </div>
         ))}
-        <p className="text-[11px] text-toss-sub pt-1">* 30대 배당 투자자 표본 기반 추정 데이터 (Mock). 실제 통계와 다를 수 있습니다.</p>
+        <p className="text-[11px] text-toss-sub pt-1">* {ageGroup} 배당 투자자 표본 기반 추정 데이터 (Mock). 실제 통계와 다를 수 있습니다.</p>
       </div>
     </div>
   );

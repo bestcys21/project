@@ -181,7 +181,7 @@ async function handleWithYahoo(rawTicker: string) {
     const det = summary?.summaryDetail;
     const cal = summary?.calendarEvents;
 
-    if (det?.dividendRate   != null) dps        = det.dividendRate;
+    if (det?.dividendRate   != null && det.dividendRate > 0) dps = det.dividendRate;
     if (det?.dividendYield  != null) divYield   = det.dividendYield;
     if (det?.exDividendDate != null) exDateRaw  = det.exDividendDate;
     if (cal?.dividendDate   != null) payDateRaw = cal.dividendDate;
@@ -256,6 +256,17 @@ async function handleWithYahoo(rawTicker: string) {
       payMonths.forEach((mo) => { payDayByMonth[mo] = 15; });
 
       lastKnownDivDate = divRows[divRows.length - 1].date;
+
+      // ETF 등 Yahoo Finance가 DPS를 0으로 반환하는 경우: 이력 합산으로 보완
+      if ((dps === 0 || dps == null) && divRows.length > 0) {
+        const oneYearAgo = new Date();
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+        const recentRows = divRows.filter(d => d.date >= oneYearAgo);
+        if (recentRows.length > 0) {
+          dps = recentRows.reduce((sum, d) => sum + d.amount, 0);
+          if (price != null && price > 0) divYield = dps / price;
+        }
+      }
     }
   } catch { /* 이력 없으면 기본값 */ }
 
