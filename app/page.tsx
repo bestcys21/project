@@ -1,4 +1,19 @@
+import type { Metadata } from "next";
 import CalculatorForm from "@/components/CalculatorForm";
+import { BASE_URL } from "./layout";
+
+export const metadata: Metadata = {
+  title: "배당금 계산기 - 세후 배당금 즉시 계산",
+  description:
+    "보유하신 주식 종목과 수량만 입력하면 세후 배당금과 지급 일정을 즉시 알려드립니다. 로그인 없이 배당 포트폴리오를 구성해 보세요.",
+  alternates: { canonical: BASE_URL },
+  openGraph: {
+    url: BASE_URL,
+    title: "배당노트 - 가장 쉬운 주식 배당금 계산기 및 포트폴리오 관리",
+    description:
+      "보유하신 주식 종목과 수량만 입력하면 세후 배당금과 지급 일정을 즉시 알려드립니다. 로그인 없이 배당 포트폴리오를 구성해 보세요.",
+  },
+};
 
 export default function Home() {
   return (
