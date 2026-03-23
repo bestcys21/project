@@ -123,6 +123,13 @@ async function fetchKisDividendRank(
   const token = await getAccessToken();
   // TR: HHKDB13470100 — CTS_AREA 페이지네이션으로 전체 배당주 수집
   // 페이지당 ~19건, 최대 10페이지(~190건)까지 순회
+  // TTM(Trailing 12 Months): 오늘 기준 최근 365일
+  const todayKIS    = new Date();
+  const ttmStart    = new Date(todayKIS);
+  ttmStart.setDate(ttmStart.getDate() - 365);
+  const F_DT = ttmStart.toISOString().split("T")[0].replace(/-/g, "");  // "YYYYMMDD"
+  const T_DT = todayKIS.toISOString().split("T")[0].replace(/-/g, "");  // "YYYYMMDD"
+
   const allItems: KisDividendRankItem[] = [];
   const seen = new Set<string>();
   let ctsArea = "";
@@ -150,8 +157,8 @@ async function fetchKisDividendRank(
     url.searchParams.set("UPJONG",                    "");
     url.searchParams.set("GB2",                       "0");
     url.searchParams.set("GB3",                       "1");
-    url.searchParams.set("F_DT",                      "20240101");
-    url.searchParams.set("T_DT",                      "20241231");
+    url.searchParams.set("F_DT",                      F_DT);
+    url.searchParams.set("T_DT",                      T_DT);
     url.searchParams.set("GB4",                       "0");
 
     const res = await fetch(url.toString(), {

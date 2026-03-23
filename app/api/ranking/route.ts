@@ -360,41 +360,81 @@ export async function GET(req: NextRequest) {
     const naverItems = naverResult.status === "fulfilled" ? naverResult.value : [];
 
     if (kisItems.length > 0 || naverItems.length > 0) {
-      // 6자리 ticker를 키로 병합 — Naver 먼저 채우고 KIS로 덮어쓰기 (KIS = 현재가 기준)
-      const merged = new Map<string, any>();
+      const TAX_KR = 0.154; // 배당소득세 14% + 지방소득세 1.4%
 
+      // Naver 현재가 맵 (KIS yield 재계산에 사용)
+      const naverPriceMap = new Map<string, number>();
       for (const item of naverItems) {
-        if (item.dividendYield > 0 && item.dividendYield <= 0.30 && item.price > 0) {
-          merged.set(item.ticker, {
-            ticker: item.ticker,
-            name:   item.name,
-            dividendYield: item.dividendYield,
-            dps:   item.dps,
-            price: item.price,
-            market: "KR",
-          });
-        }
+        if (item.price > 0) naverPriceMap.set(item.ticker, item.price);
       }
 
-      for (const item of kisItems) {
-        const price = item.currentPrice;
-        const dps   = item.dividendAmount;
-        const dividendYield = dps > 0 && price > 0 ? dps / price : item.dividendYield;
-        if (dividendYield > 0 && dividendYield <= 0.30 && price > 0) {
-          merged.set(item.ticker, {
-            ticker: item.ticker,
-            name:   item.name,
-            dividendYield,
-            dps,
-            price,
-            market: "KR",
-          });
+      const merged = new Map<string, any>();
+
+      // 1) Naver 데이터 먼저 채우기 (Naver는 이미 정제된 현재가·DPS)
+      for (const item of naverItems) {
+        if (!item.price || !item.dividendYield || item.dividendYield <= 0) continue;
+        if (item.dividendYield > 0.20) {
+          console.log(`[EXCLUDED >20%][Naver] ${item.ticker} ${item.name} | dps=${item.dps} | price=${item.price} | yield=${(item.dividendYield * 100).toFixed(2)}%`);
+          continue;
         }
+        const yieldPostTax = item.dividendYield * (1 - TAX_KR);
+        merged.set(item.ticker, {
+          ticker: item.ticker,
+          name:   item.name,
+          dividendYield: item.dividendYield,
+          yieldPostTax,
+          dps:    item.dps,
+          price:  item.price,
+          market: "KR",
+          isHighYield: item.dividendYield >= 0.15,
+          taxRisk: false, // 포트폴리오 수량 알아야 계산 가능 — dashboard에서 처리
+        });
+      }
+
+      // 2) KIS 데이터로 덮어쓰기 — TTM DPS + Naver 현재가로 정방향 재계산
+      for (const item of kisItems) {
+        const naverPrice  = naverPriceMap.get(item.ticker);
+        const price       = naverPrice ?? item.currentPrice; // Naver 우선, 없으면 KIS 역산가
+        const dps         = item.dividendAmount;             // TTM 실제 지급 합계 (KIS)
+        if (!price || !dps || price <= 0 || dps <= 0) continue;
+
+        const dividendYield = dps / price; // 정방향 계산: TTM DPS ÷ 현재가
+
+        // >20% = 데이터 오류로 간주 → 랭킹 제외
+        if (dividendYield > 0.20) {
+          console.log(`[EXCLUDED >20%][KIS] ${item.ticker} ${item.name} | dps=${dps} | price=${price}(${naverPrice ? "naver" : "back-calc"}) | yield=${(dividendYield * 100).toFixed(2)}%`);
+          continue;
+        }
+
+        const yieldPostTax = dividendYield * (1 - TAX_KR);
+        const isHighYield  = dividendYield >= 0.15;
+
+        if (isHighYield) {
+          console.log(`[WARN ≥15%][KIS] ${item.ticker} ${item.name} | dps=${dps} | price=${price} | yield=${(dividendYield * 100).toFixed(2)}%`);
+        }
+
+        merged.set(item.ticker, {
+          ticker: item.ticker,
+          name:   item.name,
+          dividendYield,
+          yieldPostTax,
+          dps,
+          price,
+          market: "KR",
+          isHighYield,
+          taxRisk: false,
+        });
       }
 
       const sorted = Array.from(merged.values())
         .sort((a, b) => b.dividendYield - a.dividendYield)
         .slice(0, 50);
+
+      // 검증 로그 — 상위 10개 출력
+      console.log(`[RANKING KR] ticker | dividendTTM | currentPrice | yieldPreTax | yieldPostTax`);
+      sorted.slice(0, 10).forEach((item) => {
+        console.log(`[RANKING KR] ${item.ticker} ${item.name} | ${item.dps} | ${item.price} | ${(item.dividendYield * 100).toFixed(2)}% | ${(item.yieldPostTax * 100).toFixed(2)}%`);
+      });
 
       const source = kisItems.length > 0 && naverItems.length > 0
         ? "KIS+Naver"
@@ -450,9 +490,14 @@ export async function GET(req: NextRequest) {
         }
       }
 
-      if (!price || !dividendYield || dividendYield <= 0 || dividendYield > 0.30) continue;
+      if (!price || !dividendYield || dividendYield <= 0) continue;
+      if (dividendYield > 0.20) {
+        console.log(`[EXCLUDED >20%][Yahoo/KR] ${ticker} ${koreanName} | yield=${(dividendYield * 100).toFixed(2)}%`);
+        continue;
+      }
       if (!dps && price) dps = Math.round(price * dividendYield);
-      data.push({ ticker, name: koreanName, dividendYield, dps, price, market: "KR" });
+      const yieldPostTax = dividendYield * (1 - 0.154);
+      data.push({ ticker, name: koreanName, dividendYield, yieldPostTax, dps, price, market: "KR", isHighYield: dividendYield >= 0.15, taxRisk: false });
     }
 
     const sorted = data
@@ -491,7 +536,8 @@ export async function GET(req: NextRequest) {
           ? raw > 1 ? raw / 100 : raw
           : null;
 
-      return { ticker, name: quote?.longName ?? fallbackName, dividendYield, dps, price, market };
+      const yieldPostTax = dividendYield != null ? dividendYield * (1 - 0.15) : null; // US 배당세 15%
+      return { ticker, name: quote?.longName ?? fallbackName, dividendYield, yieldPostTax, dps, price, market, isHighYield: (dividendYield ?? 0) >= 0.15, taxRisk: false };
     },
     10,
     300,
@@ -500,7 +546,7 @@ export async function GET(req: NextRequest) {
   const data = results
     .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled")
     .map((r) => r.value)
-    .filter((d) => d.dividendYield != null && d.dividendYield > 0 && d.dividendYield <= 0.30)
+    .filter((d) => d.dividendYield != null && d.dividendYield > 0 && d.dividendYield <= 0.20)
     .sort((a, b) => b.dividendYield - a.dividendYield)
     .slice(0, 50);
 
