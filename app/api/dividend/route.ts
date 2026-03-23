@@ -168,68 +168,74 @@ async function handleWithYahoo(rawTicker: string) {
     );
   }
 
-  // KIS 실시간 가격 우선 사용 (KR 주식만, Yahoo보다 정확)
   const isKoreanStock = ticker.endsWith(".KS") || ticker.endsWith(".KQ");
   let price: number | null = quote.regularMarketPrice ?? null;
-  if (isKoreanStock && hasKisKey()) {
-    try {
-      const stockCode = ticker.replace(/\.(KS|KQ)$/, "");
-      const kisPrice  = await getKisPrice(stockCode);
-      if (kisPrice?.price) {
-        price = kisPrice.price;
-        // KIS 종목명이 더 정확하면 사용 (quote.longName이 없을 때)
-        if (!quote.longName && !quote.shortName && kisPrice.name) {
-          quote = { ...quote, longName: kisPrice.name };
-        }
-      }
-    } catch { /* KIS 실패 시 Yahoo 가격 유지 */ }
-  }
 
   let   dps: number | null = (quote as any).trailingAnnualDividendRate ?? null;
   let   divYield      = (quote as any).trailingAnnualDividendYield      ?? null;
   let   exDateRaw     = (quote as any).exDividendDate                    ?? null;
   let   payDateRaw    = (quote as any).dividendDate                      ?? null;
 
-  // quoteSummary — 더 정확한 배당 데이터
-  try {
-    const summary = await yf.quoteSummary(ticker, {
-      modules: ["summaryDetail", "calendarEvents"],
-    });
-    const det = summary?.summaryDetail;
-    const cal = summary?.calendarEvents;
+  const stockCode = ticker.replace(/\.(KS|KQ)$/, "");
 
-    if (det?.dividendRate   != null && det.dividendRate > 0) dps = det.dividendRate;
-    if (det?.dividendYield  != null) divYield   = det.dividendYield;
-    if (det?.exDividendDate != null) exDateRaw  = det.exDividendDate;
-    if (cal?.dividendDate   != null) payDateRaw = cal.dividendDate;
-    else if (det?.dividendDate != null) payDateRaw = det.dividendDate;
-  } catch { /* 무시 */ }
+  // quoteSummary / KIS price / KIS schedule / DART / chart — 병렬 실행으로 속도 개선
+  const [summaryResult, kisPriceResult, kisScheduleResult, dartResult, chartResult] =
+    await Promise.allSettled([
+      yf.quoteSummary(ticker, { modules: ["summaryDetail", "calendarEvents"] }),
+      isKoreanStock && hasKisKey() ? getKisPrice(stockCode) : Promise.resolve(null),
+      isKoreanStock && hasKisKey() ? getKisDividendSchedule(stockCode) : Promise.resolve(null),
+      isKoreanStock && process.env.DART_API_KEY ? getDartDividend(stockCode) : Promise.resolve(null),
+      yf.chart(ticker, {
+        period1:  (() => { const d = new Date(); d.setFullYear(d.getFullYear() - 2); return d.toISOString().split("T")[0]; })(),
+        period2:  new Date().toISOString().split("T")[0],
+        interval: "1mo",
+        events:   "dividends",
+      }),
+    ]);
 
-  // 한국 주식 → KIS 예탁원 배당일정 (가장 정확한 배당락일/지급일 소스)
-  let kisSchedule: { exDate: string | null; paymentDate: string | null; dps: number | null } | null = null;
-  if (isKoreanStock && hasKisKey()) {
+  // quoteSummary 결과 적용
+  if (summaryResult.status === "fulfilled") {
     try {
-      const stockCode = ticker.replace(/\.(KS|KQ)$/, "");
-      kisSchedule = await getKisDividendSchedule(stockCode);
-      // KIS DPS가 있으면 Yahoo/DART 값 덮어쓰기
-      if (kisSchedule?.dps && kisSchedule.dps > 0) {
-        dps = kisSchedule.dps;
-        if (price != null && price > 0) divYield = dps / price;
-      }
-    } catch { /* 실패 시 Yahoo 유지 */ }
+      const summary = summaryResult.value;
+      const det = (summary as any)?.summaryDetail;
+      const cal = (summary as any)?.calendarEvents;
+      if (det?.dividendRate   != null && det.dividendRate > 0) dps = det.dividendRate;
+      if (det?.dividendYield  != null) divYield   = det.dividendYield;
+      if (det?.exDividendDate != null) exDateRaw  = det.exDividendDate;
+      if (cal?.dividendDate   != null) payDateRaw = cal.dividendDate;
+      else if (det?.dividendDate != null) payDateRaw = det.dividendDate;
+    } catch { /* 무시 */ }
   }
 
-  // 한국 주식 → Open DART 공시 데이터로 DPS 검증/보완 (KIS 없을 때)
-  if (isKoreanStock && !kisSchedule?.dps && process.env.DART_API_KEY) {
-    try {
-      const stockCode = ticker.replace(".KS", "").replace(".KQ", "");
-      const dartData  = await getDartDividend(stockCode);
-      if (dartData) {
-        if (dartData.dps != null && dartData.dps > 0) dps = dartData.dps;
-        if (divYield == null && dartData.dividendYield != null) divYield = dartData.dividendYield;
-        if (dps != null && price != null && price > 0) divYield = dps / price;
+  // KIS 실시간 가격 적용
+  if (kisPriceResult.status === "fulfilled" && kisPriceResult.value) {
+    const kisPrice = kisPriceResult.value;
+    if (kisPrice?.price) {
+      price = kisPrice.price;
+      if (!quote.longName && !quote.shortName && kisPrice.name) {
+        quote = { ...quote, longName: kisPrice.name };
       }
-    } catch { /* DART 실패 시 Yahoo 데이터로 진행 */ }
+    }
+  }
+
+  // KIS 배당일정 적용
+  let kisSchedule: { exDate: string | null; paymentDate: string | null; dps: number | null } | null = null;
+  if (kisScheduleResult.status === "fulfilled" && kisScheduleResult.value) {
+    kisSchedule = kisScheduleResult.value;
+    if (kisSchedule?.dps && kisSchedule.dps > 0) {
+      dps = kisSchedule.dps;
+      if (price != null && price > 0) divYield = dps / price;
+    }
+  }
+
+  // DART 적용 (KIS schedule DPS 없을 때만)
+  if (!kisSchedule?.dps && dartResult.status === "fulfilled" && dartResult.value) {
+    const dartData = dartResult.value;
+    if (dartData) {
+      if (dartData.dps != null && dartData.dps > 0) dps = dartData.dps;
+      if (divYield == null && dartData.dividendYield != null) divYield = dartData.dividendYield;
+      if (dps != null && price != null && price > 0) divYield = dps / price;
+    }
   }
 
   // KIS 날짜 우선 적용, 없으면 Yahoo 값 사용
@@ -243,19 +249,12 @@ async function handleWithYahoo(rawTicker: string) {
   let lastKnownDivDate: Date | null = null;   // 이력에서 가장 최근 배당락일
 
   try {
-    const twoYearsAgo = new Date();
-    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-
-    // Yahoo Finance가 historical()을 삭제 → chart()로 직접 교체
-    const chartResult = await yf.chart(ticker, {
-      period1:  twoYearsAgo.toISOString().split("T")[0],
-      period2:  new Date().toISOString().split("T")[0],
-      interval: "1mo",
-      events:   "dividends",
-    });
+    // 병렬로 받은 chart 결과 사용
+    const chartData = chartResult.status === "fulfilled" ? chartResult.value : null;
+    if (!chartData) throw new Error("chart 없음");
 
     // chart()는 dividends를 { [timestamp]: { amount, date } } 형태로 반환
-    const dividendsObj = (chartResult as any)?.events?.dividends ?? {};
+    const dividendsObj = (chartData as any)?.events?.dividends ?? {};
     const divRows: Array<{ date: Date; amount: number }> = Object.values(dividendsObj)
       .map((d: any) => ({
         date:   d.date instanceof Date ? d.date : new Date((d.date as number) * 1000),

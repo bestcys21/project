@@ -91,38 +91,44 @@ export default function StockPriceChart({ ticker, stockName, currency = "KRW", d
       {/* 헤더 */}
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-[13px] font-bold text-toss-text">
+          <p className="text-[15px] font-extrabold text-toss-text">
             {stockName ? `${stockName} 주가` : "주가 차트"}
           </p>
           {!loading && !error && changeRate != null && (
-            <p className={`text-[12px] font-semibold mt-0.5 ${isUp ? "text-red-500" : "text-blue-500"}`}>
-              {isUp ? "▲" : "▼"} {Math.abs(changeRate).toFixed(2)}%
-              <span className="text-toss-sub font-normal ml-1.5">({PERIOD_LABELS[period]})</span>
-            </p>
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              <p className={`text-[13px] font-bold ${isUp ? "text-red-500" : "text-blue-500"}`}>
+                {isUp ? "▲" : "▼"} {Math.abs(changeRate).toFixed(2)}%
+                <span className="text-toss-sub font-normal text-[12px] ml-1.5">({PERIOD_LABELS[period]})</span>
+              </p>
+              {/* 배당수익률 — 등락률 옆에 나란히 */}
+              {dividendYield != null && dividendYield > 0 && (
+                <span className="text-[12px] font-bold px-2 py-0.5 rounded-md bg-toss-blue text-white">
+                  배당률 {(dividendYield * 100).toFixed(2)}%
+                </span>
+              )}
+            </div>
           )}
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {/* 배당수익률 뱃지 */}
-          {dividendYield != null && dividendYield > 0 && (
-            <span className="text-[11px] font-bold px-2 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-toss-blue">
+          {/* 로딩 중에도 배당수익률 표시 */}
+          {(loading || error) && dividendYield != null && dividendYield > 0 && (
+            <span className="inline-block mt-1 text-[12px] font-bold px-2 py-0.5 rounded-md bg-toss-blue text-white">
               배당률 {(dividendYield * 100).toFixed(2)}%
             </span>
           )}
-          {/* 기간 필터 */}
-          <div className="flex bg-toss-bg rounded-lg p-0.5">
-            {(["1M", "3M", "1Y"] as Period[]).map((p) => (
-              <button
-                key={p}
-                onClick={() => setPeriod(p)}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all
-                  ${period === p
-                    ? "bg-toss-card text-toss-blue shadow-sm"
-                    : "text-toss-sub hover:text-toss-label"}`}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
+        </div>
+        {/* 기간 탭 — 언더라인 스타일 */}
+        <div className="flex border-b border-toss-border flex-shrink-0">
+          {(["1M", "3M", "1Y"] as Period[]).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPeriod(p)}
+              className={`px-3 py-1.5 text-[12px] font-bold transition-all border-b-2 -mb-px
+                ${period === p
+                  ? "text-toss-blue border-toss-blue"
+                  : "text-toss-sub border-transparent hover:text-toss-label"}`}
+            >
+              {p}
+            </button>
+          ))}
         </div>
       </div>
 

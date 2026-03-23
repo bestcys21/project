@@ -196,6 +196,11 @@ export default function CalculatorForm() {
     setChartTicker(apiTicker);
     setChartCurrency(market === "KR" ? "KRW" : "USD");
     setDividendYield(null);
+    // 차트 표시 시 배당수익률 즉시 노출 (계산 전에도)
+    fetch(`/api/dividend?ticker=${encodeURIComponent(apiTicker)}`)
+      .then(r => r.json())
+      .then(d => { if (d.dividendYield != null) setDividendYield(d.dividendYield); })
+      .catch(() => {});
   }
 
   function handleMarketChange(m: Market) {
@@ -310,7 +315,7 @@ export default function CalculatorForm() {
 
         {/* 종목 검색 */}
         <div className="space-y-2">
-          <label className="block text-[13px] font-semibold text-toss-label">종목명</label>
+          <label className="block text-[13px] font-bold text-toss-text">종목명</label>
 
           <div ref={wrapRef} className="relative">
             <input
@@ -419,7 +424,7 @@ export default function CalculatorForm() {
         {/* 수량 + 날짜 */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-toss-label">보유 수량</label>
+            <label className="block text-[13px] font-bold text-toss-text">보유 수량</label>
             <div className="relative">
               <input type="number" min={1} value={qty} onChange={(e) => setQty(e.target.value)}
                 placeholder="0"
@@ -429,20 +434,22 @@ export default function CalculatorForm() {
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-toss-label">매수 예정일</label>
+            <label className="block text-[13px] font-bold text-toss-text">매수 예정일</label>
             <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="toss-input" />
           </div>
         </div>
 
         {/* 세율 안내 */}
-        <div className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl
-          ${market === "KR" ? "bg-blue-50 dark:bg-blue-900/20" : "bg-green-50 dark:bg-green-900/20"}`}>
-          <svg className={`w-4 h-4 flex-shrink-0 ${market === "KR" ? "text-toss-blue" : "text-green-700"}`}
+        <div className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border
+          ${market === "KR"
+            ? "bg-blue-50/50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/30"
+            : "bg-green-50/50 dark:bg-green-900/10 border-green-100 dark:border-green-900/30"}`}>
+          <svg className={`w-3.5 h-3.5 flex-shrink-0 ${market === "KR" ? "text-blue-400" : "text-green-500"}`}
             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round"
               d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 110 20A10 10 0 0112 2z" />
           </svg>
-          <span className={`text-[13px] font-medium ${market === "KR" ? "text-toss-blue" : "text-green-700"}`}>
+          <span className={`text-[12px] font-medium ${market === "KR" ? "text-blue-500 dark:text-blue-400" : "text-green-600 dark:text-green-400"}`}>
             {market === "KR" ? "한국 배당소득세 15.4% 자동 적용" : "미국 배당소득세 15% 자동 적용 (원천징수)"}
           </span>
         </div>

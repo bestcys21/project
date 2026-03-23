@@ -16,6 +16,24 @@ import {
 
 const TAX_RATE: Record<Market, number> = { KR: 0.154, US: 0.15 };
 
+// ── 3.5% 예금 금리 벤치마크 (3단계) ─────────────────────────────────────────
+function getYieldStatus(yld: number | null): { msg: string; color: string } | null {
+  if (yld == null) return null;
+  const pct = yld * 100;
+  if (pct < 3.5) return { msg: "은행 예금 대비 낮음", color: "text-toss-sub" };
+  if (pct < 5.0) return { msg: "시중 금리 수준의 안정적 배당", color: "text-green-600 dark:text-green-400" };
+  return { msg: "고배당 — 수익률 매력적", color: "text-toss-blue" };
+}
+
+// ── 배당 월급 생활 비유 ──────────────────────────────────────────────────────
+function getMonthlyDivMsg(monthly: number): string {
+  if (monthly <= 0) return "";
+  if (monthly < 50_000)  return `매달 커피 약 ${Math.max(1, Math.floor(monthly / 5000))}잔의 여유를 선물합니다. ☕`;
+  if (monthly < 150_000) return "매달 고정적으로 나가는 통신비를 스스로 해결 중입니다. 📱";
+  if (monthly < 500_000) return "매달 가족 외식 한 번의 즐거움이 자산에서 나옵니다. 🍽️";
+  return "월세의 상당 부분을 배당이 든든하게 분담하고 있습니다. 🏠";
+}
+
 type ApiEntry = {
   dps: number;
   dividendYield?: number | null;
@@ -173,7 +191,7 @@ export default function DashboardPage() {
   const [showToast, setShowToast] = useState(false);
 
   // 인사이트 모달
-  const [activeModal, setActiveModal] = useState<"health" | "peer" | "portfolio" | null>(null);
+  const [activeModal, setActiveModal] = useState<"peer" | "portfolio" | null>(null);
 
   // 종목 제거 확인 모달
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
@@ -339,26 +357,6 @@ export default function DashboardPage() {
   const maxWeightPct = totalNetForWeight > 0 && maxWeightEvent
     ? (maxWeightEvent.netAmount / totalNetForWeight) * 100 : 0;
 
-  // 건강도 점수
-  const healthInfo = holdings.length > 0 ? (() => {
-    let score = 100;
-    const items: { ok: boolean | "warn"; label: string }[] = [];
-    if (holdings.length < 3)      { score -= 20; items.push({ ok: false,   label: `종목 수 ${holdings.length}개 — 부족` }); }
-    else if (holdings.length < 5) { score -= 5;  items.push({ ok: "warn",  label: `종목 ${holdings.length}개 — 보통` }); }
-    else                          {               items.push({ ok: true,    label: "종목 분산 양호" }); }
-    if (gapMonths.length >= 3)    { score -= 20; items.push({ ok: false,   label: `공백 ${gapMonths.length}개월` }); }
-    else if (gapMonths.length >= 1){ score -= 10; items.push({ ok: "warn", label: `공백 ${gapMonths.length}개월` }); }
-    else                          {               items.push({ ok: true,    label: "매월 배당 수령" }); }
-    if (maxWeightPct > 50)        { score -= 20; items.push({ ok: false,   label: `단일 비중 ${maxWeightPct.toFixed(0)}% 초과` }); }
-    else if (maxWeightPct > 30)   { score -= 10; items.push({ ok: "warn",  label: `비중 ${maxWeightPct.toFixed(0)}% 주의` }); }
-    else if (events.length > 0)   {               items.push({ ok: true,    label: "비중 분산 양호" }); }
-    if (avgYield != null) {
-      if (avgYield < 0.02)        { score -= 10; items.push({ ok: false,   label: "수익률 낮음" }); }
-      else if (avgYield >= 0.04)  {               items.push({ ok: true,    label: "수익률 우수" }); }
-      else                        {               items.push({ ok: "warn",  label: "수익률 보통" }); }
-    }
-    return { score: Math.max(score, 0), items };
-  })() : null;
 
   // 인사이트 배너 (위험 > 기회 > 달성, 1개만 노출)
   const insightBanner = holdings.length > 0 ? (() => {
@@ -402,7 +400,7 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {/* 연간 세후 배당 — 주인공 카드 (col-span-2) */}
+          {/* 연간 세후 배당 — 주인공 카드 */}
           <SummaryCard
             label={
               chartPeriod === "N12M" ? "향후 12개월 세후 배당"
@@ -411,40 +409,38 @@ export default function DashboardPage() {
             }
             value={`${Math.round(annualNet).toLocaleString("ko-KR")}원`}
             hero
+            taxLabel
             tooltip={`DPS × 수량 × (1-세율)\n연간 합계: ${Math.round(fullYearNet).toLocaleString("ko-KR")}원`}
           />
-          {/* 건강도 점수 카드 */}
-          {healthInfo ? (
-            <div
-              className="bg-toss-card rounded-2xl shadow-card p-4 flex flex-col justify-between min-h-[96px] cursor-pointer hover:ring-2 hover:ring-toss-blue/30 transition-all"
-              onClick={() => setActiveModal("health")}>
-              <p className="text-[12px] font-semibold text-toss-sub">포트폴리오 건강도</p>
-              <div className="flex items-end justify-between mt-1">
-                <p className={`text-[26px] font-extrabold leading-tight ${
-                  healthInfo.score >= 80 ? "text-green-500" : healthInfo.score >= 60 ? "text-toss-blue" : "text-amber-500"}`}>
-                  {healthInfo.score}<span className="text-[14px] font-bold ml-0.5 text-toss-sub">/100</span>
-                </p>
-                <div className="text-right space-y-0.5">
-                  {healthInfo.items.slice(0, 2).map((item, i) => (
-                    <p key={i} className="text-[10px] font-medium text-toss-sub flex items-center gap-1 justify-end">
-                      <span>{item.ok === true ? "✅" : item.ok === "warn" ? "⚠️" : "❌"}</span>
-                      <span>{item.label}</span>
-                    </p>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-toss-card rounded-2xl shadow-card p-4 flex flex-col justify-center items-center min-h-[96px]">
-              <p className="text-[12px] font-semibold text-toss-sub">포트폴리오 건강도</p>
-              <p className="text-[22px] font-extrabold text-toss-label mt-1">-</p>
-            </div>
-          )}
-          <SummaryCard
-            label="평균 배당수익률"
-            value={avgYield != null ? `${(avgYield * 100).toFixed(2)}%` : "-"}
-            tooltip={avgYield != null ? `배당수익률 = 연간 배당금 / 현재가\n포트폴리오 가중평균` : "데이터 로딩 중"}
-          />
+          {/* 배당 월급 카드 */}
+          {(() => {
+            const monthly = annualNet / 12;
+            const monthlyMsg = annualNet > 0 ? getMonthlyDivMsg(monthly) : undefined;
+            return (
+              <SummaryCard
+                label="배당 월급"
+                value={annualNet > 0 ? `${Math.round(monthly).toLocaleString("ko-KR")}원` : "-"}
+                subText={monthlyMsg}
+                taxLabel
+                tooltip={`연간 세후 배당 ÷ 12\n= 월 평균 수령액\n(세후 15.4% 제외 기준)`}
+              />
+            );
+          })()}
+          {(() => {
+            const ys = getYieldStatus(avgYield);
+            return (
+              <SummaryCard
+                label="평균 배당수익률"
+                value={avgYield != null ? `${(avgYield * 100).toFixed(2)}%` : "-"}
+                subText={ys?.msg}
+                subColor={ys?.color}
+                taxLabel
+                tooltip={avgYield != null
+                  ? `배당수익률 = 연간 배당금 / 현재가\n포트폴리오 가중평균\n※ 예금 기준금리 3.5% 대비`
+                  : "데이터 로딩 중"}
+              />
+            );
+          })()}
           <SummaryCard
             label="다음 배당 D-day"
             value={dday !== null ? (dday === 0 ? "오늘! 🎉" : `D-${dday}`) : "-"}
@@ -525,13 +521,15 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* 필터 탭 */}
+          {/* 필터 탭 — 언더라인 인디케이터 */}
           {events.length > 0 && (
-            <div className="flex gap-1.5">
+            <div className="flex gap-0 border-b border-toss-border">
               {(["ALL", "KR", "US"] as const).map((f) => (
                 <button key={f} onClick={() => setFilterMarket(f)}
-                  className={`px-3 py-1 rounded-lg text-[12px] font-semibold transition-all
-                    ${filterMarket === f ? "bg-toss-blue text-white" : "bg-toss-bg text-toss-sub hover:text-toss-text"}`}>
+                  className={`px-4 py-2 text-[13px] font-bold transition-all border-b-2 -mb-px
+                    ${filterMarket === f
+                      ? "text-toss-blue border-toss-blue"
+                      : "text-toss-sub border-transparent hover:text-toss-text"}`}>
                   {f === "ALL" ? "전체" : f === "KR" ? "한국" : "미국"}
                 </button>
               ))}
@@ -689,9 +687,6 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="relative flex-shrink-0">
                           <StockLogo ticker={e.ticker} name={e.name} market={e.market} size={36} />
-                          <span className="absolute -bottom-0.5 -right-0.5 text-[10px] leading-none select-none">
-                            {e.market === "KR" ? "🇰🇷" : "🇺🇸"}
-                          </span>
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
@@ -956,7 +951,7 @@ export default function DashboardPage() {
                   <div>
                     <p className="text-[13px] font-bold text-toss-text">포트폴리오 분석</p>
                     <p className="text-[11px] text-toss-sub mt-0.5">
-                      🇰🇷 {krPct}% · 🇺🇸 {100 - krPct}% · {holdings.length}종목 · 탭해서 자세히
+                      한국 {krPct}% · 미국 {100 - krPct}% · {holdings.length}종목 · 탭해서 자세히
                     </p>
                   </div>
                 </div>
@@ -980,9 +975,7 @@ export default function DashboardPage() {
             {/* 모달 헤더 */}
             <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-toss-border sticky top-0 bg-toss-card rounded-t-3xl sm:rounded-t-3xl z-10">
               <p className="text-[16px] font-extrabold text-toss-text">
-                {activeModal === "health" ? "포트폴리오 건강도"
-                  : activeModal === "peer" ? "또래 배당러 비교"
-                  : "포트폴리오 분석"}
+                {activeModal === "peer" ? "또래 배당러 비교" : "포트폴리오 분석"}
               </p>
               <button onClick={() => setActiveModal(null)}
                 className="p-2 rounded-xl hover:bg-toss-bg transition-colors text-toss-sub">
@@ -993,28 +986,6 @@ export default function DashboardPage() {
             </div>
             {/* 모달 컨텐츠 */}
             <div className="p-6">
-              {activeModal === "health" && healthInfo && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <p className={`text-[48px] font-extrabold leading-none ${
-                      healthInfo.score >= 80 ? "text-green-500" : healthInfo.score >= 60 ? "text-toss-blue" : "text-amber-500"}`}>
-                      {healthInfo.score}
-                    </p>
-                    <div>
-                      <p className="text-[14px] font-bold text-toss-text">건강도 점수</p>
-                      <p className="text-[12px] text-toss-sub">/100점 만점</p>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    {healthInfo.items.map((item, i) => (
-                      <div key={i} className="flex items-center gap-2.5 py-2.5 border-b border-toss-border last:border-0">
-                        <span className="text-base">{item.ok === true ? "✅" : item.ok === "warn" ? "⚠️" : "❌"}</span>
-                        <p className="text-[13px] text-toss-text font-medium">{item.label}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
               {activeModal === "peer" && (
                 <PeerInsight annualNet={annualNet} avgYield={avgYield} stockCount={holdings.length} />
               )}
@@ -1037,8 +1008,8 @@ export default function DashboardPage() {
                           <div className="h-full rounded-full bg-toss-blue transition-all duration-500" style={{ width: `${krPct}%` }} />
                         </div>
                         <div className="flex gap-3 text-[12px] font-bold flex-shrink-0">
-                          <span className="text-toss-blue">🇰🇷 {krPct}%</span>
-                          <span className="text-green-600">🇺🇸 {usPct}%</span>
+                          <span className="text-toss-blue">한국 {krPct}%</span>
+                          <span className="text-green-600">미국 {usPct}%</span>
                         </div>
                       </div>
                       {krPct > 80 && (
@@ -1294,8 +1265,9 @@ function getDday(dateStr: string): number {
 }
 
 /* ── sub components ── */
-function SummaryCard({ label, value, highlight, hero, large, tooltip }: {
-  label: string; value: string; highlight?: boolean; hero?: boolean; large?: boolean; tooltip?: string;
+function SummaryCard({ label, value, highlight, hero, large, tooltip, subText, subColor, taxLabel }: {
+  label: string; value: string; highlight?: boolean; hero?: boolean; large?: boolean;
+  tooltip?: string; subText?: string; subColor?: string; taxLabel?: boolean;
 }) {
   return (
     <div className={`relative bg-toss-card rounded-xl shadow-card group cursor-default flex flex-col justify-between
@@ -1311,6 +1283,12 @@ function SummaryCard({ label, value, highlight, hero, large, tooltip }: {
         large ? "text-[22px] text-toss-text" : "text-[15px] text-toss-text"}`}>
         {value}
       </p>
+      {subText && (
+        <p className={`text-[10px] font-medium leading-snug mt-1.5 [word-break:keep-all] ${subColor ?? "text-toss-sub"}`}>
+          {subText}
+        </p>
+      )}
+      {taxLabel && <p className="text-[9px] text-toss-sub/60 mt-1 font-normal">세후 기준</p>}
       {tooltip && (
         <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50
                         w-56 px-3 py-2.5 rounded-xl bg-[#191F28] text-white text-[11px] leading-relaxed text-center

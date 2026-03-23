@@ -21,6 +21,8 @@ export function hasKisKey(): boolean {
 // Vercel KV(Redis)가 있으면 인스턴스 간 토큰 공유 → 재발급 최소화
 // KV가 없으면 인메모리 캐시만 사용 (로컬 개발)
 let tokenMemCache: { token: string; expiresAt: number } | null = null;
+// 동시 토큰 발급 요청 중복 방지 (같은 인스턴스 내)
+let tokenFetchPromise: Promise<string> | null = null;
 
 function getRedis() {
   const url   = process.env.UPSTASH_REDIS_REST_URL;
@@ -56,37 +58,49 @@ async function getAccessToken(): Promise<string> {
     return tokenMemCache.token;
   }
 
-  // 2) Vercel KV 캐시 확인 (인스턴스 간 공유 — 재발급 방지 핵심)
-  const kvCache = await kvGet("kis:token");
-  if (kvCache && Date.now() < kvCache.expiresAt) {
-    tokenMemCache = kvCache;
-    return tokenMemCache.token;
-  }
+  // 2) 동시 요청 중복 방지 — 이미 발급 중이면 같은 Promise 반환
+  if (tokenFetchPromise) return tokenFetchPromise;
 
-  // 3) 만료/없음 → 신규 발급
-  const res = await fetch(`${KIS_BASE}/oauth2/tokenP`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json; charset=utf-8" },
-    body: JSON.stringify({
-      grant_type: "client_credentials",
-      appkey:     APP_KEY,
-      appsecret:  APP_SECRET,
-    }),
-    signal: AbortSignal.timeout(10000),
-  });
+  tokenFetchPromise = (async () => {
+    try {
+      // 3) Vercel KV 캐시 확인 (인스턴스 간 공유 — 재발급 방지 핵심)
+      const kvCache = await kvGet("kis:token");
+      if (kvCache && Date.now() < kvCache.expiresAt) {
+        tokenMemCache = kvCache;
+        return tokenMemCache.token;
+      }
 
-  if (!res.ok) throw new Error(`KIS token error HTTP ${res.status}`);
-  const data = await res.json();
-  if (!data.access_token) throw new Error(`KIS token missing: ${data.msg1 ?? ""}`);
+      // 4) 만료/없음 → 신규 발급 (카톡 알림 발생 지점 — 최소화 필요)
+      const res = await fetch(`${KIS_BASE}/oauth2/tokenP`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        body: JSON.stringify({
+          grant_type: "client_credentials",
+          appkey:     APP_KEY,
+          appsecret:  APP_SECRET,
+        }),
+        signal: AbortSignal.timeout(10000),
+      });
 
-  const expiresIn  = (data.expires_in as number);
-  const expiresAt  = Date.now() + expiresIn * 1000 - 60_000;
-  const newCache   = { token: data.access_token, expiresAt };
+      if (!res.ok) throw new Error(`KIS token error HTTP ${res.status}`);
+      const data = await res.json();
+      if (!data.access_token) throw new Error(`KIS token missing: ${data.msg1 ?? ""}`);
 
-  tokenMemCache = newCache;
-  await kvSet("kis:token", newCache, expiresIn - 60); // KV에 TTL과 함께 저장
+      // KIS 토큰 유효기간(보통 86400초=24h), 버퍼 10분으로 늘려 재발급 최소화
+      const expiresIn = (data.expires_in as number) || 86400;
+      const expiresAt = Date.now() + expiresIn * 1000 - 10 * 60 * 1000;
+      const newCache  = { token: data.access_token, expiresAt };
 
-  return tokenMemCache.token;
+      tokenMemCache = newCache;
+      await kvSet("kis:token", newCache, expiresIn - 600);
+
+      return tokenMemCache!.token;
+    } finally {
+      tokenFetchPromise = null;
+    }
+  })();
+
+  return tokenFetchPromise;
 }
 
 // ─── 인메모리 캐시 ────────────────────────────────────────────────────────────
