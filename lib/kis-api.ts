@@ -1,7 +1,7 @@
 /**
  * 한국투자증권 (KIS) Open API helper
  * - 실시간 주식 현재가 조회 (Yahoo Finance보다 정확)
- * - 배당 API는 이 플랜에서 미지원 → DPS는 DART 사용
+ * - 배당 순위 조회: FHPST01720000 (KOSPI/KOSDAQ/ETF 병렬)
  *
  * 환경변수 (.env.local):
  *   KIS_APP_KEY=...
@@ -9,6 +9,9 @@
  *
  * https://apiportal.koreainvestment.com/
  */
+import fs from "fs";
+import path from "path";
+import os from "os";
 
 const KIS_BASE   = "https://openapi.koreainvestment.com:9443";
 const APP_KEY    = process.env.KIS_APP_KEY    ?? "";
@@ -19,13 +22,42 @@ export function hasKisKey(): boolean {
 }
 
 // ─── 토큰 캐시 (24시간 유효, 1분 여유) ───────────────────────────────────────
-let tokenCache: { token: string; expiresAt: number } | null = null;
+// 서버리스 환경에서 인메모리 변수는 재시작 시 초기화되므로
+// 파일 시스템에 토큰을 저장해 불필요한 재발급을 방지한다.
+const TOKEN_CACHE_FILE = path.join(os.tmpdir(), "kis_token_cache.json");
+let tokenMemCache: { token: string; expiresAt: number } | null = null;
+
+function readTokenFromFile(): { token: string; expiresAt: number } | null {
+  try {
+    const raw = fs.readFileSync(TOKEN_CACHE_FILE, "utf-8");
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function writeTokenToFile(cache: { token: string; expiresAt: number }) {
+  try {
+    fs.writeFileSync(TOKEN_CACHE_FILE, JSON.stringify(cache), "utf-8");
+  } catch {
+    // 파일 쓰기 실패 시 인메모리 캐시만 사용
+  }
+}
 
 async function getAccessToken(): Promise<string> {
-  if (tokenCache && Date.now() < tokenCache.expiresAt) {
-    return tokenCache.token;
+  // 1) 인메모리 캐시 확인
+  if (tokenMemCache && Date.now() < tokenMemCache.expiresAt) {
+    return tokenMemCache.token;
   }
 
+  // 2) 파일 캐시 확인 (서버리스 재시작 후에도 유효한 토큰 재사용)
+  const fileCache = readTokenFromFile();
+  if (fileCache && Date.now() < fileCache.expiresAt) {
+    tokenMemCache = fileCache;
+    return tokenMemCache.token;
+  }
+
+  // 3) 만료/없음 → 신규 발급
   const res = await fetch(`${KIS_BASE}/oauth2/tokenP`, {
     method: "POST",
     headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -34,6 +66,7 @@ async function getAccessToken(): Promise<string> {
       appkey:     APP_KEY,
       appsecret:  APP_SECRET,
     }),
+    signal: AbortSignal.timeout(10000),
   });
 
   if (!res.ok) throw new Error(`KIS token error HTTP ${res.status}`);
@@ -41,8 +74,12 @@ async function getAccessToken(): Promise<string> {
   if (!data.access_token) throw new Error(`KIS token missing: ${data.msg1 ?? ""}`);
 
   const expiresIn = (data.expires_in as number) * 1000;
-  tokenCache = { token: data.access_token, expiresAt: Date.now() + expiresIn - 60_000 };
-  return tokenCache.token;
+  const newCache = { token: data.access_token, expiresAt: Date.now() + expiresIn - 60_000 };
+
+  tokenMemCache = newCache;
+  writeTokenToFile(newCache);
+
+  return tokenMemCache.token;
 }
 
 // ─── 인메모리 캐시 ────────────────────────────────────────────────────────────
@@ -57,6 +94,229 @@ function getCached<T>(key: string): T | null {
 }
 function setCached<T>(key: string, data: T, ttlMs: number) {
   cache.set(key, { data, expiresAt: Date.now() + ttlMs });
+}
+
+// ─── 배당 순위 조회 ───────────────────────────────────────────────────────────
+// TR: FHPST01720000 — 국내주식 배당 순위 조회 (KOSPI/KOSDAQ/ETF)
+export interface KisDividendRankItem {
+  ticker:         string;   // 6자리 종목코드
+  name:           string;
+  currentPrice:   number;
+  dividendAmount: number;   // 주당 배당금 (원)
+  dividendYield:  number;   // 소수 (0.05 = 5%)
+}
+
+async function fetchKisDividendRank(
+  marketCode: string,   // "J" = KOSPI, "Q" = KOSDAQ, "ETF"
+): Promise<KisDividendRankItem[]> {
+  const cacheKey = `kis:rank:${marketCode}`;
+  const cached = getCached<KisDividendRankItem[]>(cacheKey);
+  if (cached) return cached;
+
+  const token = await getAccessToken();
+  // 국내주식 배당률 상위 [국내주식-106]
+  // TR: HHKDB13470100, 응답 필드: sht_cd, isin_name, record_date, per_sto_divi_amt, divi_rate, divi_kind
+  // F_DT/T_DT = 배당 기준일(record_date) 범위. FY2024 확정 배당 기준.
+  const url   = new URL(`${KIS_BASE}/uapi/domestic-stock/v1/ranking/dividend-rate`);
+  url.searchParams.set("fid_cond_mrkt_div_code",  marketCode);
+  url.searchParams.set("fid_cond_scr_div_code",   "20171");
+  url.searchParams.set("fid_input_iscd",           "0000");
+  url.searchParams.set("fid_div_cls_code",          "0");
+  url.searchParams.set("fid_blng_cls_code",         "0");
+  url.searchParams.set("fid_rank_sort_cls_code",    "0");
+  url.searchParams.set("fid_trgt_cls_code",         "0");
+  url.searchParams.set("fid_trgt_exls_cls_code",    "0");
+  url.searchParams.set("fid_vol_cnt",               "0");
+  url.searchParams.set("fid_input_cnt_1",           "0");
+  url.searchParams.set("fid_input_price_1",         "");
+  url.searchParams.set("fid_input_price_2",         "");
+  url.searchParams.set("fid_rsfl_rate1",            "");
+  url.searchParams.set("fid_rsfl_rate2",            "");
+  url.searchParams.set("CTS_AREA",                  "");
+  url.searchParams.set("GB1",                       "0");
+  url.searchParams.set("UPJONG",                    "");
+  url.searchParams.set("GB2",                       "0");
+  url.searchParams.set("GB3",                       "1");
+  url.searchParams.set("F_DT",                      "20240101");
+  url.searchParams.set("T_DT",                      "20241231");
+  url.searchParams.set("GB4",                       "0");
+
+  const res = await fetch(url.toString(), {
+    headers: {
+      authorization:  `Bearer ${token}`,
+      appkey:         APP_KEY,
+      appsecret:      APP_SECRET,
+      "tr_id":        "HHKDB13470100",
+      "custtype":     "P",
+      "Content-Type": "application/json; charset=utf-8",
+    },
+    signal: AbortSignal.timeout(15000),
+  });
+
+  if (!res.ok) return [];
+  const json = await res.json();
+  if (json.rt_cd !== "0" || !Array.isArray(json.output)) return [];
+
+  const items: KisDividendRankItem[] = (json.output as any[])
+    .filter((o: any) => o.sht_cd && parseFloat(o.divi_rate ?? "0") > 0)
+    .map((o: any) => {
+      const dividendAmount = parseFloat(String(o.per_sto_divi_amt ?? "0").replace(/,/g, "")) || 0;
+      const yieldPct       = parseFloat(String(o.divi_rate       ?? "0").replace(/,/g, "")) || 0;
+      const dividendYield  = yieldPct > 1 ? yieldPct / 100 : yieldPct;
+      // 현재가 역산: DPS / 배당수익률 (API 응답에 현재가 필드 없음)
+      const currentPrice   = dividendYield > 0 ? Math.round(dividendAmount / dividendYield) : 0;
+      return {
+        ticker:        String(o.sht_cd),
+        name:          String(o.isin_name ?? o.sht_cd),
+        currentPrice,
+        dividendAmount,
+        dividendYield,
+      };
+    })
+    .filter((item) => item.dividendYield > 0 && item.currentPrice > 0);
+
+  setCached(cacheKey, items, 60 * 60 * 1000); // 1시간 캐시
+  return items;
+}
+
+/**
+ * KOSPI + KOSDAQ + ETF 배당 순위를 병렬로 가져와 병합·정렬
+ * KIS 키 없으면 빈 배열 반환 (caller에서 fallback 처리)
+ * 전체 작업에 20초 타임아웃 적용
+ */
+export async function getKisDividendRanking(limit = 100): Promise<KisDividendRankItem[]> {
+  if (!hasKisKey()) return [];
+
+  const work = async (): Promise<KisDividendRankItem[]> => {
+    const [kospi, kosdaq, etf] = await Promise.allSettled([
+      fetchKisDividendRank("J"),
+      fetchKisDividendRank("Q"),
+      fetchKisDividendRank("ETF"),
+    ]);
+
+    const all: KisDividendRankItem[] = [];
+    const seen = new Set<string>();
+
+    for (const result of [kospi, kosdaq, etf]) {
+      if (result.status !== "fulfilled") continue;
+      for (const item of result.value) {
+        if (!seen.has(item.ticker)) {
+          seen.add(item.ticker);
+          all.push(item);
+        }
+      }
+    }
+
+    return all
+      .sort((a, b) => b.dividendYield - a.dividendYield)
+      .slice(0, limit);
+  };
+
+  try {
+    const timeout = new Promise<KisDividendRankItem[]>((resolve) =>
+      setTimeout(() => resolve([]), 20000),
+    );
+    return await Promise.race([work(), timeout]);
+  } catch {
+    return [];
+  }
+}
+
+// ─── 예탁원 배당 일정 조회 ────────────────────────────────────────────────────
+// TR: HHKDB669102C0 — 예탁원정보(배당일정) [국내주식-145]
+export interface KisDividendSchedule {
+  exDate:      string | null;   // 배당락일  YYYY.MM.DD
+  recordDate:  string | null;   // 기준일    YYYY.MM.DD
+  paymentDate: string | null;   // 지급일    YYYY.MM.DD
+  dps:         number | null;   // 주당 배당금 (원)
+}
+
+function fmtKisDate(raw: string | undefined): string | null {
+  if (!raw || raw.length < 8) return null;
+  // YYYYMMDD → YYYY.MM.DD
+  return `${raw.slice(0, 4)}.${raw.slice(4, 6)}.${raw.slice(6, 8)}`;
+}
+
+export async function getKisDividendSchedule(stockCode: string): Promise<KisDividendSchedule | null> {
+  if (!hasKisKey()) return null;
+
+  const cacheKey = `kis:divschedule:${stockCode}`;
+  const cached = getCached<KisDividendSchedule>(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const token = await getAccessToken();
+    const today  = new Date();
+    const start  = new Date(today.getFullYear() - 1, 0, 1);
+    const end    = new Date(today.getFullYear() + 1, 11, 31);
+    const yyyymmdd = (d: Date) =>
+      `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+
+    const url = new URL(`${KIS_BASE}/uapi/domestic-stock/v1/ksdinfo/dividend`);
+    url.searchParams.set("SHT_CD",       stockCode);
+    url.searchParams.set("INQR_STRT_DT", yyyymmdd(start));
+    url.searchParams.set("INQR_END_DT",  yyyymmdd(end));
+    url.searchParams.set("PDNO",         "");
+    url.searchParams.set("PRDT_TYPE_CD", "300"); // 주식
+
+    const res = await fetch(url.toString(), {
+      headers: {
+        authorization:  `Bearer ${token}`,
+        appkey:         APP_KEY,
+        appsecret:      APP_SECRET,
+        "tr_id":        "HHKDB669102C0",
+        "custtype":     "P",
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      signal: AbortSignal.timeout(10000),
+    });
+
+    if (!res.ok) return null;
+    const json = await res.json();
+    if (json.rt_cd !== "0") return null;
+
+    // output 또는 output1 배열 탐색
+    const rows: any[] = Array.isArray(json.output)  ? json.output :
+                        Array.isArray(json.output1) ? json.output1 : [];
+    if (rows.length === 0) return null;
+
+    // 가장 최근 배당 일정 선택 (ex-date 기준 내림차순)
+    const todayStr = yyyymmdd(today);
+    const sorted = [...rows].sort((a, b) => {
+      const da = a.ex_divi_dt ?? a.bsop_dtt ?? a.stnd_dt ?? "";
+      const db = b.ex_divi_dt ?? b.bsop_dtt ?? b.stnd_dt ?? "";
+      return db.localeCompare(da);
+    });
+
+    // 미래 또는 최근 과거 중 가장 가까운 것
+    const best = sorted.find((r) => {
+      const exRaw = r.ex_divi_dt ?? r.bsop_dtt ?? r.stnd_dt ?? "";
+      return exRaw >= todayStr;
+    }) ?? sorted[0];
+
+    if (!best) return null;
+
+    // 가능한 필드명으로 값 추출 (KIS 버전에 따라 다름)
+    const exRaw  = best.ex_divi_dt  ?? best.bsop_dtt   ?? best.stnd_dt   ?? null;
+    const recRaw = best.base_dt     ?? best.stnd_dt     ?? null;
+    const payRaw = best.divi_pay_dt ?? best.pay_dt      ?? null;
+    const dpsRaw = best.stkl_divi_amt ?? best.per_sher_divi_amt ?? best.divi_amt ?? null;
+
+    const result: KisDividendSchedule = {
+      exDate:      fmtKisDate(exRaw  ?? undefined),
+      recordDate:  fmtKisDate(recRaw ?? undefined),
+      paymentDate: fmtKisDate(payRaw ?? undefined),
+      dps:         dpsRaw ? parseFloat(String(dpsRaw).replace(/,/g, "")) || null : null,
+    };
+
+    // 유효한 날짜가 하나도 없으면 null 반환
+    if (!result.exDate && !result.paymentDate) return null;
+
+    setCached(cacheKey, result, 6 * 60 * 60 * 1000); // 6시간 캐시
+    return result;
+  } catch {
+    return null;
+  }
 }
 
 // ─── 주식 현재가 조회 ─────────────────────────────────────────────────────────

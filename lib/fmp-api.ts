@@ -229,17 +229,18 @@ export async function getFmpRankItems(
       batch.map(async ({ ticker, name }) => {
         const q = await getFmpQuote(ticker);
         if (!q) return null;
-        // 연간 DPS: dividendYield × price (역산)
-        let dps = q.dps;
-        if (!dps && q.dividendYield && q.price) {
-          dps = q.dividendYield * q.price;
-        }
-        const dividendYield = (dps && q.price && q.price > 0)
-          ? dps / q.price
-          : q.dividendYield;
+
+        // 연간 DPS: FMP profile의 dividendYield(연간 수익률) × price 로 역산
+        // q.dps = lastDiv (1회 배당금)이므로 연간화에 사용하면 안 됨
+        const dividendYield = q.dividendYield ?? null;
+        const annualDps = (dividendYield && q.price && q.price > 0)
+          ? dividendYield * q.price
+          : null;
 
         if (!dividendYield || dividendYield <= 0) return null;
-        return { ticker, name, price: q.price, dps, dividendYield, market: "US" as const };
+        // 수익률 30% 초과는 데이터 오류로 간주 (특수 상황 제외)
+        if (dividendYield > 0.30) return null;
+        return { ticker, name, price: q.price, dps: annualDps, dividendYield, market: "US" as const };
       })
     );
     settled.forEach((r) => {

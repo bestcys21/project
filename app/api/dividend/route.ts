@@ -6,7 +6,7 @@ import {
   getFmpDividendHistory,
   estimateFrequency,
 } from "@/lib/fmp-api";
-import { hasKisKey, getKisPrice } from "@/lib/kis-api";
+import { hasKisKey, getKisPrice, getKisDividendSchedule } from "@/lib/kis-api";
 
 // SSL 우회 (사내망/개발 환경)
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -205,8 +205,22 @@ async function handleWithYahoo(rawTicker: string) {
     else if (det?.dividendDate != null) payDateRaw = det.dividendDate;
   } catch { /* 무시 */ }
 
-  // 한국 주식 → Open DART 공시 데이터로 DPS 검증/보완
-  if (isKoreanStock && process.env.DART_API_KEY) {
+  // 한국 주식 → KIS 예탁원 배당일정 (가장 정확한 배당락일/지급일 소스)
+  let kisSchedule: { exDate: string | null; paymentDate: string | null; dps: number | null } | null = null;
+  if (isKoreanStock && hasKisKey()) {
+    try {
+      const stockCode = ticker.replace(/\.(KS|KQ)$/, "");
+      kisSchedule = await getKisDividendSchedule(stockCode);
+      // KIS DPS가 있으면 Yahoo/DART 값 덮어쓰기
+      if (kisSchedule?.dps && kisSchedule.dps > 0) {
+        dps = kisSchedule.dps;
+        if (price != null && price > 0) divYield = dps / price;
+      }
+    } catch { /* 실패 시 Yahoo 유지 */ }
+  }
+
+  // 한국 주식 → Open DART 공시 데이터로 DPS 검증/보완 (KIS 없을 때)
+  if (isKoreanStock && !kisSchedule?.dps && process.env.DART_API_KEY) {
     try {
       const stockCode = ticker.replace(".KS", "").replace(".KQ", "");
       const dartData  = await getDartDividend(stockCode);
@@ -218,8 +232,9 @@ async function handleWithYahoo(rawTicker: string) {
     } catch { /* DART 실패 시 Yahoo 데이터로 진행 */ }
   }
 
-  const fmtExDate  = fmt(exDateRaw);
-  const fmtPayDate = fmt(payDateRaw);
+  // KIS 날짜 우선 적용, 없으면 Yahoo 값 사용
+  const fmtExDate  = kisSchedule?.exDate      ?? fmt(exDateRaw);
+  const fmtPayDate = kisSchedule?.paymentDate  ?? fmt(payDateRaw);
 
   // 배당 지급 이력으로 패턴 파악
   let payMonths: number[] = [];

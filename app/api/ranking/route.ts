@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hasFmpKey, getFmpRankItems } from "@/lib/fmp-api";
 import { getDartDividend, getCached } from "@/lib/dart-api";
-import { getNaverBatch } from "@/lib/naver-api";
+import { getNaverBatch, getNaverDividendRanking } from "@/lib/naver-api";
+import { hasKisKey, getKisDividendRanking } from "@/lib/kis-api";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -19,12 +20,30 @@ function getCachedRank(market: string): any[] | null {
   return entry.data;
 }
 function setCachedRank(market: string, data: any[]) {
-  rankCache.set(market, { data, expiresAt: Date.now() + 60 * 60 * 1000 }); // 1시간
+  // 딥 카피: 백그라운드 비동기 뮤테이션이 캐시를 오염시키는 것을 방지
+  rankCache.set(market, { data: JSON.parse(JSON.stringify(data)), expiresAt: Date.now() + 60 * 60 * 1000 }); // 1시간
 }
 
 function getClient() {
   const YahooFinance = require("yahoo-finance2").default;
   return new YahooFinance({ suppressNotices: ["yahooSurvey", "ripHistorical"] });
+}
+
+// DART 보정: 전체 작업에 타임아웃을 걸어 느린 DART API가 응답을 블로킹하지 않도록 함
+async function applyDartCorrection(data: any[], timeoutMs = 5000) {
+  if (!process.env.DART_API_KEY) return;
+  const correction = Promise.allSettled(
+    data.map(async (item) => {
+      const code     = item.ticker.replace(/\.(KS|KQ)$/, "");
+      const dartData = await getDartDividend(code);
+      if (dartData?.dps && dartData.dps > 0 && item.price > 0) {
+        item.dps           = dartData.dps;
+        item.dividendYield = dartData.dps / item.price;
+      }
+    }),
+  );
+  const timeout = new Promise<void>((resolve) => setTimeout(resolve, timeoutMs));
+  await Promise.race([correction, timeout]);
 }
 
 // ── 한국 KOSPI/KOSDAQ 주요 고배당 후보 (Yahoo Finance 필터 후 상위 50개 반환)
@@ -49,6 +68,11 @@ const KR_TICKERS_RAW = [
   { ticker: "001465.KS", name: "현대해상우" },
   { ticker: "007575.KS", name: "이수화학우" },
   { ticker: "004545.KS", name: "삼양사우" },
+  { ticker: "000815.KS", name: "삼성화재우" },
+  { ticker: "003575.KS", name: "대신증권우" },
+  { ticker: "010955.KS", name: "S-Oil우" },
+  { ticker: "006080.KS", name: "SK디스커버리우" },
+  { ticker: "009415.KS", name: "세아홀딩스우" },
   // 은행/금융
   { ticker: "105560.KS", name: "KB금융" },
   { ticker: "055550.KS", name: "신한지주" },
@@ -75,9 +99,9 @@ const KR_TICKERS_RAW = [
   // 담배/소비재
   { ticker: "033780.KS", name: "KT&G" },
   // 인프라/유틸리티/리츠
+  // 참고: 한국전력(015760), 한국가스공사(036460)는 만성 적자로 배당 중단 → 제외
   { ticker: "088980.KS", name: "맥쿼리인프라" },
-  { ticker: "015760.KS", name: "한국전력" },
-  { ticker: "036460.KS", name: "한국가스공사" },
+  { ticker: "071970.KS", name: "스카이라이프" },
   { ticker: "330590.KS", name: "롯데리츠" },
   { ticker: "395400.KS", name: "SK리츠" },
   { ticker: "432320.KS", name: "KB스타리츠" },
@@ -324,73 +348,111 @@ export async function GET(req: NextRequest) {
 
   // ── KR 주식 ──────────────────────────────────────────────────────────────
   if (market === "KR") {
-    const yf         = getClient();
-    const tickerSyms = KR_TICKERS.map((t) => t.ticker);
-    // 한국어 이름 맵 (Yahoo 영문명 대신 항상 이 값 사용)
-    const nameMap    = new Map(KR_TICKERS.map((t) => [t.ticker, t.name]));
-    const stockCodes = KR_TICKERS.map((t) => t.ticker.replace(/\.(KS|KQ)$/, ""));
+    // ─ 1순위: KIS + Naver 병렬 조회 후 병합 ─────────────────────────────
+    // KIS는 수익률 상위 ~50개 종목, Naver는 KOSPI/KOSDAQ 스크리너로 누락 종목 보완
+    // DART 보정은 핫 패스에서 제거 — 백그라운드 뮤테이션으로 정렬 순서 오염 방지
+    const [kisResult, naverResult] = await Promise.allSettled([
+      hasKisKey() ? getKisDividendRanking(100) : Promise.resolve([]),
+      getNaverDividendRanking(100),
+    ]);
 
-    // Step 1: Yahoo 배치 조회 (전체를 한 번에 — 개별 호출 대비 10배 빠름)
-    let yahooMap = new Map<string, any>();
-    try {
-      // yahoo-finance2는 배열 입력 지원
-      const quotes: any[] = await yf.quote(tickerSyms);
-      const quoteArr = Array.isArray(quotes) ? quotes : [quotes];
-      quoteArr.forEach((q: any) => {
-        if (q?.symbol) yahooMap.set(q.symbol, q);
-      });
-    } catch {
-      // 배치 실패 시 빈 맵 — Naver/DART로만 진행
-    }
+    const kisItems   = kisResult.status   === "fulfilled" ? kisResult.value   : [];
+    const naverItems = naverResult.status === "fulfilled" ? naverResult.value : [];
 
-    // Step 2: Naver 가격 배치 조회 (병렬)
-    const naverMap = await getNaverBatch(stockCodes, 15, 100);
+    if (kisItems.length > 0 || naverItems.length > 0) {
+      // 6자리 ticker를 키로 병합 — Naver 먼저 채우고 KIS로 덮어쓰기 (KIS = 현재가 기준)
+      const merged = new Map<string, any>();
 
-    // Step 3: 종목별 데이터 집계
-    const data: any[] = [];
-    for (const { ticker } of KR_TICKERS) {
-      const stockCode   = ticker.replace(/\.(KS|KQ)$/, "");
-      const koreanName  = nameMap.get(ticker) ?? stockCode; // 항상 한국어 이름
-      const yahoo       = yahooMap.get(ticker);
-      const naver       = naverMap.get(stockCode);
-
-      // 가격: Naver 우선 (KIS 없을 때 더 정확) → Yahoo 백업
-      let price = naver?.price ?? yahoo?.regularMarketPrice ?? null;
-
-      // DPS / yield: Yahoo 기본값 (커버리지 100%)
-      let dps: number | null =
-        yahoo?.trailingAnnualDividendRate ?? yahoo?.dividendRate ?? null;
-      let dividendYield: number | null = null;
-
-      if (dps != null && dps > 0 && price != null && price > 0) {
-        dividendYield = dps / price;
-      } else {
-        const raw = yahoo?.trailingAnnualDividendYield ?? null;
-        if (raw != null && raw > 0) {
-          dividendYield = raw > 1 ? raw / 100 : raw;
-          if (price != null && price > 0) dps = (dividendYield as number) * price;
+      for (const item of naverItems) {
+        if (item.dividendYield > 0 && item.dividendYield <= 0.30 && item.price > 0) {
+          merged.set(item.ticker, {
+            ticker: item.ticker,
+            name:   item.name,
+            dividendYield: item.dividendYield,
+            dps:   item.dps,
+            price: item.price,
+            market: "KR",
+          });
         }
       }
 
-      if (!price || !dividendYield || dividendYield <= 0) continue;
-      data.push({ ticker, name: koreanName, dividendYield, dps, price, market: "KR" });
+      for (const item of kisItems) {
+        const price = item.currentPrice;
+        const dps   = item.dividendAmount;
+        const dividendYield = dps > 0 && price > 0 ? dps / price : item.dividendYield;
+        if (dividendYield > 0 && dividendYield <= 0.30 && price > 0) {
+          merged.set(item.ticker, {
+            ticker: item.ticker,
+            name:   item.name,
+            dividendYield,
+            dps,
+            price,
+            market: "KR",
+          });
+        }
+      }
+
+      const sorted = Array.from(merged.values())
+        .sort((a, b) => b.dividendYield - a.dividendYield)
+        .slice(0, 50);
+
+      const source = kisItems.length > 0 && naverItems.length > 0
+        ? "KIS+Naver"
+        : kisItems.length > 0 ? "KIS" : "Naver";
+
+      setCachedRank(market, sorted);
+      return NextResponse.json(
+        { market, data: sorted },
+        { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400", "X-Source": source } },
+      );
     }
 
-    // Step 4: DART DPS 보정 (캐시 히트 시만 — 블로킹 없음)
-    //         DART 데이터는 캐시 워밍 후 다음 요청부터 적용
-    if (process.env.DART_API_KEY) {
-      await Promise.allSettled(
-        data.map(async (item) => {
-          const stockCode = item.ticker.replace(/\.(KS|KQ)$/, "");
-          const cached    = getCached(`div:${stockCode}:2024`) ?? getCached(`div:${stockCode}:2023`);
-          if (!cached) return; // 캐시 없으면 스킵 (속도 우선)
-          const dartData = await getDartDividend(stockCode);
-          if (dartData?.dps && dartData.dps > 0 && item.price > 0) {
-            item.dps           = dartData.dps;
-            item.dividendYield = dartData.dps / item.price;
-          }
-        }),
-      );
+    // ─ 2순위(최후 fallback): Yahoo Finance + Naver 배치 (하드코딩 목록 필터링 방식) ─
+    // KIS와 Naver 스크리너 모두 실패했을 때만 사용
+    const yf         = getClient();
+    const tickerSyms = KR_TICKERS.map((t) => t.ticker);
+    const nameMap    = new Map(KR_TICKERS.map((t) => [t.ticker, t.name]));
+    const stockCodes = KR_TICKERS.map((t) => t.ticker.replace(/\.(KS|KQ)$/, ""));
+
+    let yahooMap = new Map<string, any>();
+    try {
+      const quotes: any[] = await yf.quote(tickerSyms);
+      const quoteArr = Array.isArray(quotes) ? quotes : [quotes];
+      quoteArr.forEach((q: any) => { if (q?.symbol) yahooMap.set(q.symbol, q); });
+    } catch { /* Naver/DART만으로 진행 */ }
+
+    const naverMap = await getNaverBatch(stockCodes, 15, 100);
+
+    const data: any[] = [];
+    for (const { ticker } of KR_TICKERS) {
+      const stockCode  = ticker.replace(/\.(KS|KQ)$/, "");
+      const koreanName = nameMap.get(ticker) ?? stockCode;
+      const naver      = naverMap.get(stockCode);
+      const yahoo      = yahooMap.get(ticker);
+
+      // 가격: Naver 우선 (더 정확), Yahoo 보조
+      const price = naver?.price ?? yahoo?.regularMarketPrice ?? null;
+
+      // 배당수익률: Naver 우선 (이미 정제된 값), Yahoo는 KR 종목에서 신뢰도 낮음
+      let dividendYield: number | null = naver?.dividendYield ?? null;
+      let dps: number | null           = naver?.dps ?? null;
+
+      if (!dividendYield) {
+        // Yahoo 배당 데이터로 보조 (KR에서 부정확할 수 있음)
+        const rawYield = yahoo?.trailingAnnualDividendYield ?? null;
+        if (rawYield != null && rawYield > 0) {
+          dividendYield = rawYield > 1 ? rawYield / 100 : rawYield;
+        }
+        const rawDps = yahoo?.trailingAnnualDividendRate ?? yahoo?.dividendRate ?? null;
+        if (rawDps != null && rawDps > 0 && price != null && price > 0) {
+          dps           = rawDps;
+          dividendYield = rawDps / price;
+        }
+      }
+
+      if (!price || !dividendYield || dividendYield <= 0 || dividendYield > 0.30) continue;
+      if (!dps && price) dps = Math.round(price * dividendYield);
+      data.push({ ticker, name: koreanName, dividendYield, dps, price, market: "KR" });
     }
 
     const sorted = data
@@ -438,7 +500,7 @@ export async function GET(req: NextRequest) {
   const data = results
     .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled")
     .map((r) => r.value)
-    .filter((d) => d.dividendYield != null && d.dividendYield > 0)
+    .filter((d) => d.dividendYield != null && d.dividendYield > 0 && d.dividendYield <= 0.30)
     .sort((a, b) => b.dividendYield - a.dividendYield)
     .slice(0, 50);
 
