@@ -5,8 +5,22 @@ import { getNaverBatch } from "@/lib/naver-api";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-// 1시간 캐시 — 랭킹 데이터는 실시간 불필요, Vercel timeout 방지
+// Vercel Edge 캐시: 1시간
 export const revalidate = 3600;
+
+// ── 서버 인메모리 캐시 (로컬 개발 포함, 첫 로드 후 즉시 응답) ──────────────
+interface RankCache { data: any[]; expiresAt: number; }
+const rankCache = new Map<string, RankCache>();
+
+function getCachedRank(market: string): any[] | null {
+  const entry = rankCache.get(market);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) { rankCache.delete(market); return null; }
+  return entry.data;
+}
+function setCachedRank(market: string, data: any[]) {
+  rankCache.set(market, { data, expiresAt: Date.now() + 60 * 60 * 1000 }); // 1시간
+}
 
 function getClient() {
   const YahooFinance = require("yahoo-finance2").default;
@@ -254,69 +268,96 @@ async function batchFetch<T>(
 export async function GET(req: NextRequest) {
   const market = req.nextUrl.searchParams.get("market") ?? "US";
 
+  // 캐시 히트 시 즉시 반환 (로컬 개발 속도 개선)
+  const cached = getCachedRank(market);
+  if (cached) {
+    return NextResponse.json(
+      { market, data: cached },
+      { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400", "X-Cache": "HIT" } },
+    );
+  }
+
   // ── US 주식: FMP 키가 있으면 FMP 사용 (배당 정확도 우수) ─────────────────
   if (market === "US" && hasFmpKey()) {
     const fmpItems = await getFmpRankItems(US_TICKERS, 10, 200);
     const data = fmpItems
       .sort((a, b) => (b.dividendYield ?? 0) - (a.dividendYield ?? 0))
       .slice(0, 50);
+    setCachedRank(market, data);
     return NextResponse.json({ market, data });
   }
 
-  // ── KR 주식: Naver 모바일 API (Yahoo 대비 정확도 대폭 향상) ──────────────
+  // ── KR 주식: Yahoo(전체 커버) + Naver(가격 정확도) + DART(DPS 정확도) ────
   if (market === "KR") {
+    const yf = getClient();
     const stockCodes = KR_TICKERS.map(({ ticker }) =>
       ticker.replace(/\.(KS|KQ)$/, ""),
     );
 
-    // Naver 배치 조회 (병렬)
+    // Step 1: Naver 가격 배치 조회 (병렬, 빠름)
     const naverMap = await getNaverBatch(stockCodes, 15, 150);
 
-    // DART DPS로 보완 (Naver yield가 부정확한 경우 대비)
-    const data: any[] = [];
-    await batchFetch(
+    // Step 2: Yahoo Finance로 전체 종목 yield 확보 (커버리지 100%)
+    //         Naver 가격으로 보정, DART DPS로 정확도 향상
+    const results = await batchFetch(
       KR_TICKERS,
       async ({ ticker, name: fallbackName }) => {
         const stockCode = ticker.replace(/\.(KS|KQ)$/, "");
-        const naver = naverMap.get(stockCode);
+        const naver     = naverMap.get(stockCode);
 
-        let price         = naver?.price         ?? null;
-        let dividendYield = naver?.dividendYield  ?? null;
-        let dps           = naver?.dps            ?? null;
-        const name        = naver?.name           ?? fallbackName;
+        // Yahoo Finance로 기본 데이터 확보
+        let price:         number | null = naver?.price ?? null;
+        let dps:           number | null = null;
+        let dividendYield: number | null = null;
+        let name:          string        = naver?.name ?? fallbackName;
 
-        // DART DPS로 수익률 재계산 (더 정확한 값이 있으면 덮어씀)
+        try {
+          const quote = await yf.quote(ticker);
+          if (!price && quote?.regularMarketPrice) price = quote.regularMarketPrice;
+          if (!name || name === fallbackName) name = quote?.longName ?? quote?.shortName ?? fallbackName;
+
+          // Yahoo DPS (KR에서 부정확하지만 커버리지 확보용)
+          const yahooRate = (quote as any)?.trailingAnnualDividendRate ?? null;
+          const yahooYield = (quote as any)?.trailingAnnualDividendYield ?? null;
+
+          if (yahooRate != null && yahooRate > 0) {
+            dps = yahooRate;
+          }
+          if (dps != null && price != null && price > 0) {
+            dividendYield = dps / price;
+          } else if (yahooYield != null && yahooYield > 0) {
+            dividendYield = yahooYield > 1 ? yahooYield / 100 : yahooYield;
+          }
+        } catch { /* Yahoo 실패 시 Naver 데이터로만 진행 */ }
+
+        // DART DPS로 정확도 향상 (개별 호출 — 캐시 히트 시 빠름)
         if (process.env.DART_API_KEY) {
           try {
             const dartData = await getDartDividend(stockCode);
             if (dartData?.dps != null && dartData.dps > 0) {
               dps = dartData.dps;
-              if (price != null && price > 0) {
-                dividendYield = dps / price;
-              }
+              if (price != null && price > 0) dividendYield = dps / price;
             }
-          } catch { /* DART 실패 시 Naver 값 유지 */ }
+          } catch { /* DART 실패 시 Yahoo 값 유지 */ }
         }
 
-        if (dividendYield != null && dividendYield > 0) {
-          data.push({ ticker, name, dividendYield, dps, price, market: "KR" });
-        }
+        if (!price || !dividendYield || dividendYield <= 0) return null;
+        return { ticker, name, dividendYield, dps, price, market: "KR" };
       },
-      10,
-      100,
+      8,   // 배치 크기 줄여 Yahoo rate limit 방지
+      200, // 배치 간 딜레이
     );
 
-    const sorted = data
+    const data = results
+      .filter((r): r is PromiseFulfilledResult<any> => r.status === "fulfilled" && r.value !== null)
+      .map((r) => r.value)
       .sort((a, b) => b.dividendYield - a.dividendYield)
       .slice(0, 50);
 
+    setCachedRank(market, data);
     return NextResponse.json(
-      { market, data: sorted },
-      {
-        headers: {
-          "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
-        },
-      },
+      { market, data },
+      { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" } },
     );
   }
 
@@ -358,12 +399,9 @@ export async function GET(req: NextRequest) {
     .sort((a, b) => b.dividendYield - a.dividendYield)
     .slice(0, 50);
 
+  setCachedRank(market, data);
   return NextResponse.json(
     { market, data },
-    {
-      headers: {
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
-      },
-    },
+    { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" } },
   );
 }
