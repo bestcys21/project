@@ -15,7 +15,7 @@ const API_KEY   = process.env.DART_API_KEY ?? "";
 interface CacheEntry<T> { data: T; expiresAt: number; }
 const cache = new Map<string, CacheEntry<unknown>>();
 
-function getCached<T>(key: string): T | null {
+export function getCached<T>(key: string): T | null {
   const entry = cache.get(key);
   if (!entry) return null;
   if (Date.now() > entry.expiresAt) { cache.delete(key); return null; }
