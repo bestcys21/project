@@ -9,10 +9,6 @@
  *
  * https://apiportal.koreainvestment.com/
  */
-import fs from "fs";
-import path from "path";
-import os from "os";
-
 const KIS_BASE   = "https://openapi.koreainvestment.com:9443";
 const APP_KEY    = process.env.KIS_APP_KEY    ?? "";
 const APP_SECRET = process.env.KIS_APP_SECRET ?? "";
@@ -21,39 +17,41 @@ export function hasKisKey(): boolean {
   return APP_KEY.length > 0 && APP_SECRET.length > 0;
 }
 
-// ─── 토큰 캐시 (24시간 유효, 1분 여유) ───────────────────────────────────────
-// 서버리스 환경에서 인메모리 변수는 재시작 시 초기화되므로
-// 파일 시스템에 토큰을 저장해 불필요한 재발급을 방지한다.
-const TOKEN_CACHE_FILE = path.join(os.tmpdir(), "kis_token_cache.json");
+// ─── 토큰 캐시 ────────────────────────────────────────────────────────────────
+// Vercel KV(Redis)가 있으면 인스턴스 간 토큰 공유 → 재발급 최소화
+// KV가 없으면 인메모리 캐시만 사용 (로컬 개발)
 let tokenMemCache: { token: string; expiresAt: number } | null = null;
 
-function readTokenFromFile(): { token: string; expiresAt: number } | null {
+async function kvGet(key: string): Promise<{ token: string; expiresAt: number } | null> {
   try {
-    const raw = fs.readFileSync(TOKEN_CACHE_FILE, "utf-8");
-    return JSON.parse(raw);
+    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) return null;
+    const { kv } = await import("@vercel/kv");
+    return await kv.get<{ token: string; expiresAt: number }>(key);
   } catch {
     return null;
   }
 }
 
-function writeTokenToFile(cache: { token: string; expiresAt: number }) {
+async function kvSet(key: string, value: { token: string; expiresAt: number }, ttlSec: number) {
   try {
-    fs.writeFileSync(TOKEN_CACHE_FILE, JSON.stringify(cache), "utf-8");
+    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) return;
+    const { kv } = await import("@vercel/kv");
+    await kv.set(key, value, { ex: ttlSec });
   } catch {
-    // 파일 쓰기 실패 시 인메모리 캐시만 사용
+    // KV 저장 실패 시 인메모리 캐시만 사용
   }
 }
 
 async function getAccessToken(): Promise<string> {
-  // 1) 인메모리 캐시 확인
+  // 1) 인메모리 캐시 확인 (가장 빠름)
   if (tokenMemCache && Date.now() < tokenMemCache.expiresAt) {
     return tokenMemCache.token;
   }
 
-  // 2) 파일 캐시 확인 (서버리스 재시작 후에도 유효한 토큰 재사용)
-  const fileCache = readTokenFromFile();
-  if (fileCache && Date.now() < fileCache.expiresAt) {
-    tokenMemCache = fileCache;
+  // 2) Vercel KV 캐시 확인 (인스턴스 간 공유 — 재발급 방지 핵심)
+  const kvCache = await kvGet("kis:token");
+  if (kvCache && Date.now() < kvCache.expiresAt) {
+    tokenMemCache = kvCache;
     return tokenMemCache.token;
   }
 
@@ -73,11 +71,12 @@ async function getAccessToken(): Promise<string> {
   const data = await res.json();
   if (!data.access_token) throw new Error(`KIS token missing: ${data.msg1 ?? ""}`);
 
-  const expiresIn = (data.expires_in as number) * 1000;
-  const newCache = { token: data.access_token, expiresAt: Date.now() + expiresIn - 60_000 };
+  const expiresIn  = (data.expires_in as number);
+  const expiresAt  = Date.now() + expiresIn * 1000 - 60_000;
+  const newCache   = { token: data.access_token, expiresAt };
 
   tokenMemCache = newCache;
-  writeTokenToFile(newCache);
+  await kvSet("kis:token", newCache, expiresIn - 60); // KV에 TTL과 함께 저장
 
   return tokenMemCache.token;
 }
