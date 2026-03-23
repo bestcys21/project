@@ -114,69 +114,85 @@ async function fetchKisDividendRank(
   if (cached) return cached;
 
   const token = await getAccessToken();
-  // 국내주식 배당률 상위 [국내주식-106]
-  // TR: HHKDB13470100, 응답 필드: sht_cd, isin_name, record_date, per_sto_divi_amt, divi_rate, divi_kind
-  // F_DT/T_DT = 배당 기준일(record_date) 범위. FY2024 확정 배당 기준.
-  const url   = new URL(`${KIS_BASE}/uapi/domestic-stock/v1/ranking/dividend-rate`);
-  url.searchParams.set("fid_cond_mrkt_div_code",  marketCode);
-  url.searchParams.set("fid_cond_scr_div_code",   "20171");
-  url.searchParams.set("fid_input_iscd",           "0000");
-  url.searchParams.set("fid_div_cls_code",          "0");
-  url.searchParams.set("fid_blng_cls_code",         "0");
-  url.searchParams.set("fid_rank_sort_cls_code",    "0");
-  url.searchParams.set("fid_trgt_cls_code",         "0");
-  url.searchParams.set("fid_trgt_exls_cls_code",    "0");
-  url.searchParams.set("fid_vol_cnt",               "0");
-  url.searchParams.set("fid_input_cnt_1",           "0");
-  url.searchParams.set("fid_input_price_1",         "");
-  url.searchParams.set("fid_input_price_2",         "");
-  url.searchParams.set("fid_rsfl_rate1",            "");
-  url.searchParams.set("fid_rsfl_rate2",            "");
-  url.searchParams.set("CTS_AREA",                  "");
-  url.searchParams.set("GB1",                       "0");
-  url.searchParams.set("UPJONG",                    "");
-  url.searchParams.set("GB2",                       "0");
-  url.searchParams.set("GB3",                       "1");
-  url.searchParams.set("F_DT",                      "20240101");
-  url.searchParams.set("T_DT",                      "20241231");
-  url.searchParams.set("GB4",                       "0");
+  // TR: HHKDB13470100 — CTS_AREA 페이지네이션으로 전체 배당주 수집
+  // 페이지당 ~19건, 최대 10페이지(~190건)까지 순회
+  const allItems: KisDividendRankItem[] = [];
+  const seen = new Set<string>();
+  let ctsArea = "";
+  let page = 0;
+  const MAX_PAGES = 10;
 
-  const res = await fetch(url.toString(), {
-    headers: {
-      authorization:  `Bearer ${token}`,
-      appkey:         APP_KEY,
-      appsecret:      APP_SECRET,
-      "tr_id":        "HHKDB13470100",
-      "custtype":     "P",
-      "Content-Type": "application/json; charset=utf-8",
-    },
-    signal: AbortSignal.timeout(15000),
-  });
+  do {
+    const url = new URL(`${KIS_BASE}/uapi/domestic-stock/v1/ranking/dividend-rate`);
+    url.searchParams.set("fid_cond_mrkt_div_code",  marketCode);
+    url.searchParams.set("fid_cond_scr_div_code",   "20171");
+    url.searchParams.set("fid_input_iscd",           "0000");
+    url.searchParams.set("fid_div_cls_code",          "0");
+    url.searchParams.set("fid_blng_cls_code",         "0");
+    url.searchParams.set("fid_rank_sort_cls_code",    "0");
+    url.searchParams.set("fid_trgt_cls_code",         "0");
+    url.searchParams.set("fid_trgt_exls_cls_code",    "0");
+    url.searchParams.set("fid_vol_cnt",               "0");
+    url.searchParams.set("fid_input_cnt_1",           "0");
+    url.searchParams.set("fid_input_price_1",         "");
+    url.searchParams.set("fid_input_price_2",         "");
+    url.searchParams.set("fid_rsfl_rate1",            "");
+    url.searchParams.set("fid_rsfl_rate2",            "");
+    url.searchParams.set("CTS_AREA",                  ctsArea);
+    url.searchParams.set("GB1",                       "0");
+    url.searchParams.set("UPJONG",                    "");
+    url.searchParams.set("GB2",                       "0");
+    url.searchParams.set("GB3",                       "1");
+    url.searchParams.set("F_DT",                      "20240101");
+    url.searchParams.set("T_DT",                      "20241231");
+    url.searchParams.set("GB4",                       "0");
 
-  if (!res.ok) return [];
-  const json = await res.json();
-  if (json.rt_cd !== "0" || !Array.isArray(json.output)) return [];
+    const res = await fetch(url.toString(), {
+      headers: {
+        authorization:  `Bearer ${token}`,
+        appkey:         APP_KEY,
+        appsecret:      APP_SECRET,
+        "tr_id":        "HHKDB13470100",
+        "custtype":     "P",
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      signal: AbortSignal.timeout(15000),
+    });
 
-  const items: KisDividendRankItem[] = (json.output as any[])
-    .filter((o: any) => o.sht_cd && parseFloat(o.divi_rate ?? "0") > 0)
-    .map((o: any) => {
+    if (!res.ok) break;
+    const json = await res.json();
+    if (json.rt_cd !== "0" || !Array.isArray(json.output)) break;
+
+    for (const o of json.output as any[]) {
+      if (!o.sht_cd || parseFloat(o.divi_rate ?? "0") <= 0) continue;
+      if (seen.has(String(o.sht_cd))) continue;
+      seen.add(String(o.sht_cd));
+
       const dividendAmount = parseFloat(String(o.per_sto_divi_amt ?? "0").replace(/,/g, "")) || 0;
       const yieldPct       = parseFloat(String(o.divi_rate       ?? "0").replace(/,/g, "")) || 0;
       const dividendYield  = yieldPct > 1 ? yieldPct / 100 : yieldPct;
-      // 현재가 역산: DPS / 배당수익률 (API 응답에 현재가 필드 없음)
       const currentPrice   = dividendYield > 0 ? Math.round(dividendAmount / dividendYield) : 0;
-      return {
-        ticker:        String(o.sht_cd),
-        name:          String(o.isin_name ?? o.sht_cd),
-        currentPrice,
-        dividendAmount,
-        dividendYield,
-      };
-    })
-    .filter((item) => item.dividendYield > 0 && item.currentPrice > 0);
 
-  setCached(cacheKey, items, 60 * 60 * 1000); // 1시간 캐시
-  return items;
+      if (dividendYield > 0 && currentPrice > 0) {
+        allItems.push({
+          ticker:        String(o.sht_cd),
+          name:          String(o.isin_name ?? o.sht_cd),
+          currentPrice,
+          dividendAmount,
+          dividendYield,
+        });
+      }
+    }
+
+    // 다음 페이지 토큰 — 빈 문자열이면 마지막 페이지
+    ctsArea = String(json.CTS_AREA ?? "").trim();
+    page++;
+  } while (ctsArea !== "" && page < MAX_PAGES);
+
+  if (allItems.length > 0) {
+    setCached(cacheKey, allItems, 60 * 60 * 1000); // 1시간 캐시
+  }
+  return allItems;
 }
 
 /**

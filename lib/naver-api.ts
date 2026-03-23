@@ -106,7 +106,8 @@ async function fetchNaverDividendRankPage(
   sosok: 0 | 1,
   page  = 1,
 ): Promise<NaverDividendRankItem[]> {
-  const url = `${NAVER_PC}/sise/dividendCostList.naver?sosok=${sosok}&page=${page}`;
+  // dividendCostList.naver → 삭제됨(404). sise_dividend_yield.naver 로 교체
+  const url = `${NAVER_PC}/sise/sise_dividend_yield.naver?sosok=${sosok}&page=${page}`;
   try {
     const res = await fetch(url, {
       headers: {
