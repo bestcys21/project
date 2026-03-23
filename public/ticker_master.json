@@ -1,5 +1,47 @@
 [
   {
+    "name": "1Q 200��Ƽ��",
+    "ticker": "451060",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "1Q CD�ݸ���Ƽ��(�ռ�)",
+    "ticker": "491610",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "1Q �Ӵϸ��Ͼ�Ƽ��",
+    "ticker": "479080",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "1Q �ڸ��ƹ����",
+    "ticker": "495330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "1Q �ܱ����ä��Ƽ��",
+    "ticker": "463290",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "1Q �������׷�ä��(A+�̻�)&�������",
+    "ticker": "492500",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
     "name": "3노드디지탈그룹유한공사",
     "ticker": "900010",
     "exchange": "KS",
@@ -25599,6 +25641,608 @@
     "market": "KR"
   },
   {
+    "name": "ACE 11�������ڵ�����ȸ��äAA-�̻��Ƽ��",
+    "ticker": "473440",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE 200",
+    "ticker": "105190",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE 200TR",
+    "ticker": "332500",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE 26-06 ȸ��ä(AA-�̻�)��Ƽ��",
+    "ticker": "461270",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE 2������&ģȯ������Ƽ��",
+    "ticker": "385600",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE 2�������ڵ�����ȸ��äAA-�̻��Ƽ��",
+    "ticker": "475260",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE 5�������ڵ�����ȸ��äAA-�̻��Ƽ��",
+    "ticker": "475270",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE 8�������ڵ�����ȸ��äAA-�̻��Ƽ��",
+    "ticker": "475280",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE AI�ݵ�üTOP3+",
+    "ticker": "469150",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ESG��Ƽ��",
+    "ticker": "385590",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE Fn����Һ��ֵ���",
+    "ticker": "226380",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE KPOP��Ŀ��",
+    "ticker": "475050",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE KRX������",
+    "ticker": "411060",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE MSCI�ʸ���(�ռ�)",
+    "ticker": "261920",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE MSCI�ε��׽þ�(�ռ�)",
+    "ticker": "256440",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE MSCI�߽���(�ռ�)",
+    "ticker": "291130",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �϶��̸������ü��",
+    "ticker": "497520",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �۷ι�AI�������ݵ�ü",
+    "ticker": "494340",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �۷ι��귣��TOP10",
+    "ticker": "435040",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �۷ι��ݵ�üTOP4 Plus",
+    "ticker": "446770",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �۷ι����ĸ�",
+    "ticker": "497510",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �۷ι�����TOP10",
+    "ticker": "460960",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �۷ι����������Ƽ��",
+    "ticker": "414270",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �Ｚ�׷쵿�ϰ���",
+    "ticker": "131890",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �Ｚ�׷켽�Ͱ���",
+    "ticker": "108450",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �ƽþ�TOP50",
+    "ticker": "277540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �ε������ǥBIG5�׷��Ƽ��",
+    "ticker": "487920",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �ε��������Ŀ���Ƽ��",
+    "ticker": "487910",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �ι���",
+    "ticker": "145670",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �Ϻ�Nikkei225(H)",
+    "ticker": "238720",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �Ϻ�TOPIX�ι���(�ռ� H)",
+    "ticker": "205720",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �Ϻ�TOPIX��������(H)",
+    "ticker": "196030",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �Ϻ��ݵ�ü",
+    "ticker": "469160",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �Ӵϸ��Ͼ�Ƽ��",
+    "ticker": "487340",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �ڸ��ƹ����",
+    "ticker": "496120",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �ڸ���AI��ũ�ٽɻ��",
+    "ticker": "380340",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �ڽ���",
+    "ticker": "305050",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �ڽ���150",
+    "ticker": "354500",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �׽�����ü�ξ�Ƽ��",
+    "ticker": "457480",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�30�ⱹä��ȭ�����Ƽ��(H)",
+    "ticker": "476750",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�30�ⱹä��Ƽ��",
+    "ticker": "476760",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�30�ⱹä��Ƽ��(H)",
+    "ticker": "453850",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�30�ⱹä������������(�ռ� H)",
+    "ticker": "452250",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�500���ϸ�Ÿ��Ŀ������(�ռ�)",
+    "ticker": "480030",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ��弱�� ��������(�ռ� H)",
+    "ticker": "225130",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �ܱ�ä�Ǿ��ľ�Ƽ��",
+    "ticker": "440640",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�ģȯ��׸��׸�",
+    "ticker": "391600",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�IT���ͳ�(�ռ� H)",
+    "ticker": "280320",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�S&P500",
+    "ticker": "360200",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�S&P500�̱�äȥ��50��Ƽ��",
+    "ticker": "438080",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ��Ʈ��VN30(�ռ�)",
+    "ticker": "245710",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�WideMoat���ϰ���",
+    "ticker": "309230",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ���۹��ü�ξ�Ƽ��",
+    "ticker": "483340",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱��ֽĺ���Ʈ����",
+    "ticker": "473590",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ���ù��ü�ξ�Ƽ��",
+    "ticker": "483420",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ���þ�MSCI(�ռ�)",
+    "ticker": "265690",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱��ε��긮��(�ռ� H)",
+    "ticker": "181480",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ���ڷ�TOP10",
+    "ticker": "433500",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱��ݵ�ü���ϸ�Ÿ��Ŀ������(�ռ�)",
+    "ticker": "480040",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱��޷�SOFR�ݸ�(�ռ�)",
+    "ticker": "456880",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱��޷��ܱ�ä�Ǿ�Ƽ��",
+    "ticker": "440650",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ����ä10��",
+    "ticker": "365780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ����ä3��",
+    "ticker": "114460",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ����ä��(AA-�̻�)��Ƽ��",
+    "ticker": "356540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �߱���â��STAR50",
+    "ticker": "416090",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ����ȯ����ġ�־�Ƽ��",
+    "ticker": "447430",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ����ⱹ��ä��Ƽ��",
+    "ticker": "272910",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ����ũ�μ���Ʈ���ü�ξ�Ƽ��",
+    "ticker": "483330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �ܱ����ä",
+    "ticker": "190620",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �����ƹ��ü�ξ�Ƽ��",
+    "ticker": "483320",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱����ٿ�����",
+    "ticker": "402970",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �����ڱ׷���Ŀ��",
+    "ticker": "469170",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ���̳��׼���ũ",
+    "ticker": "371870",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ������ä��ȥ��",
+    "ticker": "448540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �߱�����CSI300",
+    "ticker": "168580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �߱�����CSI300��������(�ռ�)",
+    "ticker": "219900",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�����ũ7+���ϸ�Ÿ��Ŀ������(�ռ�)",
+    "ticker": "480020",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�����ũTOP7 Plus",
+    "ticker": "465580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�����ũTOP7 Plus�ι���(�ռ�)",
+    "ticker": "465620",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�����ũTOP7 Plus��������(�ռ�)",
+    "ticker": "465610",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱������ϵ��Ƽ��(H)",
+    "ticker": "455660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �������ڻ����ְ�ġ��Ƽ��",
+    "ticker": "494330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE ��������",
+    "ticker": "152500",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�������100",
+    "ticker": "367380",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̱�������100�̱�äȥ��50��Ƽ��",
+    "ticker": "438100",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "ACE �̰���������",
+    "ticker": "316300",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
     "name": "AJ네트웍스",
     "ticker": "095570",
     "exchange": "KS",
@@ -25673,6 +26317,41 @@
     "ticker": "003990",
     "exchange": "KS",
     "type": "stock",
+    "market": "KR"
+  },
+  {
+    "name": "BNK 26-06 Ư��ä(AAA�̻�)��Ƽ��",
+    "ticker": "495710",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "BNK 2�����������",
+    "ticker": "466810",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "BNK �µ���̽�AI",
+    "ticker": "487750",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "BNK ���ְ�ġ��Ƽ��",
+    "ticker": "445690",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "BNK �̷����������Ƽ��",
+    "ticker": "457930",
+    "exchange": "KS",
+    "type": "etf",
     "market": "KR"
   },
   {
@@ -25785,6 +26464,20 @@
     "ticker": "083660",
     "exchange": "KS",
     "type": "stock",
+    "market": "KR"
+  },
+  {
+    "name": "DAISHIN343 AI�ݵ�ü&�������Ƽ��",
+    "ticker": "486240",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "DAISHIN343 K200",
+    "ticker": "434960",
+    "exchange": "KS",
+    "type": "etf",
     "market": "KR"
   },
   {
@@ -25998,6 +26691,20 @@
     "market": "KR"
   },
   {
+    "name": "FOCUS AI�ڸ��ƾ�Ƽ��",
+    "ticker": "448570",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "FOCUS ESG������",
+    "ticker": "285690",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
     "name": "FSN",
     "ticker": "214270",
     "exchange": "KS",
@@ -26072,6 +26779,293 @@
     "ticker": "083450",
     "exchange": "KS",
     "type": "stock",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO 200",
+    "ticker": "293180",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO 200 TOP10",
+    "ticker": "407310",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO 200TR",
+    "ticker": "332930",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO 200�����ι���",
+    "ticker": "306520",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO 200������������",
+    "ticker": "304780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO 32-10 ����ä��Ƽ��",
+    "ticker": "448490",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO CAPEX��������iSelect",
+    "ticker": "454320",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO eĿ�ӽ�",
+    "ticker": "322400",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO Fn K-Ǫ��",
+    "ticker": "438900",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO Fn K-POP&�̵��",
+    "ticker": "395290",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO Fn K-�ݵ�ü",
+    "ticker": "395270",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO Fn K-��Ÿ����MZ",
+    "ticker": "402460",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO Fn K-����",
+    "ticker": "395280",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO Fn K-�����������÷���",
+    "ticker": "368190",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO Fn5G���",
+    "ticker": "367740",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO Fnģȯ�濡����",
+    "ticker": "381570",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO Fn����&������",
+    "ticker": "381560",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO Fn�����ؿ�",
+    "ticker": "441540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO Fn�����׸�",
+    "ticker": "407300",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO K-��Ƽ",
+    "ticker": "479850",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO KOFR�ݸ���Ƽ��(�ռ�)",
+    "ticker": "453060",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO KRX300",
+    "ticker": "304760",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO K�����",
+    "ticker": "322410",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO MSCI Korea TR",
+    "ticker": "332940",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO ź��ȿ���׸�����",
+    "ticker": "375760",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO �۷ι�ź�ҹ���Ǽ���ICE(�ռ�)",
+    "ticker": "401590",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO �۷ι���ä�����",
+    "ticker": "473640",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO �۷ι����Ÿ�S&P(�ռ�)",
+    "ticker": "354350",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO �۷ι�����MSCI(�ռ�)",
+    "ticker": "424460",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO �۷ι�������AI��Ƽ��",
+    "ticker": "461340",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO �Ӵϸ��Ͼ�Ƽ��",
+    "ticker": "486830",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO �ڸ��ƹ����",
+    "ticker": "495750",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO �ڽ���150",
+    "ticker": "304770",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO �ڽ���150������������",
+    "ticker": "306530",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO �ݵ�ü�ٽɰ����ֵ���",
+    "ticker": "476260",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO �̱�S&P500",
+    "ticker": "432840",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO ���¼�������",
+    "ticker": "491820",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO ���ڷ�iSelect",
+    "ticker": "434730",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO ����ä��(AA-�̻�)��Ƽ��",
+    "ticker": "461500",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO ���̿��ڸ��ƾ�Ƽ��",
+    "ticker": "498050",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HANARO ��������ջ��",
+    "ticker": "314700",
+    "exchange": "KS",
+    "type": "etf",
     "market": "KR"
   },
   {
@@ -26205,6 +27199,34 @@
     "ticker": "097230",
     "exchange": "KS",
     "type": "stock",
+    "market": "KR"
+  },
+  {
+    "name": "HK 200",
+    "ticker": "491700",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HK S&P�ڸ��Ʒο캼",
+    "ticker": "215620",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HK ����ä��(AA-�̻�)��Ƽ��",
+    "ticker": "472920",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "HK ����Ʈ�Ϸ����Ƽ��",
+    "ticker": "391670",
+    "exchange": "KS",
+    "type": "etf",
     "market": "KR"
   },
   {
@@ -26404,6 +27426,13 @@
     "market": "KR"
   },
   {
+    "name": "ITF 200",
+    "ticker": "472840",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
     "name": "JB금융지주",
     "ticker": "175330",
     "exchange": "KS",
@@ -26579,6 +27608,13 @@
     "market": "KR"
   },
   {
+    "name": "KCGI �̱�S&P500 TOP10",
+    "ticker": "483570",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
     "name": "KD",
     "ticker": "044180",
     "exchange": "KS",
@@ -26649,10 +27685,1844 @@
     "market": "KR"
   },
   {
+    "name": "KIWOOM 200",
+    "ticker": "069660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM 200TR",
+    "ticker": "294400",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM 200�����ι���",
+    "ticker": "253240",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM 200�����ι���2X",
+    "ticker": "253230",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM 200������������",
+    "ticker": "253250",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM 26-09ȸ��ä(AA-�̻�)��Ƽ��",
+    "ticker": "464240",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM CD�ݸ���Ƽ��(�ռ�)",
+    "ticker": "458210",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM Fn���������ű��",
+    "ticker": "460280",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM K-2�������Ϲ̰��޸�",
+    "ticker": "488200",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM K-�ݵ�ü�Ϲ̰��޸�",
+    "ticker": "488210",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM K-��ũTOP10",
+    "ticker": "469790",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM KRX100",
+    "ticker": "100910",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM TDF2030��Ƽ��",
+    "ticker": "435530",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM TDF2040��Ƽ��",
+    "ticker": "435540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM TDF2050��Ƽ��",
+    "ticker": "435550",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �۷ι�AI�ݵ�ü",
+    "ticker": "473490",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �۷ι�ǻó�����Ƽ",
+    "ticker": "394350",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �۷ι�����GRID������",
+    "ticker": "489860",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �Ƿ�AI",
+    "ticker": "483020",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �ε�Nifty50(�ռ�)",
+    "ticker": "200250",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �Ӵϸ��Ͼ�Ƽ��",
+    "ticker": "476450",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �ڸ��ƹ����",
+    "ticker": "496090",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �ڽ���100",
+    "ticker": "153270",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �ڽ���150",
+    "ticker": "316670",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �ڽ���150�����ι���",
+    "ticker": "291620",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �ڽ���150������������",
+    "ticker": "291630",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �ܱ�ä��ESG��Ƽ��",
+    "ticker": "419890",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱�ETF���STOXX",
+    "ticker": "426330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱�S&P500",
+    "ticker": "449770",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱�S&P500(H)",
+    "ticker": "449780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM ���ä1��",
+    "ticker": "122260",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �ܱ��ڱ�",
+    "ticker": "130730",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱��޷�SOFR�ݸ���Ƽ��(�ռ�)",
+    "ticker": "460270",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱��޷�����",
+    "ticker": "138230",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱��޷������ι���",
+    "ticker": "139660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱��޷������ι���2X",
+    "ticker": "230480",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱��޷�������������",
+    "ticker": "225800",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM ����ä10�ⷹ������",
+    "ticker": "167860",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM ����ä10��",
+    "ticker": "148070",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM ����ä30���Ƽ��",
+    "ticker": "471460",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM ����ä3��",
+    "ticker": "114470",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM ���̳�A50Ŀ��ƮMSCI",
+    "ticker": "441330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM ����äKIS",
+    "ticker": "430500",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM ����ä��(AA-�̻�)��Ƽ��",
+    "ticker": "454780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM ����DAX",
+    "ticker": "411860",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM ����Ĩ",
+    "ticker": "104520",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �����",
+    "ticker": "104530",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱����Ϲ����͹��̿���ũ�Ǿ�ǰ+",
+    "ticker": "483030",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱�����缺�峪����",
+    "ticker": "373790",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱�������100(H)",
+    "ticker": "453080",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱�������30��Ƽ��",
+    "ticker": "459790",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱�������ǻ��",
+    "ticker": "498270",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM ���̳������Һ�TOP CSI",
+    "ticker": "454180",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KIWOOM �̱��������������",
+    "ticker": "474800",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
     "name": "KNN",
     "ticker": "058400",
     "exchange": "KS",
     "type": "stock",
+    "market": "KR"
+  },
+  {
+    "name": "KoAct AI�������Ƽ��",
+    "ticker": "487130",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KoAct �۷ι�AI&�κ���Ƽ��",
+    "ticker": "471040",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KoAct �۷ι�ģȯ�������������Ƽ��",
+    "ticker": "475070",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KoAct �ڸ��ƹ������Ƽ��",
+    "ticker": "495230",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KoAct �ݵ�ü&2�������ٽɼ����Ƽ��",
+    "ticker": "482030",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KoAct ��缺���Ƽ��",
+    "ticker": "476850",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KoAct �̱�ġ��&����ȯġ������Ƽ��",
+    "ticker": "490330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KoAct �̱�õ�������������Ƽ��",
+    "ticker": "497780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KoAct ���̿��ｺ�ɾ��Ƽ��",
+    "ticker": "462900",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 200",
+    "ticker": "069500",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 200 �߼���",
+    "ticker": "226980",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 200ESG",
+    "ticker": "337160",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 200exTOP",
+    "ticker": "337150",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 200IT TR",
+    "ticker": "363580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 200TR",
+    "ticker": "278530",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 200Ÿ����Ŭ��Ŀ������",
+    "ticker": "498400",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 200�̱�äȥ��",
+    "ticker": "284430",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 200��ġ������",
+    "ticker": "223190",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 200��Ƽ��",
+    "ticker": "494890",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 200���ϰ���",
+    "ticker": "252650",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 200���ڽ���150������",
+    "ticker": "360140",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 200�����ι���2X",
+    "ticker": "252670",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 26-12 ȸ��ä(AA-�̻�)��Ƽ��",
+    "ticker": "473290",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 2�������ٽɼ���10",
+    "ticker": "461950",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 2���������",
+    "ticker": "305720",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 2�����������������",
+    "ticker": "462330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 33-06 ����ä��Ƽ��",
+    "ticker": "457690",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 3���깰����(H)",
+    "ticker": "271060",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX 53-09 ����ä��Ƽ��",
+    "ticker": "457700",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX AI�ݵ�ü",
+    "ticker": "395160",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX AI�ݵ�ü�ٽ����",
+    "ticker": "471990",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX AI�����ٽɼ���",
+    "ticker": "487240",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX CD1��ݸ��÷�����Ƽ��(�ռ�)",
+    "ticker": "481050",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX CD�ݸ���Ƽ��(�ռ�)",
+    "ticker": "459580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ESG����ä��(A-�̻�)��Ƽ��",
+    "ticker": "439860",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ģȯ�������ؿ��Ƽ��",
+    "ticker": "445150",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX iShares�̱����÷��̼Ǳ�ä��Ƽ��",
+    "ticker": "468370",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX iShares�̱����ڵ��ȸ��ä��Ƽ��",
+    "ticker": "468630",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX iShares�̱������ϵ��Ƽ��",
+    "ticker": "468380",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX IT",
+    "ticker": "266370",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX K-�����������÷���",
+    "ticker": "368680",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX KOFR�ݸ���Ƽ��(�ռ�)",
+    "ticker": "423160",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX KRX300",
+    "ticker": "292190",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX KRX300��������",
+    "ticker": "306950",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX KTOP30",
+    "ticker": "229720",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX K������",
+    "ticker": "266360",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX MSCI EM����(H)",
+    "ticker": "291890",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX MSCI Korea",
+    "ticker": "156080",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX MSCI KOREA ESG���Ϲ���",
+    "ticker": "289040",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX MSCI Korea TR",
+    "ticker": "278540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX MSCI������",
+    "ticker": "251350",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ö��",
+    "ticker": "117680",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX S&P�۷ι�������(�ռ�)",
+    "ticker": "269420",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX TDF2030��Ƽ��",
+    "ticker": "433970",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX TDF2040��Ƽ��",
+    "ticker": "433980",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX TDF2050��Ƽ��",
+    "ticker": "434060",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX Top10���ϰ���",
+    "ticker": "395170",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX Top5PlusTR",
+    "ticker": "315930",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX TRF3070",
+    "ticker": "329650",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX TRF5050",
+    "ticker": "329660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX TRF7030",
+    "ticker": "329670",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX WTI��������(H)",
+    "ticker": "261220",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX WTI���������ι���(H)",
+    "ticker": "271050",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ź��ȿ���׸�����",
+    "ticker": "375770",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �۷ι��κ�(�ռ�)",
+    "ticker": "276990",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �۷ι���ġ����TOP2 Plus",
+    "ticker": "476070",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �븸��ũ�����ٿ�����",
+    "ticker": "487950",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �췮��",
+    "ticker": "275300",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ܱ⺯���ݸ���ä�Ǿ�Ƽ��",
+    "ticker": "273140",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �Ǽ�",
+    "ticker": "117700",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �Ｚ�׷�",
+    "ticker": "102780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �Ｚ�׷���",
+    "ticker": "213610",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �Ｚ����ä��ȥ��",
+    "ticker": "448330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ƽþƴ޷�ä��ESG�÷�����Ƽ��",
+    "ticker": "437070",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ƽþ�AI�ݵ�üexChina��Ƽ��",
+    "ticker": "446690",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ʼ��Һ���",
+    "ticker": "266410",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ε�Nifty50",
+    "ticker": "453810",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ε�Nifty50��������(�ռ�)",
+    "ticker": "453820",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ε�ŸŸ�׷�",
+    "ticker": "477730",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ἱ��(H)",
+    "ticker": "138920",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ι���",
+    "ticker": "114800",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �κ���Ƽ��",
+    "ticker": "445290",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �Ϻ�TOPIX100",
+    "ticker": "101280",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �Ϻ��ε��긮��(H)",
+    "ticker": "352540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ּҺ�����",
+    "ticker": "279540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �Ӵϸ��Ͼ�Ƽ��",
+    "ticker": "488770",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ѱ��븸IT�����̾�",
+    "ticker": "298770",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ѱ��ε��긮��������",
+    "ticker": "476800",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڵ���",
+    "ticker": "091180",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڸ��ƹ�缺��",
+    "ticker": "211900",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڸ��ƹ�缺��ä��ȥ��",
+    "ticker": "237370",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڸ��ƹ����",
+    "ticker": "495850",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڸ������ż����Ƽ��",
+    "ticker": "373490",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڽ��Ǵ�����",
+    "ticker": "337140",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڽ��ڱ۷ι�",
+    "ticker": "461450",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڽ���",
+    "ticker": "226490",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڽ���100",
+    "ticker": "237350",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڽ���150",
+    "ticker": "229200",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڽ���150���ڽ���200������",
+    "ticker": "360150",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڽ���150�����ι���",
+    "ticker": "251340",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڽ���150��������",
+    "ticker": "233740",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ڽ���TR",
+    "ticker": "359210",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ݵ�ü",
+    "ticker": "091160",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ݵ�ü��������",
+    "ticker": "494310",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ｺ�ɾ�",
+    "ticker": "266420",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �׽���Ŀ������ä��ȥ�վ�Ƽ��",
+    "ticker": "475080",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �׽�����ü��FactSet",
+    "ticker": "459560",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�10�ⱹä����",
+    "ticker": "308620",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�30�ⱹäŸ��Ŀ������(�ռ� H)",
+    "ticker": "481060",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�30�ⱹä��Ʈ�󼱹�(H)",
+    "ticker": "304660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�30�ⱹä��Ʈ�󼱹��ι���(H)",
+    "ticker": "304670",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�30�ⱹä��Ƽ��(H)",
+    "ticker": "484790",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ��簡ġ",
+    "ticker": "325020",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ��弱��(H)",
+    "ticker": "132030",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ��弱���ι���(H)",
+    "ticker": "280940",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�AI��ũTOP10",
+    "ticker": "485540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�AI��ũTOP10Ÿ��Ŀ������",
+    "ticker": "483280",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�AI�����ٽ�������",
+    "ticker": "487230",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ܱ�ä��",
+    "ticker": "153130",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �ܱ�ä��PLUS",
+    "ticker": "214980",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ��ä����10��",
+    "ticker": "152380",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ��ä����10���ι���",
+    "ticker": "176950",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ��ä����3���ι���",
+    "ticker": "292770",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�ETF���Top10 Indxx",
+    "ticker": "428560",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ��ġ��",
+    "ticker": "275290",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P500",
+    "ticker": "379800",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P500(H)",
+    "ticker": "449180",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P500Ŀ�´����̼�",
+    "ticker": "463690",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P500�ʼ��Һ���",
+    "ticker": "453630",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P500�ｺ�ɾ�",
+    "ticker": "453640",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P500��ũ�����",
+    "ticker": "463680",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P500��ƿ��Ƽ",
+    "ticker": "463640",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P500���Һ���",
+    "ticker": "453660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P500����",
+    "ticker": "453650",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P500����(H)",
+    "ticker": "219480",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P500�����(�ռ�)",
+    "ticker": "200030",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P500������(�ռ�)",
+    "ticker": "218420",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P500������Ŀ������(�ռ� H)",
+    "ticker": "276970",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�S&P���̿�(�ռ�)",
+    "ticker": "185680",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�Ŭ��������������",
+    "ticker": "419420",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ��Ÿ������Ƽ��",
+    "ticker": "401470",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ��Ƽ����",
+    "ticker": "337120",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ��Ƽ������������(H)",
+    "ticker": "321410",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���",
+    "ticker": "140710",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���߹ݵ�ü(�ռ�)",
+    "ticker": "450190",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���ĺ�ȭ�ַ��",
+    "ticker": "404260",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���Plus",
+    "ticker": "244670",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���ű���׸���Ƽ��",
+    "ticker": "364690",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱��ε��긮��(H)",
+    "ticker": "352560",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���ӻ��",
+    "ticker": "300950",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���Һ���",
+    "ticker": "266390",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱��ݵ�ü",
+    "ticker": "390390",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱��޷�SOFR�ݸ���Ƽ��(�ռ�)",
+    "ticker": "455030",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱��޷�����",
+    "ticker": "261240",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱��޷������ι���",
+    "ticker": "261270",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱��޷������ι���2X",
+    "ticker": "261260",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱��޷�������������",
+    "ticker": "261250",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ����",
+    "ticker": "102970",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ����",
+    "ticker": "091170",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ����",
+    "ticker": "140700",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���̿�",
+    "ticker": "244580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ����&���",
+    "ticker": "395150",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���̳�2������MSCI(�ռ�)",
+    "ticker": "419430",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ����ä10���Ƽ��",
+    "ticker": "471230",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ����ä30���Ƽ��",
+    "ticker": "439870",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ����ä3��",
+    "ticker": "114260",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���̳�A50",
+    "ticker": "169950",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���̳�AI��ũ��Ƽ��",
+    "ticker": "428510",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ����ä��(AA-�̻�)��Ƽ��",
+    "ticker": "273130",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���̳�CSI300",
+    "ticker": "283580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���̳�H",
+    "ticker": "099140",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���̳�H��������(H)",
+    "ticker": "204450",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱���ũTOP3�÷���",
+    "ticker": "491090",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ����ź�ҹ���Ǽ���ICE(H)",
+    "ticker": "400570",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ����ƼPlus",
+    "ticker": "244660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱����Ŀ�����ݾ�Ƽ��",
+    "ticker": "441640",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �����Plus",
+    "ticker": "244620",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱����а���",
+    "ticker": "473460",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱����ٿ�����",
+    "ticker": "489250",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱����ٿ�����Ÿ��Ŀ������",
+    "ticker": "483290",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���̳��׼���ũ",
+    "ticker": "372330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ������",
+    "ticker": "325010",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ������",
+    "ticker": "102960",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ������(H)",
+    "ticker": "144600",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�����2000(H)",
+    "ticker": "280930",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�����ä��ESG��Ƽ��(H)",
+    "ticker": "437080",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���̳���â��STAR50(�ռ�)",
+    "ticker": "415340",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ������ǰTOP10 STOXX",
+    "ticker": "456250",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���̳���õChiNext(�ռ�)",
+    "ticker": "256750",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ������ȭ��",
+    "ticker": "117460",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�����Ʈ�����ƼS&P",
+    "ticker": "390400",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�����ũ10(H)",
+    "ticker": "314250",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �������",
+    "ticker": "279530",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �������",
+    "ticker": "275280",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �������ä��(AA-�̻�)��Ƽ��",
+    "ticker": "363570",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ��������",
+    "ticker": "122630",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ��������(H)",
+    "ticker": "138910",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�������100",
+    "ticker": "379810",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�������100(H)",
+    "ticker": "449190",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�������100���ϸ�Ŀ������OTM",
+    "ticker": "494300",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�������100����(H)",
+    "ticker": "304940",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�������100�����ι���(H)",
+    "ticker": "409810",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�������100��������(�ռ� H)",
+    "ticker": "409820",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �̱�������AI��ũ��Ƽ��",
+    "ticker": "411420",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���������TOP10Ÿ����Ŭ��Ŀ������",
+    "ticker": "498410",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ���������Ƽ��",
+    "ticker": "385520",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX ����������(�ռ�)",
+    "ticker": "450180",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "KODEX �������������Ƽ��",
+    "ticker": "385510",
+    "exchange": "KS",
+    "type": "etf",
     "market": "KR"
   },
   {
@@ -27111,6 +29981,419 @@
     "market": "KR"
   },
   {
+    "name": "PLUS 200",
+    "ticker": "152100",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS 200TR",
+    "ticker": "491220",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS 200�����ι���2X",
+    "ticker": "253160",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS 200������������",
+    "ticker": "253150",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ESG��ġ�־�Ƽ��",
+    "ticker": "395750",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ESG�����־�Ƽ��",
+    "ticker": "395760",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS KOFR�ݸ�",
+    "ticker": "453010",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS K���",
+    "ticker": "449450",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS K����",
+    "ticker": "429740",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS S&P�۷ι�������",
+    "ticker": "269530",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS TDF2060��Ƽ��",
+    "ticker": "433880",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �¾籤&ESS",
+    "ticker": "457990",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �۷ι�AI������",
+    "ticker": "489010",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �۷ι�HBM�ݵ�ü",
+    "ticker": "442580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �۷ι�MSCI(�ռ� H)",
+    "ticker": "189400",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �۷ι����",
+    "ticker": "496770",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �۷ι�����&�����뿬������",
+    "ticker": "419650",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �۷ι������&�����ڿ�������",
+    "ticker": "415920",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �췮ȸ��ä50",
+    "ticker": "239660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �Ϻ��ݵ�ü�Һ���",
+    "ticker": "464920",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �Ϻ���ȭ�ʴܱⱹä(�ռ�)",
+    "ticker": "489000",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �Ӵϸ��Ͼ�Ƽ��",
+    "ticker": "477050",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �ڸ��ƹ����",
+    "ticker": "495040",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �ڽ���",
+    "ticker": "227830",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �ڽ���150",
+    "ticker": "301400",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �ڽ���150�����ι���",
+    "ticker": "301410",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �ڽ���50",
+    "ticker": "122090",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �ڽ���TR",
+    "ticker": "328370",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �̱�ä30���Ƽ��",
+    "ticker": "464470",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �ܱ�ä�Ǿ�Ƽ��",
+    "ticker": "278620",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ��ä����10��",
+    "ticker": "289670",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ��ä����3��",
+    "ticker": "298340",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ��õ���̳ؽ�Ʈ(�ռ�)",
+    "ticker": "256450",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �̱�S&P500",
+    "ticker": "429760",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �̱�S&P500(H)",
+    "ticker": "269540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �̱�S&P500������",
+    "ticker": "494410",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ���ﱹMSCI(�ռ� H)",
+    "ticker": "195980",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �̱��ٿ������������(�ռ� H)",
+    "ticker": "213630",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �̱��޷�SOFR�ݸ���Ƽ��(�ռ�)",
+    "ticker": "456200",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ����ä10���Ƽ��",
+    "ticker": "461460",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ����ä30���Ƽ��",
+    "ticker": "451600",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ����ä�Ӵϸ��Ͼ�Ƽ��",
+    "ticker": "491230",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ����ä��(AA-�̻�)��Ƽ��",
+    "ticker": "451000",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ����ä��ȥ��",
+    "ticker": "447660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �̱��ܱ�ȸ��ä(AAA~A)",
+    "ticker": "332610",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ����Ʈ��ŸQualityä��ȥ��",
+    "ticker": "238670",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �̱���ũTOP10",
+    "ticker": "461900",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �̱���ũTOP10��������(�ռ�)",
+    "ticker": "461910",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �̱����췮ȸ��ä",
+    "ticker": "332620",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �����װ�&UAM",
+    "ticker": "421320",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �ֵ�����",
+    "ticker": "280920",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ������MSCI(�ռ� H)",
+    "ticker": "195970",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �������",
+    "ticker": "161510",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �������ä��ȥ��",
+    "ticker": "251600",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ���������Ŭ��Ŀ������",
+    "ticker": "489030",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �̱���������ũ",
+    "ticker": "287180",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �����������50",
+    "ticker": "251590",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS ������������50",
+    "ticker": "266550",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "PLUS �̱�������������ֵ��ϸ�Ŀ������",
+    "ticker": "494420",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
     "name": "PN풍년",
     "ticker": "024940",
     "exchange": "KS",
@@ -27150,6 +30433,790 @@
     "ticker": "218410",
     "exchange": "KS",
     "type": "stock",
+    "market": "KR"
+  },
+  {
+    "name": "RISE 200",
+    "ticker": "148020",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE 200TR",
+    "ticker": "361580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE 200��Ŭ��Ŀ������",
+    "ticker": "475720",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE 200����",
+    "ticker": "284980",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE 200�����Ŀ������ATM",
+    "ticker": "290080",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE 200�����ι���",
+    "ticker": "252410",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE 200�����ι���2X",
+    "ticker": "252420",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE 200������������",
+    "ticker": "252400",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE 2������TOP10",
+    "ticker": "465330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE 2������TOP10�ι���(�ռ�)",
+    "ticker": "465350",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE 2��������Ƽ��",
+    "ticker": "422420",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE 5��׷���",
+    "ticker": "105780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE AI&�κ�",
+    "ticker": "469070",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE AI�÷���",
+    "ticker": "427120",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ä��ȥ��",
+    "ticker": "183700",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE CD�ݸ���Ƽ��(�ռ�)",
+    "ticker": "477080",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ESG��ȸå������",
+    "ticker": "290130",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE IT�÷���",
+    "ticker": "326240",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE KIS����ä30��Enhanced",
+    "ticker": "385560",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE KOFR�ݸ���Ƽ��(�ռ�)",
+    "ticker": "479520",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE KQ�����",
+    "ticker": "270800",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE KRX300",
+    "ticker": "292050",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE K����&���෹��",
+    "ticker": "388280",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE TDF2030��Ƽ��",
+    "ticker": "442550",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE TDF2040��Ƽ��",
+    "ticker": "442560",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE TDF2050��Ƽ��",
+    "ticker": "442570",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE V&S����Ʈ���",
+    "ticker": "234310",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE V&S����Ʈ���ä��ȥ��",
+    "ticker": "241390",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �۷ι�Ŭ��������",
+    "ticker": "399580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �۷ι��ֽĺл��Ƽ��",
+    "ticker": "459750",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �۷ι��ڻ��о�Ƽ��",
+    "ticker": "461490",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �۷ι��񸸻��TOP2+",
+    "ticker": "476310",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �۷ι���ũ�����(�ռ� H)",
+    "ticker": "276650",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �۷ι����Ұ���",
+    "ticker": "417450",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �۷ι����ڷ�",
+    "ticker": "442320",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �۷ι�����Ƽ����",
+    "ticker": "475380",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �۷ι������ͼ��͸���(�ռ�)",
+    "ticker": "375270",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �۷ι��������",
+    "ticker": "437370",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �췮������ǥ��",
+    "ticker": "140580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ܱⱹ��ä��Ƽ��",
+    "ticker": "272560",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ȶ�㼱��(H)",
+    "ticker": "334690",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ȶ�㼱���ι���(H)",
+    "ticker": "334700",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �Ｚ�׷�Top3ä��ȥ��",
+    "ticker": "448630",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ε������м���",
+    "ticker": "498610",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �Ϻ�����TOP4Plus",
+    "ticker": "488480",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �Ӵϸ��Ͼ�Ƽ��",
+    "ticker": "455890",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ڸ��Ʊ��������",
+    "ticker": "498860",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ڸ��ƹ����",
+    "ticker": "495050",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ڽ���",
+    "ticker": "302450",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ڽ���150",
+    "ticker": "270810",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ڽ���150�����ι���",
+    "ticker": "275750",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ڽ���150������������",
+    "ticker": "278240",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ｺ�ɾ�",
+    "ticker": "253280",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ｺ�ɾ�ä��ȥ��",
+    "ticker": "253290",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �׽�����þƸ���ä��ȥ��",
+    "ticker": "449580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �߼��������",
+    "ticker": "281990",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱�30�ⱹäĿ������(�ռ�)",
+    "ticker": "472830",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱�30�ⱹä��ȭ����(�ռ� H)",
+    "ticker": "472870",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱�30�ⱹä��Ƽ��",
+    "ticker": "481340",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �߱�췮ȸ��ä",
+    "ticker": "136340",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ��ä30�ⷹ������(�ռ�)",
+    "ticker": "451670",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱�AI��ũ��Ƽ��",
+    "ticker": "495940",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱�AI���ü�ε��ϸ�����Ŀ������",
+    "ticker": "490590",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱�AI���ü��TOP3Plus",
+    "ticker": "485690",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ܱ�ä�Ǿ��ľ�Ƽ��",
+    "ticker": "385550",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ��ä����10��",
+    "ticker": "295000",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ��ä����10���ι���",
+    "ticker": "295020",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ��ä����3��",
+    "ticker": "432600",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ��ä����5������",
+    "ticker": "397420",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �߱�MSCI China(H)",
+    "ticker": "310080",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱�S&P500",
+    "ticker": "379780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱�S&P500(H)",
+    "ticker": "453330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱�S&P���ŷ",
+    "ticker": "460660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱�S&P����������(�ռ� H)",
+    "ticker": "219390",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ��Ʈ��ũ������",
+    "ticker": "367760",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ��ũ����Ʈ������TOP10",
+    "ticker": "475350",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ��Ÿ����",
+    "ticker": "401170",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ֽ�ȥ��",
+    "ticker": "183710",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ��޸𸮹ݵ�ü��Ƽ��",
+    "ticker": "388420",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ���ν�Ź��50(H)",
+    "ticker": "379790",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ���Ұ����׸�",
+    "ticker": "367770",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱��ݵ�üNYSE",
+    "ticker": "469060",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱��ݵ�üNYSE(H)",
+    "ticker": "469050",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱��ݵ�ü�ι���(�ռ� H)",
+    "ticker": "491630",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ���͸� ������Ŭ��",
+    "ticker": "446700",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱��޷�SOFR�ݸ���Ƽ��(�ռ�)",
+    "ticker": "455960",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱��޷������ι���",
+    "ticker": "469530",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ����ä10���Ƽ��",
+    "ticker": "481430",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ����ä3�⼱���ι���",
+    "ticker": "282000",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ����ä3��",
+    "ticker": "114100",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ����ä��(A-�̻�)��Ƽ��",
+    "ticker": "385540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ����ä��Ƽ��",
+    "ticker": "336160",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ���̳�HSCEI(H)",
+    "ticker": "250730",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ���̳�H�����ι���(H)",
+    "ticker": "291680",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱���ⱹä����(H)",
+    "ticker": "267440",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱���ⱹä�����ι���(H)",
+    "ticker": "267450",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱���ⱹä������������(�ռ� H)",
+    "ticker": "267490",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ����ⱹ��ä��Ƽ��",
+    "ticker": "272570",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱���ũ100���ϸ�����Ŀ������",
+    "ticker": "491620",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �����",
+    "ticker": "266160",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱����100���ϸ�����Ŀ������",
+    "ticker": "490600",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �ܱ����ä",
+    "ticker": "196230",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �����׸�",
+    "ticker": "300640",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ���̳��׼���ũ",
+    "ticker": "371150",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ������",
+    "ticker": "140570",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �߱�����CSI300",
+    "ticker": "463300",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �������÷���",
+    "ticker": "326230",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱��ܱ����ڵ��ȸ��ä��Ƽ��",
+    "ticker": "437350",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱�������100",
+    "ticker": "368590",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE ���������10TR",
+    "ticker": "315960",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �̱��������켱����",
+    "ticker": "354240",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "RISE �߱����������CSI100",
+    "ticker": "174360",
+    "exchange": "KS",
+    "type": "etf",
     "market": "KR"
   },
   {
@@ -27510,6 +31577,349 @@
     "market": "KR"
   },
   {
+    "name": "SOL 200 Top10",
+    "ticker": "411540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL 200TR",
+    "ticker": "295040",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL 26-12 ȸ��ä(AA-�̻�)��Ƽ��",
+    "ticker": "488980",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL 2�������Һ���Fn",
+    "ticker": "455860",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL AI�ݵ�ü�Һ���",
+    "ticker": "455850",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL CD�ݸ�&�Ӵϸ��Ͼ�Ƽ��",
+    "ticker": "497880",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL KIS�ܱ����ä",
+    "ticker": "363510",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL KRX300",
+    "ticker": "292500",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL KRX���ĺ�ȭ�ַ��",
+    "ticker": "404650",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL K���",
+    "ticker": "490480",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �۷ι�AI�ݵ�üž�Ⱦ�Ƽ��",
+    "ticker": "423170",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �۷ι�ź�ҹ���Ǽ���ICE(�ռ�)",
+    "ticker": "400590",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �ʴܱ�ä�Ǿ�Ƽ��",
+    "ticker": "469830",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �Ƿ���Һ���Fn",
+    "ticker": "464610",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �Ӵϸ��Ͼ�Ƽ��",
+    "ticker": "484890",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �ѱ����۷ι�������&2��������Ƽ��",
+    "ticker": "429980",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �ڵ���TOP3�÷���",
+    "ticker": "466930",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �ڵ����Һ���Fn",
+    "ticker": "464600",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �ڸ��Ƹް���ũ��Ƽ��",
+    "ticker": "444200",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �ڸ��ƹ����TR",
+    "ticker": "495550",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �ڽ���150",
+    "ticker": "450910",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �ݵ�ü�İ���",
+    "ticker": "475310",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �ݵ�ü������",
+    "ticker": "475300",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱�30�ⱹäĿ������(�ռ�)",
+    "ticker": "473330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱�30�ⱹä��Ƽ��(H)",
+    "ticker": "461600",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱�500Ÿ�ٵ��ϸ�Ŀ�����ݾ�Ƽ��",
+    "ticker": "494210",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱�AI�ݵ�üĨ����Ŀ",
+    "ticker": "479620",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱�AI����Ʈ����",
+    "ticker": "481180",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱�AI����������",
+    "ticker": "486450",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱�S&P500",
+    "ticker": "433330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱�S&P500ESG",
+    "ticker": "399110",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱�S&P500��ȭ����(H)",
+    "ticker": "499150",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱�TOP5ä��ȥ��50",
+    "ticker": "447620",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL ����ä10��",
+    "ticker": "438570",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL ����ä30���Ƽ��",
+    "ticker": "474390",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL ����ä3��",
+    "ticker": "438560",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL ����ä��(AA-�̻�)��Ƽ��",
+    "ticker": "436140",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL ����TOP3�÷���",
+    "ticker": "466920",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱���ũTOP10",
+    "ticker": "481190",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL ����ź�ҹ���Ǽ���S&P(H)",
+    "ticker": "400580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL ���̳��¾籤CSI(�ռ�)",
+    "ticker": "413220",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱����ٿ�����",
+    "ticker": "446720",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱����ٿ�����(H)",
+    "ticker": "452360",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱����ٿ�����2ȣ",
+    "ticker": "493420",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱����̱�äȥ��50",
+    "ticker": "490490",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL ���̳����ұ��CSI500(�ռ� H)",
+    "ticker": "220130",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL �̱�������100",
+    "ticker": "476030",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL ���������÷��������",
+    "ticker": "484880",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "SOL ���̳����������Ƽ��(�ռ�)",
+    "ticker": "415760",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
     "name": "SOOP",
     "ticker": "067160",
     "exchange": "KS",
@@ -27580,6 +31990,1462 @@
     "market": "KR"
   },
   {
+    "name": "TIGER 200",
+    "ticker": "102110",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200 IT",
+    "ticker": "139260",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200 ö������",
+    "ticker": "139240",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200 �Ǽ�",
+    "ticker": "139220",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200 �ｺ�ɾ�",
+    "ticker": "227540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200 ��Ȱ�Һ���",
+    "ticker": "227560",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200 ���Һ���",
+    "ticker": "139290",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200 ����",
+    "ticker": "139270",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200 �߰���",
+    "ticker": "139230",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200 �����",
+    "ticker": "227550",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200 ������ȭ��",
+    "ticker": "139250",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200IT��������",
+    "ticker": "243880",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200Ŀ�´����̼Ǽ���",
+    "ticker": "315270",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200Ŀ������",
+    "ticker": "289480",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200Ŀ������OTM",
+    "ticker": "166400",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200TR",
+    "ticker": "310960",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200���ϰ���",
+    "ticker": "252000",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200�����ι���2X",
+    "ticker": "252710",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200������ȭ�з�������",
+    "ticker": "243890",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 200������������",
+    "ticker": "267770",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 27-04ȸ��ä(A+�̻�)��Ƽ��",
+    "ticker": "480260",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 2������TOP10",
+    "ticker": "364980",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 2������TOP10��������",
+    "ticker": "412570",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 2�������׸�",
+    "ticker": "305540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER 2����������Fn",
+    "ticker": "462010",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER AI�ڸ��Ʊ׷ν���Ƽ��",
+    "ticker": "365040",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER AI�ݵ�ü�ٽɰ���",
+    "ticker": "471760",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ǻó�����Ƽ��Ƽ��",
+    "ticker": "387280",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER BBIG",
+    "ticker": "364960",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER BBIG��������",
+    "ticker": "412560",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER CD1��ݸ���Ƽ��(�ռ�)",
+    "ticker": "475630",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER CD�ݸ��÷�����Ƽ��(�ռ�)",
+    "ticker": "499660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER CD�ݸ�����KIS(�ռ�)",
+    "ticker": "357870",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER Fn��Ÿ����",
+    "ticker": "400970",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER Fn�����������",
+    "ticker": "377990",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER KEDI���ű��ESG30",
+    "ticker": "417630",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER KOFR�ݸ���Ƽ��(�ռ�)",
+    "ticker": "449170",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER KRX300",
+    "ticker": "292160",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER KRX���ĺ�ȭ�ַ��",
+    "ticker": "404540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER KTOP30",
+    "ticker": "228820",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER K���&����",
+    "ticker": "463250",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER K����",
+    "ticker": "300610",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER LG�׷��÷���",
+    "ticker": "138530",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER MKF������",
+    "ticker": "445910",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER MSCI KOREA ESG���Ϲ���",
+    "ticker": "289250",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER MSCI KOREA ESG������",
+    "ticker": "289260",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER MSCI Korea TR",
+    "ticker": "310970",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ȭ��ǰ",
+    "ticker": "228790",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER S&P�۷ι��ｺ�ɾ�(�ռ�)",
+    "ticker": "248270",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER S&P�۷ι�������(�ռ�)",
+    "ticker": "269370",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER TSMC�Ŀ�帮���ü��",
+    "ticker": "453950",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ź��ȿ���׸�����",
+    "ticker": "376410",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι�4��������ű��(�ռ� H)",
+    "ticker": "275980",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι�AI&�κ�ƽ�� INDXX",
+    "ticker": "464310",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι�AI�÷�����Ƽ��",
+    "ticker": "412770",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι�AI��Ƽ��",
+    "ticker": "466950",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι�AI���̹�����",
+    "ticker": "418670",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι�AI�����������Ƽ��",
+    "ticker": "491010",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι�Ŭ������ǻ��INDXX",
+    "ticker": "371450",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι��̳뺣�̼Ǿ�Ƽ��",
+    "ticker": "387270",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι��µ���̽�AI",
+    "ticker": "480310",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι��ڿ�������(�ռ� H)",
+    "ticker": "276000",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι���ġ����TOP2Plus",
+    "ticker": "476690",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι���Ƭ&2������SOLACTIVE(�ռ�)",
+    "ticker": "394670",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι���Ƽ����TIF��Ƽ��",
+    "ticker": "440340",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι����ź���ĨTOP10",
+    "ticker": "464930",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �۷ι���������&������SOLACTIVE",
+    "ticker": "394660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �췮ȸ��ä��Ƽ��",
+    "ticker": "438330",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �췮��ġ",
+    "ticker": "227570",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �켱��",
+    "ticker": "261140",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ܱ⼱�������ϵ�(�ռ� H)",
+    "ticker": "182490",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �Ｚ�׷�",
+    "ticker": "138520",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �Ƿ���",
+    "ticker": "307510",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ε�����Ƽ50",
+    "ticker": "453870",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ε�����Ƽ50��������(�ռ�)",
+    "ticker": "236350",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ε�������������",
+    "ticker": "479730",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ι���",
+    "ticker": "123310",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ο캼",
+    "ticker": "174350",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �Ϻ�TOPIX(�ռ� H)",
+    "ticker": "195920",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �Ϻ��ݵ�üFACTSET",
+    "ticker": "465660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �Ϻ�������",
+    "ticker": "292560",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �Ϻ�������225",
+    "ticker": "241180",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ڸ��ƹ����",
+    "ticker": "496080",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ڸ���TOP10",
+    "ticker": "292150",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ڸ�����ũ��Ƽ��",
+    "ticker": "471780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ڽ��Ǵ�����",
+    "ticker": "277640",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ڽ��ǰ����",
+    "ticker": "210780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ڽ��ڱ۷ι�",
+    "ticker": "461580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ڽ���",
+    "ticker": "277630",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ڽ���150",
+    "ticker": "232080",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ڽ���150 ��������",
+    "ticker": "233160",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ڽ���150IT",
+    "ticker": "261060",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ڽ���150�����ι���",
+    "ticker": "250780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ڽ���150���̿���ũ",
+    "ticker": "261070",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ڽ���������",
+    "ticker": "277650",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ݵ�ü",
+    "ticker": "091230",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ݵ�üTOP10",
+    "ticker": "396500",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ݵ�üTOP10��������",
+    "ticker": "488080",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ｺ�ɾ�",
+    "ticker": "143860",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �׽���ä��ȥ��Fn",
+    "ticker": "447770",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̸�¡����MSCI��������(�ռ� H)",
+    "ticker": "225060",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�30�ⱹäĿ�����ݾ�Ƽ��(H)",
+    "ticker": "476550",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�30�ⱹä��Ʈ����Ƽ��(�ռ� H)",
+    "ticker": "458250",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ��缺��",
+    "ticker": "211560",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ��깰����Enhanced(H)",
+    "ticker": "137610",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ��弱��(H)",
+    "ticker": "319640",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�ä10�⼱��",
+    "ticker": "305080",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ��ä3��",
+    "ticker": "114820",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�AI�ݵ�ü�ո���",
+    "ticker": "491830",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�AI����ũ10",
+    "ticker": "490090",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�AI����ũ10Ÿ�ٵ��ϸ�Ŀ������",
+    "ticker": "493810",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ܱ�ä�Ǿ�Ƽ��",
+    "ticker": "272580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�ĳ��ī��100",
+    "ticker": "465670",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�MSCI����(�ռ� H)",
+    "ticker": "182480",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�S&P500",
+    "ticker": "360750",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�S&P500(H)",
+    "ticker": "448290",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�S&P500Ÿ�ٵ��ϸ�Ŀ������",
+    "ticker": "482730",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�S&P500���ϰ���",
+    "ticker": "488500",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�S&P500����(H)",
+    "ticker": "143850",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�S&P500�����ι���(H)",
+    "ticker": "225030",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�S&P500������",
+    "ticker": "429000",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�S&P500��������(�ռ� H)",
+    "ticker": "225040",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ��ƾ35",
+    "ticker": "105010",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���߹ݵ�ü(�ռ�)",
+    "ticker": "449690",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���Ŀ�����ݾ�Ƽ��",
+    "ticker": "472150",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱��ʶ��Ǿƹݵ�ü������",
+    "ticker": "381180",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱��ʶ��Ǿƹݵ�ü��������(�ռ�)",
+    "ticker": "423920",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱��ʶ��Ǿ�AI�ݵ�ü������",
+    "ticker": "497570",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���ν�Ź��50(�ռ� H)",
+    "ticker": "195930",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���ν�Ź�����30",
+    "ticker": "245350",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���ν�Ź����������(�ռ� H)",
+    "ticker": "225050",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���ͳ�TOP10",
+    "ticker": "365000",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �߱��Һ��׸�",
+    "ticker": "150460",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱��ٿ�����30",
+    "ticker": "245340",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱��޷�SOFR�ݸ���Ƽ��(�ռ�)",
+    "ticker": "456610",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱��޷��ܱ�ä�Ǿ�Ƽ��",
+    "ticker": "329750",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱��޷������ι���2X",
+    "ticker": "261120",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱��޷�������������",
+    "ticker": "261110",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���෹��",
+    "ticker": "228800",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ����",
+    "ticker": "157500",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ����",
+    "ticker": "091220",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ����ä30�⽺Ʈ����Ƽ��",
+    "ticker": "451530",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ����ä��(AA-�̻�)��Ƽ��",
+    "ticker": "451540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̳�CSI300",
+    "ticker": "192090",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̳�CSI300�ι���(�ռ�)",
+    "ticker": "217780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̳�CSI300��������(�ռ�)",
+    "ticker": "204480",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ����ȸ��",
+    "ticker": "307520",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̳�HSCEI",
+    "ticker": "245360",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ����ⱹä",
+    "ticker": "302190",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ����TOP10",
+    "ticker": "494670",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ����TOP10",
+    "ticker": "364990",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̿�TOP10",
+    "ticker": "364970",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ����Ʈ����",
+    "ticker": "157490",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱���ũTOP10 INDXX",
+    "ticker": "381170",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱���ũTOP10 INDXX(H)",
+    "ticker": "472160",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱���ũTOP10ä��ȥ��",
+    "ticker": "472170",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱���ũTOP10Ÿ��Ŀ������",
+    "ticker": "474220",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̳�Ŭ��������SOLACTIVE",
+    "ticker": "396510",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �����",
+    "ticker": "139280",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �����",
+    "ticker": "147970",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �ܱ����ä",
+    "ticker": "157450",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �����ä��ȥ��",
+    "ticker": "237440",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �����ǹ�",
+    "ticker": "160580",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱����TOP10",
+    "ticker": "494840",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �����ε���������",
+    "ticker": "329200",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �����ε���������ä��",
+    "ticker": "341850",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱����ٿ�����",
+    "ticker": "458730",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱����ٿ�����Ÿ��Ŀ������1ȣ",
+    "ticker": "458750",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱����ٿ�����Ÿ��Ŀ������2ȣ",
+    "ticker": "458760",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱����ڵ��ȸ��ä��Ƽ��(H)",
+    "ticker": "458260",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̳��ݵ�üFACTSET",
+    "ticker": "396520",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̳��׼�30",
+    "ticker": "117690",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̳��׼���ũ",
+    "ticker": "371160",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̳��׼���ũ��������(�ռ� H)",
+    "ticker": "438320",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̳���â��STAR50(�ռ�)",
+    "ticker": "414780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱������ڳؽ�Ʈ100",
+    "ticker": "429010",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱������ڹ��̿�",
+    "ticker": "203780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �������׷��÷���",
+    "ticker": "138540",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ��������",
+    "ticker": "123320",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ��������(H)",
+    "ticker": "139320",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�������100",
+    "ticker": "133690",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�������100(H)",
+    "ticker": "448300",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�������100ä��ȥ��Fn",
+    "ticker": "435420",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�������100ETF����",
+    "ticker": "483240",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�������100Ŀ������(�ռ�)",
+    "ticker": "441680",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�������100Ÿ�ٵ��ϸ�Ŀ������",
+    "ticker": "486290",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̱�������100��������(�ռ�)",
+    "ticker": "418660",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ��������Enhanced(H)",
+    "ticker": "130680",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER �̵��������",
+    "ticker": "228810",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���������÷���TOP10",
+    "ticker": "466940",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���������ι���(H)",
+    "ticker": "217770",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ����������(�ռ�)",
+    "ticker": "449680",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̳�������SOLACTIVE",
+    "ticker": "371460",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̳����̿���ũSOLACTIVE",
+    "ticker": "371470",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIGER ���̳���������������(�ռ�)",
+    "ticker": "456680",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIME Korea�÷�������Ƽ��",
+    "ticker": "441800",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIME K�̳뺣�̼Ǿ�Ƽ��",
+    "ticker": "385710",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIME K��ó��Ƽ��",
+    "ticker": "410870",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIME K���̿���Ƽ��",
+    "ticker": "463050",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIME K�������������Ƽ��",
+    "ticker": "404120",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIME �۷ι�AI�ΰ����ɾ�Ƽ��",
+    "ticker": "456600",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIME �۷ι��Һ�Ʈ�����Ƽ��",
+    "ticker": "494180",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIME �۷ι�������ũ&����Ƽ��",
+    "ticker": "478150",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIME �۷ι����̿���Ƽ��",
+    "ticker": "485810",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIME �ڸ��ƹ������Ƽ��",
+    "ticker": "495060",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIME �ڽ��Ǿ�Ƽ��",
+    "ticker": "385720",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIME �̱�S&P500��Ƽ��",
+    "ticker": "426020",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TIME �̱�������100��Ƽ��",
+    "ticker": "426030",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
     "name": "TJ미디어",
     "ticker": "032540",
     "exchange": "KS",
@@ -27598,6 +33464,34 @@
     "ticker": "048770",
     "exchange": "KS",
     "type": "stock",
+    "market": "KR"
+  },
+  {
+    "name": "TREX 200",
+    "ticker": "108590",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TREX �ݴ���Ż 200",
+    "ticker": "145850",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TRUSTON �ڸ��ƹ������Ƽ��",
+    "ticker": "496130",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "TRUSTON ���ְ�ġ��Ƽ��",
+    "ticker": "472720",
+    "exchange": "KS",
+    "type": "etf",
     "market": "KR"
   },
   {
@@ -27622,10 +33516,129 @@
     "market": "KR"
   },
   {
+    "name": "UNICORN R&D ��Ƽ��",
+    "ticker": "433250",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "UNICORN SK���̴н����ü�ξ�Ƽ��",
+    "ticker": "494220",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "UNICORN ����ƮIPO��Ƽ��",
+    "ticker": "476000",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "UNICORN ������AI���ұ����Ƽ��",
+    "ticker": "470310",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "VITA MZ�Һ��Ƽ��",
+    "ticker": "422260",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "VITA ������ľ�Ƽ��",
+    "ticker": "452440",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
     "name": "WISCOM",
     "ticker": "024070",
     "exchange": "KS",
     "type": "stock",
+    "market": "KR"
+  },
+  {
+    "name": "WON 200",
+    "ticker": "448100",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "WON AI ESG��Ƽ��",
+    "ticker": "413930",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "WON �ѱ��ε���TOP3�÷���",
+    "ticker": "480460",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "WON �ݵ�ü���ü�ξ�Ƽ��",
+    "ticker": "474590",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "WON �̱�S&P500",
+    "ticker": "444490",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "WON ���ѹα�����ä��Ƽ��",
+    "ticker": "426150",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "WON ����ä�÷�����Ƽ��",
+    "ticker": "496020",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "WON ����ä�Ӵϸ��Ͼ�Ƽ��",
+    "ticker": "458030",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "WON ����ä��(AA-�̻�)��Ƽ��",
+    "ticker": "488720",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "WON �̱������װ����",
+    "ticker": "440910",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "WON �̱�������׾�",
+    "ticker": "489290",
+    "exchange": "KS",
+    "type": "etf",
     "market": "KR"
   },
   {
@@ -27654,6 +33667,139 @@
     "ticker": "051390",
     "exchange": "KS",
     "type": "stock",
+    "market": "KR"
+  },
+  {
+    "name": "�Ŀ� 200",
+    "ticker": "152870",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "�Ŀ� K-���ְ�ġ��Ƽ��",
+    "ticker": "491510",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "�Ŀ� �ڽ���100",
+    "ticker": "140950",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "�Ŀ� ����ä��(AA-�̻�)��Ƽ��",
+    "ticker": "498180",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "�Ŀ� �������������",
+    "ticker": "192720",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "���̴ٽ� �Ϻ���ũ��Ƽ��",
+    "ticker": "488290",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "���̴ٽ� �ڽ��Ǿ�Ƽ��",
+    "ticker": "403790",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "���̴ٽ� �߼�����Ƽ��",
+    "ticker": "438740",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "����Ƽ 26-09 Ư��ä(AAA)��Ƽ��",
+    "ticker": "465780",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "����Ƽ �ڽ���100",
+    "ticker": "159800",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "����Ƽ ���̳�����Ʈ��Ƽ��",
+    "ticker": "442260",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "�����÷��� �۷ι��÷�����Ƽ��",
+    "ticker": "407830",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "�����÷��� �۷ι��ϵ�����Ŀ��10��Ƽ��",
+    "ticker": "477490",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "�����÷��� �۷ι����̳��ͽôϾ��Ƽ��",
+    "ticker": "462340",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "�����÷��� �۷ι��������̾�Ƽ��",
+    "ticker": "433220",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "�����÷��� �۷ι�����������Ƽ��",
+    "ticker": "451150",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "�����÷��� �ڸ��ƴ������̾�Ƽ��",
+    "ticker": "442090",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "�����÷��� �ڸ����÷�����Ƽ��",
+    "ticker": "407820",
+    "exchange": "KS",
+    "type": "etf",
+    "market": "KR"
+  },
+  {
+    "name": "�����÷��� ���̳��ϵ�����Ŀ��10��Ƽ��",
+    "ticker": "474920",
+    "exchange": "KS",
+    "type": "etf",
     "market": "KR"
   }
 ]
