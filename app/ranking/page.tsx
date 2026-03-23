@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from "react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import StockLogo from "@/components/StockLogo";
-import { addHolding } from "@/lib/storage";
 
 interface StockData {
   ticker:        string;
@@ -103,30 +102,6 @@ const GROWTH_TICKERS_US = ["MSFT","AAPL","V","MA","UNH","AVGO"];
 const ETF_TICKERS_KR    = ["476550","458730","091160","446720","479850","329200"];
 const ETF_TICKERS_US    = ["JEPI","JEPQ","SCHD","QYLD","VYM","HDV","DVY"];
 
-function AddButton({ stock, market }: { stock: StockData; market: "KR" | "US" }) {
-  const [added, setAdded] = useState(false);
-  function handle() {
-    const rawTicker = stock.ticker.replace(/\.(KS|KQ)$/, "");
-    addHolding({
-      ticker: rawTicker,
-      name:   stock.name,
-      market: market,
-      quantity: 1,
-      purchaseDate: new Date().toISOString().split("T")[0],
-    });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2500);
-  }
-  return (
-    <button onClick={handle}
-      className={`flex-shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-lg transition-all
-        ${added
-          ? "bg-green-100 dark:bg-green-900/20 text-green-600"
-          : "bg-toss-blue/10 text-toss-blue hover:bg-toss-blue hover:text-white"}`}>
-      {added ? "✓ 추가됨" : "+ 추가"}
-    </button>
-  );
-}
 
 export default function RankingPage() {
   const [market,  setMarket]  = useState<"KR" | "US">("KR");
@@ -243,7 +218,6 @@ export default function RankingPage() {
                   <p className="text-[13px] font-bold text-toss-text truncate">{s.name}</p>
                   <p className={`text-[11px] font-semibold ${meta.color}`}>{(s.dividendYield*100).toFixed(2)}%</p>
                 </div>
-                <AddButton stock={s} market={market} />
               </div>
             ))}
           </div>
@@ -278,13 +252,12 @@ export default function RankingPage() {
           ) : (
             <div>
               {/* PC 테이블 헤더 */}
-              <div className="hidden md:grid md:grid-cols-[40px_50px_1fr_110px_110px_80px] gap-3 px-2 pb-2 border-b border-toss-border mb-1">
+              <div className="hidden md:grid md:grid-cols-[40px_50px_1fr_110px_110px] gap-3 px-2 pb-2 border-b border-toss-border mb-1">
                 <span className="text-[11px] font-semibold text-toss-sub text-center">순위</span>
                 <span />
                 <span className="text-[11px] font-semibold text-toss-sub">종목명</span>
                 <span className="text-[11px] font-semibold text-toss-sub text-right">현재가</span>
                 <span className="text-[11px] font-semibold text-toss-sub text-right">배당수익률</span>
-                <span />
               </div>
 
               {sorted.map((stock, i) => {
@@ -292,7 +265,7 @@ export default function RankingPage() {
                 return (
                   <div key={stock.ticker}>
                     <div className="flex items-center gap-3 py-3.5 border-b border-toss-border last:border-0
-                                   md:grid md:grid-cols-[40px_50px_1fr_110px_110px_80px]">
+                                   md:grid md:grid-cols-[40px_50px_1fr_110px_110px]">
                       {/* 순위 */}
                       <div className="w-7 text-center flex-shrink-0 md:w-auto">
                         {i < 3
@@ -349,10 +322,6 @@ export default function RankingPage() {
                             {market === "KR" ? `${stock.price.toLocaleString("ko-KR")}원` : `$${stock.price.toFixed(2)}`}
                           </p>
                         )}
-                      </div>
-                      {/* 추가 버튼 */}
-                      <div className="hidden md:flex justify-end">
-                        <AddButton stock={stock} market={market} />
                       </div>
                     </div>
 
