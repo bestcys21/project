@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hasFmpKey, getFmpRankItems } from "@/lib/fmp-api";
 import { getDartDividend } from "@/lib/dart-api";
+import { getNaverBatch } from "@/lib/naver-api";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -262,53 +263,92 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ market, data });
   }
 
-  // ── Yahoo Finance 처리 (KR 또는 FMP 키 없는 US) ──────────────────────────
-  const list = market === "KR" ? KR_TICKERS : US_TICKERS;
-  const yf   = getClient();
-  const isKR = market === "KR";
+  // ── KR 주식: Naver 모바일 API (Yahoo 대비 정확도 대폭 향상) ──────────────
+  if (market === "KR") {
+    const stockCodes = KR_TICKERS.map(({ ticker }) =>
+      ticker.replace(/\.(KS|KQ)$/, ""),
+    );
+
+    // Naver 배치 조회 (병렬)
+    const naverMap = await getNaverBatch(stockCodes, 15, 150);
+
+    // DART DPS로 보완 (Naver yield가 부정확한 경우 대비)
+    const data: any[] = [];
+    await batchFetch(
+      KR_TICKERS,
+      async ({ ticker, name: fallbackName }) => {
+        const stockCode = ticker.replace(/\.(KS|KQ)$/, "");
+        const naver = naverMap.get(stockCode);
+
+        let price         = naver?.price         ?? null;
+        let dividendYield = naver?.dividendYield  ?? null;
+        let dps           = naver?.dps            ?? null;
+        const name        = naver?.name           ?? fallbackName;
+
+        // DART DPS로 수익률 재계산 (더 정확한 값이 있으면 덮어씀)
+        if (process.env.DART_API_KEY) {
+          try {
+            const dartData = await getDartDividend(stockCode);
+            if (dartData?.dps != null && dartData.dps > 0) {
+              dps = dartData.dps;
+              if (price != null && price > 0) {
+                dividendYield = dps / price;
+              }
+            }
+          } catch { /* DART 실패 시 Naver 값 유지 */ }
+        }
+
+        if (dividendYield != null && dividendYield > 0) {
+          data.push({ ticker, name, dividendYield, dps, price, market: "KR" });
+        }
+      },
+      10,
+      100,
+    );
+
+    const sorted = data
+      .sort((a, b) => b.dividendYield - a.dividendYield)
+      .slice(0, 50);
+
+    return NextResponse.json(
+      { market, data: sorted },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+        },
+      },
+    );
+  }
+
+  // ── US 주식: Yahoo Finance fallback (FMP 없을 때) ─────────────────────
+  const yf = getClient();
 
   const results = await batchFetch(
-    list,
-    async ({ ticker, name: koreanName }) => {
-      // Yahoo에서 가격 조회 (KR/US 공통)
+    US_TICKERS,
+    async ({ ticker, name: fallbackName }) => {
       const quote = await yf.quote(ticker);
       const price = quote?.regularMarketPrice ?? null;
 
-      // Yahoo DPS (기본값, KR에선 부정확한 경우 많음)
       let dps: number | null =
         (quote as any)?.trailingAnnualDividendRate ??
         (quote as any)?.dividendRate ??
         null;
 
-      // KR 주식: DART 공시 DPS로 교체 (Yahoo보다 정확)
-      if (isKR && process.env.DART_API_KEY) {
-        try {
-          const stockCode = ticker.replace(/\.(KS|KQ)$/, "");
-          const dartData  = await getDartDividend(stockCode);
-          if (dartData?.dps != null && dartData.dps > 0) {
-            dps = dartData.dps;
-          }
-        } catch { /* DART 실패 시 Yahoo DPS 유지 */ }
-      }
+      const raw =
+        (quote as any)?.trailingAnnualDividendYield ??
+        (quote as any)?.dividendYield ??
+        null;
+      const dividendYield =
+        dps != null && price != null && price > 0
+          ? dps / price
+          : raw != null
+          ? raw > 1 ? raw / 100 : raw
+          : null;
 
-      let dividendYield: number | null = null;
-      if (dps != null && price != null && price > 0) {
-        dividendYield = dps / price;
-      } else if (!isKR) {
-        // US 주식만 Yahoo yield 폴백 (KR은 Yahoo yield가 부정확)
-        const raw =
-          (quote as any)?.trailingAnnualDividendYield ??
-          (quote as any)?.dividendYield ??
-          null;
-        if (raw != null) {
-          dividendYield = raw > 1 ? raw / 100 : raw;
-        }
-      }
-
-      return { ticker, name: koreanName, dividendYield, dps, price, market };
+      return { ticker, name: quote?.longName ?? fallbackName, dividendYield, dps, price, market };
     },
     10,
-    300
+    300,
   );
 
   const data = results
@@ -318,5 +358,12 @@ export async function GET(req: NextRequest) {
     .sort((a, b) => b.dividendYield - a.dividendYield)
     .slice(0, 50);
 
-  return NextResponse.json({ market, data });
+  return NextResponse.json(
+    { market, data },
+    {
+      headers: {
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      },
+    },
+  );
 }
