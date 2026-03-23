@@ -22,11 +22,19 @@ export function hasKisKey(): boolean {
 // KV가 없으면 인메모리 캐시만 사용 (로컬 개발)
 let tokenMemCache: { token: string; expiresAt: number } | null = null;
 
+function getRedis() {
+  const url   = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+  const { Redis } = require("@upstash/redis");
+  return new Redis({ url, token });
+}
+
 async function kvGet(key: string): Promise<{ token: string; expiresAt: number } | null> {
   try {
-    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) return null;
-    const { kv } = await import("@vercel/kv");
-    return await kv.get<{ token: string; expiresAt: number }>(key);
+    const redis = getRedis();
+    if (!redis) return null;
+    return await redis.get(key);
   } catch {
     return null;
   }
@@ -34,11 +42,11 @@ async function kvGet(key: string): Promise<{ token: string; expiresAt: number } 
 
 async function kvSet(key: string, value: { token: string; expiresAt: number }, ttlSec: number) {
   try {
-    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) return;
-    const { kv } = await import("@vercel/kv");
-    await kv.set(key, value, { ex: ttlSec });
+    const redis = getRedis();
+    if (!redis) return;
+    await redis.set(key, value, { ex: ttlSec });
   } catch {
-    // KV 저장 실패 시 인메모리 캐시만 사용
+    // Redis 저장 실패 시 인메모리 캐시만 사용
   }
 }
 
