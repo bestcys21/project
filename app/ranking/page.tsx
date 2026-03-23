@@ -12,6 +12,47 @@ interface StockData {
   dps:           number | null;
   price:         number | null;
   market:        string;
+  // 배당 주기 + 배당락일 (백엔드에서 주입)
+  frequency?:    "monthly" | "quarterly" | "semi-annual" | "annual";
+  nextExDate?:   string | null; // "YYYY.MM.DD"
+}
+
+// 배당 주기 배지
+function FreqBadge({ frequency }: { frequency?: string }) {
+  if (!frequency) return null;
+  const map: Record<string, { label: string; cls: string }> = {
+    monthly:     { label: "월",  cls: "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" },
+    quarterly:   { label: "분기", cls: "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400" },
+    "semi-annual": { label: "반기", cls: "bg-gray-100 dark:bg-white/10 text-toss-label" },
+    annual:      { label: "연",  cls: "bg-gray-100 dark:bg-white/10 text-toss-sub" },
+  };
+  const b = map[frequency];
+  if (!b) return null;
+  return (
+    <span className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none ${b.cls}`}>
+      {b.label}
+    </span>
+  );
+}
+
+// 배당락일 D-day 태그
+function ExDateTag({ nextExDate }: { nextExDate?: string | null }) {
+  if (!nextExDate) return null;
+  const m = nextExDate.match(/(\d{4})\.(\d{2})\.(\d{2})/);
+  if (!m) return null;
+  const exDate = new Date(+m[1], +m[2] - 1, +m[3]);
+  const today  = new Date(); today.setHours(0, 0, 0, 0);
+  const dday   = Math.ceil((exDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  if (dday < 0 || dday > 30) return null; // 30일 이내만 표시
+  const cls =
+    dday <= 3  ? "bg-red-100 dark:bg-red-900/30 text-red-600" :
+    dday <= 7  ? "bg-orange-100 dark:bg-orange-900/30 text-orange-500" :
+                 "bg-amber-50 dark:bg-amber-900/20 text-amber-600";
+  return (
+    <span className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none ${cls}`}>
+      {dday === 0 ? "배당락 오늘" : `배당락 D-${dday}`}
+    </span>
+  );
 }
 
 type SortKey = "yield" | "stability" | "growth";
@@ -271,9 +312,13 @@ export default function RankingPage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-[12px] text-toss-sub mt-0.5">
-                          {stock.ticker.replace(/\.(KS|KQ)$/, "")}
-                        </p>
+                        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                          <p className="text-[12px] text-toss-sub">
+                            {stock.ticker.replace(/\.(KS|KQ)$/, "")}
+                          </p>
+                          <FreqBadge frequency={stock.frequency} />
+                          <ExDateTag nextExDate={stock.nextExDate} />
+                        </div>
                       </div>
                       {/* 현재가 */}
                       <div className="hidden md:block text-right flex-shrink-0">

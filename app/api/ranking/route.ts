@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { hasFmpKey, getFmpRankItems } from "@/lib/fmp-api";
 import { getDartDividend, getCached } from "@/lib/dart-api";
 import { getNaverBatch, getNaverDividendRanking } from "@/lib/naver-api";
-import { hasKisKey, getKisDividendRanking } from "@/lib/kis-api";
+import { hasKisKey, getKisDividendRanking, getKisDividendFrequency } from "@/lib/kis-api";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -430,10 +430,25 @@ export async function GET(req: NextRequest) {
         .sort((a, b) => b.dividendYield - a.dividendYield)
         .slice(0, 50);
 
+      // 배당 주기 + 다음 배당락일 병렬 조회 (5초 타임아웃, KIS 없으면 스킵)
+      if (hasKisKey()) {
+        const freqWork = Promise.allSettled(
+          sorted.map(async (item) => {
+            const code   = item.ticker.replace(/\.(KS|KQ)$/, "");
+            const result = await getKisDividendFrequency(code);
+            if (result) {
+              item.frequency   = result.frequency;
+              item.nextExDate  = result.nextExDate;
+            }
+          }),
+        );
+        await Promise.race([freqWork, new Promise<void>((r) => setTimeout(r, 5000))]);
+      }
+
       // 검증 로그 — 상위 10개 출력
       console.log(`[RANKING KR] ticker | dividendTTM | currentPrice | yieldPreTax | yieldPostTax`);
       sorted.slice(0, 10).forEach((item) => {
-        console.log(`[RANKING KR] ${item.ticker} ${item.name} | ${item.dps} | ${item.price} | ${(item.dividendYield * 100).toFixed(2)}% | ${(item.yieldPostTax * 100).toFixed(2)}%`);
+        console.log(`[RANKING KR] ${item.ticker} ${item.name} | dps=${item.dps} | price=${item.price} | ${(item.dividendYield * 100).toFixed(2)}% | postTax=${(item.yieldPostTax * 100).toFixed(2)}% | freq=${item.frequency ?? "?"} | exDate=${item.nextExDate ?? "?"}`);
       });
 
       const source = kisItems.length > 0 && naverItems.length > 0

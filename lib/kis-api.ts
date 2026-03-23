@@ -349,6 +349,89 @@ export async function getKisDividendSchedule(stockCode: string): Promise<KisDivi
   }
 }
 
+// ─── 배당 주기 + 다음 배당락일 조회 ──────────────────────────────────────────
+// 동일 TR HHKDB669102C0 재활용, TTM 지급 횟수로 주기 분류
+export interface KisDividendFreqResult {
+  frequency:    "monthly" | "quarterly" | "semi-annual" | "annual";
+  paymentCount: number;       // 최근 12개월 지급 횟수
+  nextExDate:   string | null; // "YYYY.MM.DD" — 가장 가까운 미래 배당락일
+}
+
+export async function getKisDividendFrequency(stockCode: string): Promise<KisDividendFreqResult | null> {
+  if (!hasKisKey()) return null;
+
+  const cacheKey = `kis:divfreq:${stockCode}`;
+  const cached   = getCached<KisDividendFreqResult>(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const token = await getAccessToken();
+    const today    = new Date();
+    const ttmStart = new Date(today); ttmStart.setDate(ttmStart.getDate() - 365);
+    const nextYear = new Date(today); nextYear.setFullYear(nextYear.getFullYear() + 1);
+    const yyyymmdd = (d: Date) =>
+      `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+
+    const url = new URL(`${KIS_BASE}/uapi/domestic-stock/v1/ksdinfo/dividend`);
+    url.searchParams.set("SHT_CD",       stockCode);
+    url.searchParams.set("INQR_STRT_DT", yyyymmdd(ttmStart));
+    url.searchParams.set("INQR_END_DT",  yyyymmdd(nextYear));  // 미래 포함 → nextExDate 확보
+    url.searchParams.set("PDNO",         "");
+    url.searchParams.set("PRDT_TYPE_CD", "300");
+
+    const res = await fetch(url.toString(), {
+      headers: {
+        authorization:  `Bearer ${token}`,
+        appkey:         APP_KEY,
+        appsecret:      APP_SECRET,
+        "tr_id":        "HHKDB669102C0",
+        "custtype":     "P",
+        "Content-Type": "application/json; charset=utf-8",
+      },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    if (json.rt_cd !== "0") return null;
+
+    const rows: any[] = Array.isArray(json.output)  ? json.output :
+                        Array.isArray(json.output1) ? json.output1 : [];
+    if (rows.length === 0) return null;
+
+    const todayStr    = yyyymmdd(today);
+    const ttmStartStr = yyyymmdd(ttmStart);
+
+    // TTM 지급 횟수 (과거 365일 이내)
+    const paymentCount = rows.filter((r) => {
+      const dt = r.ex_divi_dt ?? r.bsop_dtt ?? r.stnd_dt ?? "";
+      return dt >= ttmStartStr && dt <= todayStr;
+    }).length;
+
+    // 가장 가까운 미래 배당락일
+    const nextRow = rows
+      .filter((r) => (r.ex_divi_dt ?? r.bsop_dtt ?? r.stnd_dt ?? "") > todayStr)
+      .sort((a, b) =>
+        (a.ex_divi_dt ?? a.bsop_dtt ?? a.stnd_dt ?? "")
+          .localeCompare(b.ex_divi_dt ?? b.bsop_dtt ?? b.stnd_dt ?? ""),
+      )[0] ?? null;
+    const nextExDate = nextRow
+      ? fmtKisDate(nextRow.ex_divi_dt ?? nextRow.bsop_dtt ?? nextRow.stnd_dt)
+      : null;
+
+    // 지급 횟수 → 주기 분류 (사용자 요청 로직)
+    const frequency: KisDividendFreqResult["frequency"] =
+      paymentCount >= 10 ? "monthly"     :
+      paymentCount >= 3  ? "quarterly"   :
+      paymentCount >= 2  ? "semi-annual" : "annual";
+
+    const result: KisDividendFreqResult = { frequency, paymentCount, nextExDate };
+    setCached(cacheKey, result, 6 * 60 * 60 * 1000); // 6시간 캐시
+    return result;
+  } catch {
+    return null;
+  }
+}
+
 // ─── 주식 현재가 조회 ─────────────────────────────────────────────────────────
 // TR: FHKST01010100 — 주식현재가 시세
 export interface KisPrice {
