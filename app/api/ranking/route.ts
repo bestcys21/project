@@ -430,10 +430,12 @@ export async function GET(req: NextRequest) {
         .sort((a, b) => b.dividendYield - a.dividendYield)
         .slice(0, 50);
 
-      // 배당 주기 + 다음 배당락일 병렬 조회 (5초 타임아웃, KIS 없으면 스킵)
+      // 배당 주기 + 다음 배당락일: 상위 10개만 조회 (3초 타임아웃)
+      // 전체 50개 조회 시 50번 KIS 호출로 응답이 수십 초 지연됨
       if (hasKisKey()) {
+        const top10 = sorted.slice(0, 10);
         const freqWork = Promise.allSettled(
-          sorted.map(async (item) => {
+          top10.map(async (item) => {
             const code   = item.ticker.replace(/\.(KS|KQ)$/, "");
             const result = await getKisDividendFrequency(code);
             if (result) {
@@ -442,7 +444,7 @@ export async function GET(req: NextRequest) {
             }
           }),
         );
-        await Promise.race([freqWork, new Promise<void>((r) => setTimeout(r, 5000))]);
+        await Promise.race([freqWork, new Promise<void>((r) => setTimeout(r, 3000))]);
       }
 
       // 검증 로그 — 상위 10개 출력
