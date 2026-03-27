@@ -9,6 +9,9 @@
  *
  * https://apiportal.koreainvestment.com/
  */
+import fs from "fs";
+import path from "path";
+
 const KIS_BASE   = "https://openapi.koreainvestment.com:9443";
 const APP_KEY    = process.env.KIS_APP_KEY    ?? "";
 const APP_SECRET = process.env.KIS_APP_SECRET ?? "";
@@ -18,9 +21,32 @@ export function hasKisKey(): boolean {
 }
 
 // ─── 토큰 캐시 ────────────────────────────────────────────────────────────────
-// Vercel KV(Redis)가 있으면 인스턴스 간 토큰 공유 → 재발급 최소화
-// KV가 없으면 인메모리 캐시만 사용 (로컬 개발)
+// 우선순위: 인메모리 → Vercel KV(Redis) → 파일 캐시(로컬 개발용)
+// 파일 캐시는 Redis 없이 로컬 개발 시 프로세스 재시작 후에도 토큰을 유지해 재발급을 방지
 let tokenMemCache: { token: string; expiresAt: number } | null = null;
+
+// 로컬: 프로젝트 루트 / Vercel 서버리스: /tmp (쓰기 가능한 유일한 디렉토리)
+const TOKEN_CACHE_FILE =
+  process.env.VERCEL
+    ? "/tmp/.kis-token-cache.json"
+    : path.join(process.cwd(), ".kis-token-cache.json");
+
+function fileTokenRead(): { token: string; expiresAt: number } | null {
+  try {
+    const raw = fs.readFileSync(TOKEN_CACHE_FILE, "utf-8");
+    return JSON.parse(raw) as { token: string; expiresAt: number };
+  } catch {
+    return null;
+  }
+}
+
+function fileTokenWrite(cache: { token: string; expiresAt: number }): void {
+  try {
+    fs.writeFileSync(TOKEN_CACHE_FILE, JSON.stringify(cache), "utf-8");
+  } catch {
+    // 쓰기 실패 시 무시 (인메모리 캐시만 사용)
+  }
+}
 
 function getRedis() {
   const url   = process.env.UPSTASH_REDIS_REST_URL;
@@ -46,7 +72,7 @@ async function kvSet(key: string, value: { token: string; expiresAt: number }, t
     if (!redis) return;
     await redis.set(key, value, { ex: ttlSec });
   } catch {
-    // Redis 저장 실패 시 인메모리 캐시만 사용
+    // Redis 저장 실패 시 인메모리 + 파일 캐시만 사용
   }
 }
 
@@ -63,7 +89,14 @@ async function getAccessToken(): Promise<string> {
     return tokenMemCache.token;
   }
 
-  // 3) 만료/없음 → 신규 발급
+  // 3) 파일 캐시 확인 (Redis 없는 로컬 개발 환경 — 프로세스 재시작 후에도 유지)
+  const fileCache = fileTokenRead();
+  if (fileCache && Date.now() < fileCache.expiresAt) {
+    tokenMemCache = fileCache;
+    return tokenMemCache.token;
+  }
+
+  // 4) 만료/없음 → 신규 발급
   const res = await fetch(`${KIS_BASE}/oauth2/tokenP`, {
     method: "POST",
     headers: { "Content-Type": "application/json; charset=utf-8" },
@@ -85,6 +118,7 @@ async function getAccessToken(): Promise<string> {
 
   tokenMemCache = newCache;
   await kvSet("kis:token", newCache, expiresIn - 60); // KV에 TTL과 함께 저장
+  fileTokenWrite(newCache);                            // 파일에도 저장 (로컬 fallback)
 
   return tokenMemCache.token;
 }

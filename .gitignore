@@ -24,3 +24,6 @@ tsconfig.tsbuildinfo
 # Claude worktrees
 .claude/worktrees/
 .env*.local
+
+# KIS token file cache (로컬 개발용 — 토큰 재발급 방지)
+.kis-token-cache.json
